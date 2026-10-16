@@ -21,7 +21,7 @@
         <mockito.agent.path>target/agents/byte-buddy-agent.jar</mockito.agent.path>
         <spring-modulith.version>2.1.0</spring-modulith.version>
         <testcontainers.version>2.0.5</testcontainers.version>
-        <owasp-dependency-check.version>12.2.2</owasp-dependency-check.version>
+        <owasp-dependency-check.version>13.0.0</owasp-dependency-check.version>
         <h2.version>2.3.232</h2.version>
         <tomcat.version>11.0.26</tomcat.version>
         <postgresql.version>42.7.12</postgresql.version>
