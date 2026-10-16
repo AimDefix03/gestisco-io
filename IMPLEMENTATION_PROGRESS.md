@@ -2,7 +2,7 @@
 
 ## Stato generale
 
-- Current step: ORG-5 IN_PROGRESS: repository pubblico autorizzato; consolidamento baseline, diritti riservati, CI/Security e protezioni da verificare sul nuovo repository
+- Current step: ORG-5 IN_PROGRESS: baseline cabc12f pubblicata, main protetta; CI/Security e PR di verifica da concludere, review distinta necessaria per i merge
 - Next eligible step: completare ORG-5 senza ridurre i gate. Non iniziare ORG-6 o Step 4.4. Collegamento backend/frontend alla copia database recuperata e login web restano da verificare; nessun cutover implicito
 - Last completed step nel repository reale: 4.3, Inventario fisico e rettifiche approvate
 - Last update: 2026-10-16
@@ -18,9 +18,10 @@
 
 - L'utente ha sostituito la precedente scelta privata con l'autorizzazione esplicita al repository pubblico. API GitHub: `AimDefix03/gestisco-io` PUBLIC e vuoto al preflight; endpoint rulesets accessibile, lista vuota. Nessun acquisto di abbonamento.
 - Scelta esplicita: mantenere i diritti riservati. README e NOTICE non introducono una licenza open source; dipendenze e contenuti di terzi mantengono le proprie condizioni.
-- Consolidamento autorizzato della separazione e dei documenti su `miglioramenti-gestionale`, con pubblicazione iniziale prevista su main del nuovo repository vuoto. Nessun force push, riscrittura della storia o pubblicazione delle branch locali di archivio.
+- Consolidamento della separazione e dei documenti pubblicato su main: `cabc12f52e0a6adeb5712babeb78a5b462562e0e`. Remote `gestisco`; nuova branch di verifica `codex/org5-publication-verification`. Nessun force push, riscrittura della storia o pubblicazione delle branch locali di archivio.
 - L'account indicato per la review e `AimDefix03`, coincidente con l'autore. Non puo approvare le proprie PR: mantenere una approvazione obbligatoria e attendere un revisore distinto per i merge successivi. Nessuna approvazione fittizia o bypass.
-- CI e Security sul nuovo repository non ancora concluse in questo checkpoint. Il controllo `git fsck --full --strict` del checkout attuale e passato; le altre evidenze sono registrate nel [rapporto ORG-5](docs/ORG5_PUBLICATION.md).
+- Baseline locale verificata: backend 320/320, frontend 205/205, build e typecheck E2E passati; 649 file del commit identici al candidato e master invariato. Gitleaks su candidato e 23 commit pubblicati senza rilevazioni. Java locale 23 con release 17, non prova runtime Java 17.
+- Main protetta con una review obbligatoria, dodici check vincolati a GitHub Actions, branch aggiornata, amministratori inclusi e divieto di force push/cancellazione. CI 38925595841 e Security 38925596067 ancora da concludere; Dependency review richiede la PR. Dettagli e limiti nel [rapporto ORG-5](docs/ORG5_PUBLICATION.md).
 - Vecchia PR #2 lasciata aperta e draft per conservare provenienza e review storiche; non usarla per promuovere il prodotto web nel repository legacy. Chiusura/archiviazione richiedono un'azione separata autorizzata.
 - Nessuna funzionalita, migrazione, dato operativo o credenziale modificati. Organizzazione 4/6 (66.7%); applicazione 32/48 (66.7%). Beneficio reale: preparare una fonte pubblica riconoscibile del prodotto con controlli di integrazione verificabili, senza confondere il legacy o concedere una licenza open source.
 
