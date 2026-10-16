@@ -1,5 +1,11 @@
 # Deployment
 
+## Preflight dopo la separazione
+
+Il nome documentale e Gestisco.IO; la root di lavoro e `/Users/aim_defix/Desktop/Gestisco.IO`. Il cambio di nome non rinomina immagini, variabili `GESTIONALE_*`, container, database o volumi. Questi identificatori restano intenzionalmente compatibili.
+
+Prima dei comandi seguenti leggere [il layout locale](LOCAL_LAYOUT.md): scegliere esplicitamente ambiente, project Compose, porte, volumi e secret. Gli esempi di sviluppo non autorizzano l'uso dei vecchi volumi o un cutover. Non sovrascrivere una `.env.docker` esistente con il template; non rigenerare credenziali per un database gia popolato. La copia recuperata in ORG-3 e ancora separata dall'ambiente web.
+
 ## Stato attuale
 
 Il progetto supporta sviluppo locale, test automatici e uno stack `prod-like` containerizzato. Include backup giornaliero e restore drill schedulati, ma non e ancora pronto per produzione reale senza storage off-site, HTTPS, osservabilita e validazione completa della checklist release.
@@ -60,7 +66,7 @@ Parametri configurabili:
 
 ## Bootstrap super admin
 
-Il backend crea il primo super admin solo se il database non contiene account e il bootstrap e abilitato esplicitamente. Il bootstrap e disabilitato per default in tutti i profili e non esistono credenziali precompilate o alias legacy.
+Il backend crea il primo super admin solo se il database non contiene account e il bootstrap e abilitato esplicitamente. Nella configurazione applicativa, dev e prod il bootstrap e disabilitato per default e non esistono credenziali operative precompilate o alias legacy. La configurazione in `web/backend/src/test/resources/application.yml` abilita esplicitamente il bootstrap con fixture per il database H2 isolato: non e una configurazione di avvio operativo e non va copiata in altri ambienti.
 
 In `prod`, se il database e vuoto e il bootstrap non e configurato, l'applicazione si ferma con errore. Primo avvio produzione:
 

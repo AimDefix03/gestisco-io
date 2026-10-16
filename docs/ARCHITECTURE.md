@@ -1,4 +1,4 @@
-# Architecture
+# Gestisco.IO - Architecture
 
 ## Stato attuale
 
@@ -6,29 +6,25 @@ Il repository contiene:
 
 ```text
 .
-├── src/                  # Applicazione desktop Java Swing legacy
 ├── web/backend/          # API Spring Boot
 ├── web/frontend/         # Frontend React + TypeScript
+├── web/postgres/         # Supporto PostgreSQL
+├── scripts/              # Verifiche e procedure operative
+├── docs/                 # Contratti, architettura ed evidenze
 ├── pom.xml               # Build aggregata web-first
-├── pom-legacy.xml        # Build Swing esplicita
 └── README.md
 ```
 
 ## Stack verificato
 
-Swing legacy:
-
-- Java con release Maven 17.
-- Swing + FlatLaf.
-- JUnit 5.
-- Persistenza locale via file `.dat`.
+Il checkout corrente e `/Users/aim_defix/Desktop/Gestisco.IO`. Il legacy Swing e separato: non esistono piu `src/` e `pom-legacy.xml` nella root web. La cronologia comune e conservata; la separazione non e ancora committata. Vedere [layout locale](LOCAL_LAYOUT.md) e [identita e compatibilita](GESTISCO_IDENTITY_ADDENDUM.md).
 
 Backend web:
 
-- Spring Boot 4.1.0.
+- Spring Boot 4.1.1.
 - Java 17 configurato, eseguito localmente con Java 23.
 - Spring Web, Validation, Data JPA, Security.
-- Spring Modulith 1.3 per verifica dei confini business.
+- Spring Modulith 2.1.0 per verifica dei confini business.
 - PostgreSQL per sviluppo locale tramite Docker Compose.
 - H2 in memoria per test automatici.
 - Flyway per migrazioni versionate.
@@ -154,11 +150,11 @@ Motivazione:
 - Il frontend dispone di test Vitest/RTL e smoke Playwright su hardening browser, login, catalogo, registrazione cliente e ordine; i moduli amministrativi secondari restano da estendere lato browser.
 - Le richieste operative di magazzino, ordini e documenti derivano `actor` e `role` dalla sessione autenticata.
 - Il `requestId` e propagato via `X-Request-Id`, restituito nelle risposte, inserito negli errori API, registrato nei log richiesta e salvato negli eventi audit.
-- Il seed super admin e governato da configurazione: attivo in `dev/test`, disattivato in `prod`.
+- Il bootstrap super admin e disabilitato per default nella configurazione applicativa, dev e prod; richiede abilitazione esplicita e credenziali protette su database vuoto. La configurazione sotto `src/test/resources` lo abilita esplicitamente con fixture per H2 isolato, non utilizzabili come credenziali operative. Vedere `DEPLOYMENT.md`.
 - Il sistema corrente resta single-tenant: la proposta multi-azienda non e ancora implementata e non deve essere presentata come funzionalita disponibile.
 - Privacy workflow, retention generale, conservazione a norma e fatturazione elettronica non sono implementati e non devono essere presentati come conformita disponibile.
 - Onboarding SaaS, branding tenant, entitlement commerciali, provisioning e aggiornamento della flotta non sono implementati; deployment e bootstrap restano procedure della singola installazione.
 
 ## Legacy Swing
 
-La parte Swing mantiene valore come storico e come dimostrazione dei pattern OOP. E esclusa dalla build predefinita e resta disponibile tramite `pom-legacy.xml` finche i flussi web non sono equivalenti o superiori. Non riceve nuove funzionalita commerciali.
+La parte Swing e congelata in `/Users/aim_defix/Desktop/GestionaleNegozioComputer`, dove si trova la build esplicita `pom-legacy.xml`. Non e una dipendenza del web e non riceve nuove funzionalita commerciali. ORG-3 ha verificato build e test indipendenti nelle due cartelle; questa prova non equivale a parita funzionale validata da un operatore. L'originale con nome puntato e spazio finale resta soltanto per rollback.

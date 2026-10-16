@@ -1,0 +1,50 @@
+# ORG-5 - Pubblicazione Gestisco.IO
+
+Data: 2026-10-16. Stato: IN_PROGRESS. Fonte locale: `/Users/aim_defix/Desktop/Gestisco.IO`. Destinazione: [AimDefix03/gestisco-io](https://github.com/AimDefix03/gestisco-io).
+
+## Decisioni autorizzate
+
+- Pubblicazione del prodotto web con cronologia preservata, senza riscrivere la provenienza Swing.
+- Dopo il preflight privato, passaggio al pubblico autorizzato esplicitamente. API GitHub al nuovo preflight: PUBLIC, repository vuoto, nessuna branch effettiva; endpoint rulesets accessibile e lista vuota.
+- Diritti riservati, senza licenza open source: scelta esplicita dell'utente, recepita in README e NOTICE. Le condizioni delle dipendenze e dei contenuti di terzi non cambiano. Un repository pubblico resta tecnicamente copiabile e soggetto ai termini GitHub.
+- Commit della separazione e pubblicazione iniziale nel nuovo repository vuoto. Nessun force push, cancellazione di ref, riscrittura della cronologia o pubblicazione automatica di tutte le branch locali.
+- Nessun acquisto, deploy, modifica dei database operativi, avvio ORG-6 o Step 4.4.
+
+## Baseline e provenienza
+
+Il punto di partenza e `b077f7afe42b08c7976713d14552cbd58e9107a2`, branch locale `miglioramenti-gestionale`. Il consolidamento include le rimozioni intenzionali ORG-3 di 82 file Swing sotto src/ e di pom-legacy.xml, oltre ai documenti ORG-3/4/5. La storia completa resta conservata localmente e nel bundle privato ORG-2; sul nuovo remote si pubblica soltanto la linea del prodotto, non tutte le ref di archivio.
+
+Il remote dedicato previsto e `gestisco`, per non confonderlo con gli snapshot `refs/remotes/origin/*` ereditati dal vecchio progetto. Il primo push inizializza main con la baseline web verificata: questa eccezione di bootstrap non autorizza push diretti successivi. Non spostare alla cieca la main locale storica.
+
+Il vecchio repository e la [PR #2](https://github.com/AimDefix03/gestionale-negozio-computer/pull/2) restano invariati, con PR aperta e draft come traccia storica. Lo sviluppo web prosegue nel nuovo repository. Chiusura della PR o archiviazione del legacy richiedono autorizzazione separata, non sono implicite in ORG-5.
+
+## Gate e revisione
+
+Prima di chiudere ORG-5 devono risultare verificati sul nuovo repository:
+
+1. Snapshot completo e cronologia pubblicata senza rilevazioni Gitleaks, con controllo dei file locali esclusi.
+2. CI su Java 17, frontend, PostgreSQL e stack prod-like; Security con audit dipendenze, Gitleaks e CodeQL.
+3. Dependency review su una PR effettiva, poiche quel job non esegue la revisione delle dipendenze sul push iniziale.
+4. Protezione main: almeno una approvazione, invalidazione delle review obsolete, conversazioni risolte, branch aggiornata, amministratori inclusi, niente force push o cancellazione. Required checks associati ai nomi reali ricevuti da GitHub Actions, inclusi i singoli gate CI e le due lingue CodeQL.
+5. Rilettura delle protezioni da API, commit e stato remoto documentati. Nessun merge automatico.
+
+L'utente ha indicato `AimDefix03` come revisore, ma e l'account autore delle modifiche. GitHub non consente di approvare la propria PR: i merge successivi richiedono un revisore distinto. Non creare approvazioni fittizie e non togliere il requisito per sbloccare un merge. Una PR con test verdi ma senza review rimane in attesa.
+
+## Verifiche al checkpoint
+
+- `git fsck --full --strict` sul checkout autorevole: exit 0.
+- Il repository non conteneva file LICENSE/COPYING/NOTICE nella cronologia ispezionata; nessuna licenza storica rimossa. Questa verifica non sostituisce l'inventario delle licenze delle dipendenze.
+- Nuovo snapshot, scansioni, commit, push e pipeline del nuovo repository in corso di preparazione: non dichiarati superati in questo checkpoint.
+- Nessun codice applicativo, dipendenza, migrazione o configurazione operativa modificato. Master da mantenere con SHA-256 `cb5fc5a663e4acc2b01c01d94556c0ef1d9cab62ede036426f90b70a521ffa78`.
+
+## Preflight privato precedente
+
+Il repository era stato inizialmente creato privato. Ruleset e protezione classica restituivano HTTP 403 con richiesta di upgrade o repository pubblico; Code Scanning non era abilitato. Lo step era stato fermato prima di commit/push, senza ridurre i gate o effettuare acquisti. Questa limitazione e stata affrontata con la successiva scelta esplicita del pubblico, non con un bypass.
+
+Le prove locali precedenti del 16 ottobre restano distinte: Gitleaks v8.30.1 su mirror del bundle (25 commit, circa 5.32 MB) e snapshot (647 file, circa 3.02 MB), nessuna rilevazione. La prima scansione Docker del checkout aveva letto zero commit per un errore Git: non vale come esito positivo. Quelle scansioni non coprono automaticamente questo nuovo candidato.
+
+Evidenze storiche private in `/Users/aim_defix/GestiscoBackups/ORG5-20261016`. Non pubblicare le copie di recovery o i file di configurazione locali. La disponibilita iCloud puo rallentare le letture: verificare gli hash prima della pubblicazione, non sostituire file mancanti con copie presunte equivalenti.
+
+## Stato e beneficio
+
+Organizzazione 4/6 (66.7%), applicazione 32/48 (66.7%): ORG-5 non ancora completato. Non e una misura di vendibilita. Caso reale: un collaboratore trova il prodotto web aggiornato e puo proporre modifiche attraverso controlli automatici e revisione, senza alterare direttamente main o confonderlo con il progetto universitario Swing.

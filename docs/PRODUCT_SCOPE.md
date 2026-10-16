@@ -1,8 +1,10 @@
-# Product Scope
+# Gestisco.IO - Product Scope
 
 ## Stato dello scope
 
-Lo scope e stato congelato dal 2026-07-28 per concentrare il lavoro sulla stabilizzazione. Il prodotto e un prototipo avanzato senza P0 aperti, con maturita indicativa del 71-74%; i Gate A e B sono soddisfatti e la vendita assistita e completata tecnicamente, ma il prodotto non e ancora un MVP utilizzabile in produzione.
+Lo scope e stato congelato dal 2026-07-28 per concentrare il lavoro sulla stabilizzazione. Al 2026-10-15 la roadmap applicativa conta 32/48 step completati (66.7%), fino al 4.3; questo conteggio non misura la maturita produttiva. Le precedenti stime percentuali di maturita non sono mantenute. Il Gate C ha evidenze tecniche, ma la prova con operatore e i gate produttivi restano aperti: il prodotto non e dichiarato pronto per produzione o vendita. Lo stato puntuale dei finding e in `IMPLEMENTATION_PROGRESS.md` nella root.
+
+ORG-4 allinea nome e documentazione secondo [l'addendum organizzativo](GESTISCO_IDENTITY_ADDENDUM.md), senza ampliare lo scope congelato o modificare il master.
 
 Fino a una rivalutazione esplicita dello scope restano ammesse soltanto:
 
@@ -27,7 +29,7 @@ Le decisioni tecniche che modificano questi invarianti devono includere impatto 
 
 ## Visione
 
-Gestionale Negozio Computer deve evolvere da progetto didattico a gestionale operativo per piccole attivita IT: negozi di computer, assistenza tecnica, rivendita hardware/software e gestione interna di prodotti, ordini e magazzino.
+Gestisco.IO e la linea web indipendente del progetto nato come gestionale desktop per un negozio di computer. La direzione scelta e un gestionale modulare per attivita commerciali, con possibile evoluzione SaaS. Il dominio implementato resta quello documentato qui: catalogo, acquisti, vendite e magazzino. Il cambio di nome non dimostra compatibilita con qualsiasi settore e non introduce un servizio SaaS disponibile.
 
 L'obiettivo non e costruire subito un ERP completo, ma un prodotto credibile, modulare e dimostrabile in modo professionale.
 
@@ -104,4 +106,4 @@ Il prodotto deve mostrare regole operative, sicurezza, tracciabilita, dati persi
 
 ## Differenza rispetto a un ERP
 
-Non deve coprire tutte le aree aziendali. Deve essere un gestionale verticale, focalizzato su catalogo, magazzino, ordini e operazioni IT/commerciali leggere.
+Non deve coprire tutte le aree aziendali. Il perimetro corrente resta focalizzato su catalogo, acquisti, magazzino, ordini e operazioni commerciali; nuovi settori o modelli di servizio richiedono requisiti, verifica e approvazione separati.

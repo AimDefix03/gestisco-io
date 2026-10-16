@@ -1,6 +1,6 @@
-# Roadmap
+# Gestisco.IO - Roadmap
 
-Stato verificato il 2026-09-05.
+Allineamento documentale del 2026-10-15; le date delle prove tecniche sono riportate in `IMPLEMENTATION_PROGRESS.md`, senza implicare nuove esecuzioni.
 
 ## Fonte e stato reale
 
@@ -11,12 +11,14 @@ La precedente roadmap documentava molte capacita gia implementate, ma non dimost
 Stato corrente:
 
 - prototipo avanzato senza P0 aperti;
-- maturita indicativa del 95-97% nel repository reale dopo lo Step 4.3;
+- nessuna percentuale di prontezza produttiva: le vecchie stime di maturita sono ritirate;
 - 32 step completati, sincronizzati e verificati nel repository reale su 48 (66,7%);
 - gli step MVP approvati sono ammessi uno alla volta secondo `PRODUCT_SCOPE.md`;
 - i Gate A, B e C sono soddisfatti tecnicamente nel repository reale.
 
 ## Classificazione del backlog
+
+Prima di riprendere lo Step 4.4 e in corso il percorso organizzativo: ORG-1 inventario, ORG-2 indipendenza e cronologia, ORG-3 separazione e ORG-4 identita documentale conclusi; ORG-5 in corso dopo autorizzazione al repository pubblico, con diritti riservati, baseline e gate da verificare; ORG-6 handoff non iniziato. Avanzamento organizzativo 4/6 (66.7%), distinto dalla roadmap applicativa 32/48 (66.7%). Il nome Gestisco.IO non modifica scope, dipendenze o gate del master. Vedere [organizzazione](REPOSITORY_ORGANIZATION.md), [ORG-5](ORG5_PUBLICATION.md) e [addendum](GESTISCO_IDENTITY_ADDENDUM.md).
 
 | Classe | Step | Scopo | Gate |
 |---|---|---|---|

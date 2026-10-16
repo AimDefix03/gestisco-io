@@ -119,7 +119,7 @@ Stato, log, immagini, inventario delle risorse e diagnostica Playwright vengono 
 
 ### Quality gate
 
-Passa solo se hygiene, backend, frontend e stack Docker prod-like sono completati correttamente.
+Esegue il riepilogo quando hygiene, backend, frontend, migrazioni e stack Docker prod-like sono completati correttamente. Se una dipendenza fallisce il job puo risultare skipped: per questo la protezione deve richiedere anche i singoli check, non soltanto Quality gate.
 
 ## Cosa blocca una pull request
 
@@ -154,14 +154,13 @@ La branch protection remota deve impedire push diretti e merge senza pull reques
 - branch aggiornata prima del merge;
 - amministratori inclusi nelle regole;
 - force push e cancellazione del branch disabilitati;
-- check `Gestionale CI / Quality gate` obbligatorio;
-- check `Gestionale Security / Gitleaks secret scan` obbligatorio;
-- check `Gestionale Security / Dependency review` obbligatorio;
-- check `Gestionale Security / Frontend npm audit` obbligatorio;
-- check `Gestionale Security / Backend dependency inventory` obbligatorio;
-- check `Gestionale Security / CodeQL analysis` obbligatorio.
+- check `Repository hygiene`, `Backend Spring Boot`, `Frontend React`, `Database migrations`, `Prod-like Docker stack` e `Quality gate` obbligatori;
+- check `Gitleaks secret scan`, `Dependency review`, `Frontend npm audit` e `Backend dependency inventory` obbligatori;
+- entrambi i check della matrice `CodeQL analysis (java-kotlin)` e `CodeQL analysis (javascript-typescript)` obbligatori.
 
-L'attivazione e una modifica remota del repository: deve essere verificata nelle impostazioni GitHub dopo che workflow e baseline iniziale sono state pubblicate.
+I nomi vanno confermati con i check-run effettivi di GitHub Actions, non dedotti dal titolo della workflow. L'attivazione e una modifica remota del repository: deve essere verificata tramite API dopo la pubblicazione della baseline iniziale. Dependency review richiede una PR effettiva per la verifica; non considerare il job skipped sul push come una revisione superata.
+
+La review deve provenire da un revisore distinto dall'autore della PR. `AimDefix03` non puo approvare una PR creata dallo stesso account: finche non e disponibile un revisore, il merge resta bloccato anche con test verdi. Non rimuovere la protezione o usare bypass amministrativi per superare questa condizione.
 
 ## Limiti attuali
 

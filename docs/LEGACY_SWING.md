@@ -4,7 +4,7 @@
 
 La precedente applicazione desktop Java Swing e congelata come riferimento funzionale e dimostrazione didattica. Non riceve nuove funzionalita commerciali e non fa parte della build produttiva predefinita.
 
-Il codice rimane in `src/` per consentire confronti durante la verifica di parita della web app.
+Da ORG-3 il codice si trova in `src/` nella cartella separata `/Users/aim_defix/Desktop/GestionaleNegozioComputer`, non nella root web `/Users/aim_defix/Desktop/Gestisco.IO`. Le build sotto si eseguono nella cartella legacy. La cronologia completa e l'originale sono conservati: questa separazione dei sorgenti non certifica migrazione dei dati o parita di tutti i workflow.
 
 ## Build dedicata
 
@@ -31,4 +31,4 @@ Questi pattern non vengono trasferiti automaticamente nel backend web. Verranno 
 - La suite web copre i flussi sostitutivi.
 - Non esistono procedure operative documentate che richiedono Swing.
 
-Al termine della parita, `src/` e `pom-legacy.xml` potranno essere spostati in un archivio o mantenuti tramite tag Git senza essere distribuiti con il prodotto.
+La separazione locale di ORG-3 esclude gia `src/` e `pom-legacy.xml` dal checkout web, senza cancellare i sorgenti o i dati originali. Le condizioni sopra restano necessarie prima di dismettere definitivamente procedure e dati legacy. Nessun tag o nuovo repository remoto e stato creato durante la separazione.

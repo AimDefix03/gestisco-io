@@ -2,10 +2,10 @@
 
 ## Stato generale
 
-- Current step: consolidamento Git degli Step 0.2-4.3, COMPLETED sul commit applicativo `a3407d3`; Step 4.4 non iniziato
-- Next eligible step: 4.4, Scorta minima e proposte di riordino; richiede autorizzazione del prossimo step
+- Current step: ORG-5 IN_PROGRESS: repository pubblico autorizzato; consolidamento baseline, diritti riservati, CI/Security e protezioni da verificare sul nuovo repository
+- Next eligible step: completare ORG-5 senza ridurre i gate. Non iniziare ORG-6 o Step 4.4. Collegamento backend/frontend alla copia database recuperata e login web restano da verificare; nessun cutover implicito
 - Last completed step nel repository reale: 4.3, Inventario fisico e rettifiche approvate
-- Last update: 2026-10-12
+- Last update: 2026-10-16
 - Roadmap completion: 32/48 step completati, sincronizzati e verificati nel repository reale (66.7%)
 - Il 66.7% misura gli step completati, non la prontezza produttiva. La precedente stima di maturita 95-97% non e supportata dai gate ancora aperti e viene ritirata.
 - Gate C rivalidato localmente; CI e sicurezza remote verdi su `a3407d3`, inclusa scansione dipendenze backend
@@ -13,6 +13,107 @@
 - Open P1: F-17, F-18, F-19; F-04 rivalidato localmente e confermato dal gate SCA remoto
 - Open P2: F-29, F-30
 - Open P3: nessuno
+
+## Ripresa ORG-5 pubblica - 2026-10-16
+
+- L'utente ha sostituito la precedente scelta privata con l'autorizzazione esplicita al repository pubblico. API GitHub: `AimDefix03/gestisco-io` PUBLIC e vuoto al preflight; endpoint rulesets accessibile, lista vuota. Nessun acquisto di abbonamento.
+- Scelta esplicita: mantenere i diritti riservati. README e NOTICE non introducono una licenza open source; dipendenze e contenuti di terzi mantengono le proprie condizioni.
+- Consolidamento autorizzato della separazione e dei documenti su `miglioramenti-gestionale`, con pubblicazione iniziale prevista su main del nuovo repository vuoto. Nessun force push, riscrittura della storia o pubblicazione delle branch locali di archivio.
+- L'account indicato per la review e `AimDefix03`, coincidente con l'autore. Non puo approvare le proprie PR: mantenere una approvazione obbligatoria e attendere un revisore distinto per i merge successivi. Nessuna approvazione fittizia o bypass.
+- CI e Security sul nuovo repository non ancora concluse in questo checkpoint. Il controllo `git fsck --full --strict` del checkout attuale e passato; le altre evidenze sono registrate nel [rapporto ORG-5](docs/ORG5_PUBLICATION.md).
+- Vecchia PR #2 lasciata aperta e draft per conservare provenienza e review storiche; non usarla per promuovere il prodotto web nel repository legacy. Chiusura/archiviazione richiedono un'azione separata autorizzata.
+- Nessuna funzionalita, migrazione, dato operativo o credenziale modificati. Organizzazione 4/6 (66.7%); applicazione 32/48 (66.7%). Beneficio reale: preparare una fonte pubblica riconoscibile del prodotto con controlli di integrazione verificabili, senza confondere il legacy o concedere una licenza open source.
+
+## Preflight storico ORG-5 privato - 2026-10-16
+
+Questo resoconto precede la successiva autorizzazione esplicita al pubblico; non rappresenta la visibilita corrente.
+
+- Autorizzazione alla prosecuzione e scelta esplicita dell'utente: repository privato. Creato `https://github.com/AimDefix03/gestisco-io`, privato e vuoto. Nessun codice pubblicato, commit, remote aggiunto, merge, modifica della vecchia PR #2 o acquisto di abbonamento.
+- GitHub restituisce HTTP 403 con richiesta di upgrade per ruleset e protezioni classiche. Code scanning non abilitato; compatibilita dei gate privati da risolvere senza rimuoverli. Non rendere pubblico il repository e non ridurre i gate implicitamente.
+- Rapporto e punto di ripresa: [ORG-5 pubblicazione](docs/ORG5_PUBLICATION.md). Gitleaks sul bundle storico (25 commit) e sullo snapshot corrente (647 file): nessuna rilevazione; la prima scansione Docker del checkout ha letto zero commit per errore Git e NON vale come verifica superata. Backup ed evidenze in `/Users/aim_defix/GestiscoBackups/ORG5-20261016`.
+- Modifiche limitate alla documentazione. Suite applicative e pipeline remote non rieseguite; nessuna modifica a codice, database, credenziali, master o workflow. Separazione e documenti ancora non committati.
+- Organizzazione 4/6 (66.7%); roadmap applicativa 32/48 (66.7%). ORG-5 non completato. Beneficio reale: evitare una pubblicazione che sembri protetta ma permetta modifiche senza i controlli concordati.
+
+## Risultato ORG-4 - 2026-10-15
+
+- Identita documentale Gestisco.IO applicata a README, istruzioni agenti, scope, architettura e roadmap. Rimossi riferimenti correnti alla presenza di Swing nella root web e stime di maturita non supportate; mantenuti i resoconti storici datati.
+- [Addendum](docs/GESTISCO_IDENTITY_ADDENDUM.md): recepisce nome e separazione autorizzati, senza ampliare il target single-company/single-warehouse o rendere disponibili funzioni SaaS, pagamenti bancari e documenti fiscali.
+- [Verifiche e limiti](docs/ORG4_VERIFICATION.md): controlli documentali e di invarianza. Suite applicative non rieseguite; le ultime prove nelle destinazioni restano quelle ORG-3 del 2026-10-14.
+- Nessun sorgente, UI, dipendenza, configurazione, master, migrazione, database o credenziale modificato. Nessuna operazione Git di scrittura o remota; branch `miglioramenti-gestionale`, HEAD `b077f7a`. Separazione e documentazione ancora non committate.
+- Fonte autorevole: `/Users/aim_defix/Desktop/Gestisco.IO`; le altre copie non sono aggiornate da questo step. Evidenze private: `/Users/aim_defix/GestiscoBackups/ORG4-20261015`.
+- Organizzazione 4/6 (66.7%, conteggio non pesato). Roadmap applicativa 32/48 (66.7%), invariata; nessun finding chiuso e nessuna percentuale di vendibilita dedotta.
+- Beneficio reale: chi valuta o continua il progetto vede il prodotto web attuale e i suoi limiti, trova la root corretta e non scambia obiettivi SaaS futuri per funzionalita gia disponibili.
+
+## Fonte di lavoro e risultato ORG-3 - 2026-10-14
+
+- Sorgente web per le prossime attivita: `/Users/aim_defix/Desktop/Gestisco.IO`. Legacy congelato: `/Users/aim_defix/Desktop/GestionaleNegozioComputer`.
+- L'originale `/Users/aim_defix/Desktop/Gestionale.Negozio.Computer `, incluso spazio finale, resta conservato per rollback; sorgenti e sette file dati locali invariati. Non continuare lo sviluppo in quella cartella o in codex_portfolio_sources.
+- Entrambe le nuove copie derivano da `b077f7a` e preservano 25 commit e sei ref, inclusi tre commit locali non pubblicati; fsck strict passato. Nessun remote configurato, commit, tag, push o merge effettuato. Le ref origin conservate sono snapshot storici.
+- Separazione non committata: 83 file legacy esclusi dal checkout web e 634 file esclusi dal checkout Swing, archiviati privatamente e ancora disponibili nella storia. Non annullare queste rimozioni intenzionali con reset/checkout.
+- Verifiche nelle cartelle definitive: backend `mvn -B -o verify` 320/320; frontend `npm ci --offline`, 205/205 test in 42 file, build e typecheck E2E; Swing `mvn -B -o -f pom-legacy.xml verify` 41/41 e JAR. Nessun test saltato nelle suite Maven. Java locale 23.0.1 con release 17, non nuova prova runtime Java 17.
+- Nessun codice applicativo, dipendenza, migrazione o configurazione operativa cambiato. Nessun dato/secret importato automaticamente. Master immutato. Nessun avvio o cutover dell'ambiente operativo, nessuna nuova prova browser/PostgreSQL.
+- Istruzioni: [layout locale](docs/LOCAL_LAYOUT.md), [verifica finale](docs/ORG3_LOCAL_VERIFICATION.md), [storico preflight](docs/ORG3_SEPARATION.md).
+- Evidenze private durevoli: `/Users/aim_defix/GestiscoBackups/SEPARATION-20261014`. Il recupero database precedente resta separato in RECOVERY-20261014-cMQTc8, senza nuova rotazione o reset account.
+- Beneficio reale: lo sviluppo del prodotto web non si confonde piu con il progetto Swing; cronologia e dati restano recuperabili prima di qualsiasi futura pubblicazione.
+- Organizzazione 3/6 (50%, conteggio non pesato); roadmap applicativa 32/48 (66.7%), invariata. Non e una percentuale di prontezza commerciale.
+
+## Organizzazione Gestisco.IO - avviata il 2026-10-13
+
+- [x] ORG-1: inventario cartelle, Git e GitHub. Fonte autorevole: `/Users/aim_defix/Desktop/Gestionale.Negozio.Computer ` (spazio finale nel nome), branch `miglioramenti-gestionale`, HEAD `b077f7afe42b08c7976713d14552cbd58e9107a2`, allineata a origin e pulita prima di questo aggiornamento documentale.
+- [x] ORG-2: web senza Swing verificato (backend 320 test, frontend 205 e build); legacy isolato 41 test e JAR. Snapshot `9f9e23a` identico a HEAD per src/pom-legacy. Fsck passato; bundle di tutte le ref recuperato e verificato, inclusi tre commit locali.
+- [x] ORG-3: COMPLETED; recupero isolato precedente e separazione locale dei sorgenti conclusi. Due copie autonome verificate, originale preservato, nessun cutover operativo. Evidenze finali in docs/ORG3_LOCAL_VERIFICATION.md.
+- [x] ORG-4: identita e documentazione allineate a Gestisco.IO; addendum sulle decisioni organizzative approvate, master e perimetro funzionale invariati.
+- [~] ORG-5: pubblicazione pubblica autorizzata, diritti riservati; baseline, CI/Security e protezioni in verifica. Vedere docs/ORG5_PUBLICATION.md.
+- [ ] ORG-6: consegna del contesto, istruzioni avvio/ripristino e verifica di ripresa da una nuova chat.
+- Avanzamento organizzativo: 4/6 milestone (66.7%, conteggio non pesato). Roadmap applicativa invariata: 32/48 (66.7%); nessuna percentuale di prontezza commerciale dedotta.
+- Report, evidenze, criteri di accettazione e stop condition: [Organizzazione repository](docs/REPOSITORY_ORGANIZATION.md).
+
+### Note storiche dell'inventario ORG-1
+
+Queste note descrivono il controllo iniziale del 2026-10-13. Per integrita, cartelle e test attuali fare riferimento al risultato ORG-3 sopra.
+
+- Al controllo, 1.404 file `.git` risultavano `dataless` su macOS: disponibilita locale completa e integrita non ancora certificate. Non equivale a perdita o corruzione. Nessun archivio Git completo creato in questo step.
+- Portfolio gia separato con modifiche preesistenti; copie di staging e review non promosse a sorgente autorevole. Nessuna cancellazione o sovrascrittura di tali copie.
+- CI e Security verdi su `b077f7a` verificate tramite GitHub. Test applicativi non rieseguiti in questo step documentale. Nessun commit, push, merge, deploy, migrazione o accesso ai dati operativi.
+- Beneficio reale: evita di continuare nella copia sbagliata o perdere lavoro locale, cronologia e dati durante la separazione dei progetti.
+
+Le sezioni successive conservano la cronologia delle verifiche: gli stati PARTIAL o non iniziato indicati nei resoconti precedenti non sostituiscono lo stato corrente sopra.
+
+### Verifiche ORG-2
+
+- Dettaglio, hash, comandi e limiti: [ORG-2](docs/ORG2_VERIFICATION.md).
+- Prove in copie temporanee estratte dal commit remoto esatto `b077f7a`, senza inizializzare Git, senza file .dat o configurazioni operative.
+- `mvn -B -o verify`: primo tentativo fallito per 3 test Actuator impossibilitati ad aprire socket dal sandbox; ripetizione fuori sandbox PASS 320/320, nessuno skip, packaging riuscito. Java 23.0.1 con release 17, non nuova prova runtime Java 17.
+- `npm ci --offline`, `npm test` 205/205 in 42 file, `npm run build` e `npm run typecheck:e2e` passati. Nessuna nuova scansione online o prova browser dichiarata.
+- `mvn -B -o -f pom-legacy.xml verify`: PASS 41/41 e JAR, senza web nella copia di prova. Nessuna prova GUI o parita operatore.
+- Legacy consigliato: `src/` e `pom-legacy.xml` a `9f9e23ab1089f640efe7d88a91debba24ac0884a`, identici a HEAD; main contiene solo 33 file src contro gli 82 della versione completa. Nessun tag creato.
+- `git rev-list --branches --not --remotes` rileva 3 commit locali nelle branch pre-publication; refs censite nel report, non eliminate o pubblicate.
+- Dopo attese nelle letture locali, `git fsck --full` concluso con exit 0: due oggetti dangling, nessun oggetto corrotto o mancante. Nessun prune o riparazione. Il conteggio intermedio di 406 file dataless non sostituisce questa verifica.
+- Bundle completo `--all` verificato, clone mirror recuperato con `git fsck --full --strict` verde: tutte le sei ref preservate, 25 commit raggiungibili inclusi i tre locali. Copia conservata in `/Users/aim_defix/GestiscoBackups/ORG2-20261013/history.bundle`, checksum SHA-256 nel report. Non include dati ignorati, documenti non committati, reflog o oggetti dangling; documenti salvati separatamente.
+- Verifica delle copie testate contro il clone recuperato: 722 blob corrispondenti agli hash Git, zero differenze, tre assertion di isolamento passate.
+- Nessun sorgente, migrazione, database operativo o repository remoto modificato. Avanzamento concluso 2/6 organizzativo e 32/48 applicativo. ORG-3 non iniziato.
+
+### Preflight ORG-3
+
+- Autorizzato dall'utente il 2026-10-13. HEAD originale ancora `b077f7a`; preservati progress e due report ORG-1/ORG-2 non committati. Bundle ORG-2 nuovamente verificato.
+- Sei file `.dat` e un dump storico locale sono conservati fuori dal repository, con confronto checksum sorgente/copia e permessi privati. Non e un nuovo backup del database corrente e non certifica un restore.
+- Due stack gestionali rilevati, entrambi fermi: `gestionale-step43-demo` e `gestionalenegoziocomputer`. Entrambi i volumi PostgreSQL esistono; contenuto e recuperabilita non certificati da un semplice inventario.
+- Lo stack demo usa sei file secret sotto `/tmp/gestionale-step43-demo/secrets`; la directory e assente. Nessuna `.env.docker` locale rilevata nel repository. Ricerca mirata di copie nei backup organizzativi, nel workspace e in Documents/REVIEW senza risultati; non e una ricerca esaustiva dell'host.
+- Stop condition rispettata: nessuna cartella destinazione creata, nessun sorgente spostato, nessun container/volume modificato, nessun deploy, commit o push. Il progetto originale resta autorevole. Portfolio escluso.
+- Ripresa: recuperare configurazione e secret da copia privata/secret manager senza incollarli in chat. In assenza, concordare un recupero isolato con backup del volume prima di qualsiasi rotazione o ricreazione. Non generare password nuove fingendo che corrispondano al database esistente.
+- Organizzazione ancora 2/6 (33.3%); applicazione 32/48 (66.7%). Beneficio reale: evita di separare il codice lasciando inosservata la perdita delle configurazioni necessarie al riavvio.
+
+### Recupero database ORG-3 - 2026-10-14
+
+- L'utente ha autorizzato backup del volume e recupero isolato, incluse eventuali nuove credenziali soltanto sulla copia. Non autorizzati implicitamente cutover, reset account applicativi o modifiche al database originale.
+- Backup fisico a database fermo, originale montato esclusivamente read-only e senza rete. Restore in volume nuovo: 1.482/1.482 file identici. La vecchia immagine Docker era assente; usata un'immagine locale PostgreSQL 16 compatibile fissata per ID, senza download o aggiornamenti.
+- Copia PostgreSQL avviata senza rete/porte pubblicate. Cinque password ruoli database generate casualmente e conservate in directory privata stabile. Nessuna password utente applicativa cambiata. Trust locale temporaneo confinato alla copia e poi sostituito da SCRAM su tutte le regole effettive.
+- 12 controlli positivi/negativi passati: cinque credenziali, password errata rifiutata, HBA SCRAM, impronte delle 25 tabelle invariate, runtime senza DDL, SET ROLE migrator, dump logico/catalogo e isolamento. 35 migrazioni riuscite; prova aggiuntiva riavvio e accesso runtime riuscita.
+- Originale nuovamente verificato a fine intervento: 1.482 file invariati e container ancora fermo con stesso ID. Copia arrestata pulitamente. Nessun mount in scrittura sul volume originale, nessuna operazione sul secondo stack storico o su progetti terzi.
+- Backup privato e istruzioni: `/Users/aim_defix/GestiscoBackups/RECOVERY-20261014-cMQTc8`. Snapshot fisico originale, snapshot recuperato, dump logico, checksum e nuove credenziali. Non cifrato/off-site, non condivisibile per review pubblica.
+- Non verificati: UI/login web, avvio backend/frontend sulla copia, secondo restore del dump logico e validazione operatore. Non sostituisce il futuro Step 4.7.
+- ORG-3 rimane PARTIAL: cartelle non separate. Percentuali 2/6 (33.3%) organizzativo e 32/48 (66.7%) applicativo invariate.
+- Beneficio reale: credenziali infrastrutturali smarrite non costringono ad azzerare il gestionale; esiste una copia accessibile e verificata, senza cambiare account o dati originali.
 
 ## Consolidamento 2026-10-11
 

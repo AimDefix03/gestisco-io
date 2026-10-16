@@ -4,21 +4,28 @@ Regole permanenti per lavorare su questo repository.
 
 ## Fonte primaria
 
-Il codice reale e lo stato Git hanno priorita su qualsiasi descrizione esterna. Prima di ogni modifica vanno verificati struttura, build, configurazione, test e stato delle modifiche non committate.
+Leggere integralmente `MASTER_SOURCE_AGENTE_AI.md`, poi `IMPLEMENTATION_PROGRESS.md` e i documenti tecnici pertinenti. La gerarchia A.7 del master resta vincolante: criteri e gate, invarianti di sicurezza e dominio, codice reale, test comportamentali, schema/migration, documentazione. Verificare sempre le affermazioni sul codice e sullo stato Git: un test che codifica un comportamento insicuro non giustifica il bug.
+
+L'addendum `docs/GESTISCO_IDENTITY_ADDENDUM.md` recepisce soltanto il nome Gestisco.IO e la separazione approvati dall'utente. Non modifica il master, i gate o il perimetro funzionale. Non inizializzare Git se `.git` e assente; segnalare la root errata o il blocco.
 
 ## Stato del progetto
 
-Il repository contiene due linee:
+Gestisco.IO contiene esclusivamente la linea web in `web/`, con backend Spring Boot e frontend React. Root locale: `/Users/aim_defix/Desktop/Gestisco.IO`. Scope corrente: una sola azienda, un solo magazzino, pagamenti manuali e documenti simulati non fiscali. La direzione SaaS non autorizza multi-tenancy o ampliamenti automatici.
 
-- applicazione desktop legacy Java Swing nella root;
-- migrazione web in `web/` con backend Spring Boot e frontend React.
+La parte Swing congelata e separata in `/Users/aim_defix/Desktop/GestionaleNegozioComputer`. Non ricreare qui `src/` nella root o `pom-legacy.xml`; `web/backend/src/` resta necessario. La cronologia Git contiene ancora entrambe le linee per preservarne la provenienza.
 
-La direzione raccomandata e web-first con monolite modulare. La parte Swing resta utile come riferimento funzionale finche la web app non copre i flussi principali.
+ORG-5 consolida la separazione ORG-3 e l'allineamento documentale ORG-4 verso `https://github.com/AimDefix03/gestisco-io`, pubblico per decisione esplicita del 16 ottobre 2026. Il remote dedicato previsto e `gestisco`; verificare sempre `git remote -v` e lo stato effettivo in `docs/ORG5_PUBLICATION.md` prima di qualsiasi push. Le ref origin conservate sono snapshot storici, non stato GitHub aggiornato. Non effettuare checkout di vecchie branch per annullare le rimozioni intenzionali. Leggere `docs/LOCAL_LAYOUT.md`, `docs/ORG3_SEPARATION.md` e `IMPLEMENTATION_PROGRESS.md` prima di intervenire.
+
+Il codice originale resta a diritti riservati: non aggiungere una licenza open source senza una nuova decisione dell'autore. La visibilita pubblica non autorizza a pubblicare segreti, dati operativi o copie di recovery. La baseline iniziale di un repository vuoto non autorizza futuri push diretti su main, merge senza revisione o riduzioni dei gate.
+
+Il repository originale `/Users/aim_defix/Desktop/Gestionale.Negozio.Computer ` (spazio finale) e conservato per rollback, non per nuove funzionalita. Le configurazioni Docker non sono state migrate: non avviare gli stack predefiniti senza associare esplicitamente ambiente, secret, project e volumi. Non copiare credenziali o dati nei repository.
 
 ## Protocollo di lavoro
 
 - Procedere sempre a step piccoli, approvati e verificabili.
 - Non implementare piu moduli grandi nello stesso step.
+- Fermarsi alla conclusione dello step autorizzato: `AUTO_ADVANCE: false`. Leggere lo stato corrente prima di scegliere il prossimo, senza dedurlo dal numero dell'ultimo step applicativo.
+- Non rinominare automaticamente package, artifact, variabili `GESTIONALE_*`, database, volumi o UI per adeguarli al nome documentale. Le compatibilita operative sono prioritarie.
 - Non modificare file non pertinenti allo step approvato.
 - Non effettuare commit, push, merge, reset o cancellazioni distruttive senza autorizzazione esplicita.
 - Non dichiarare conformita fiscale, legale, GDPR o produttiva senza verifica professionale.
@@ -50,15 +57,17 @@ Frontend web:
 
 ```bash
 cd web/frontend
+npm ci
+npm test
+npm run typecheck
+npm run typecheck:e2e
 npm run build
 ```
 
-Swing legacy:
-
-```bash
-mvn -f pom-legacy.xml test
-```
+I comandi Swing vanno eseguiti soltanto nella cartella legacy separata.
 
 ## Documentazione
 
 Ogni step che cambia architettura, modello dati, API, sicurezza o deployment deve aggiornare la documentazione in `docs/`.
+
+Riportare comandi e risultati realmente osservati, limiti, prossimo step e un breve caso d'uso reale. Separare il conteggio delle milestone organizzative da quello degli step applicativi; nessuno dei due misura la prontezza alla vendita. Conservare i resoconti storici datati senza presentarli come nuove verifiche.
