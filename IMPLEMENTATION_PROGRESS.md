@@ -5,7 +5,7 @@
 - Current step: ORG-5 IN_PROGRESS: baseline cabc12f pubblicata, main protetta; CI/Security e PR di verifica da concludere, review distinta necessaria per i merge
 - Next eligible step: completare ORG-5 senza ridurre i gate. Non iniziare ORG-6 o Step 4.4. Collegamento backend/frontend alla copia database recuperata e login web restano da verificare; nessun cutover implicito
 - Last completed step nel repository reale: 4.3, Inventario fisico e rettifiche approvate
-- Last update: 2026-10-16
+- Last update: 2026-10-17
 - Roadmap completion: 32/48 step completati, sincronizzati e verificati nel repository reale (66.7%)
 - Il 66.7% misura gli step completati, non la prontezza produttiva. La precedente stima di maturita 95-97% non e supportata dai gate ancora aperti e viene ritirata.
 - Gate C rivalidato localmente; CI e sicurezza remote verdi su `a3407d3`, inclusa scansione dipendenze backend
@@ -13,6 +13,14 @@
 - Open P1: F-17, F-18, F-19; F-04 rivalidato localmente e confermato dal gate SCA remoto
 - Open P2: F-29, F-30
 - Open P3: nessuno
+
+## Ripresa ORG-5 - 2026-10-17
+
+- PR #13 su `codex/org5-publication-verification`, precedente head e85fd26. CI passata; Security inizialmente bloccata da Dependency graph non abilitato. Dopo l'abilitazione confermata dall'utente, rerun 38926093388 passato inclusa Dependency review. Nessuna protezione rimossa.
+- Investigato anche il precedente fallimento Chromium sulla baseline main: ripristino del focus differito nel dialog e fallback che poteva selezionare Aggiorna invece della scheda attiva. Quattro nuove regressioni prima rosse, poi verdi; frontend completo 209/209, build e typecheck E2E passati nel candidato locale.
+- Test browser rafforzato senza focus artificiale dopo la conferma. CI/Security sul nuovo commit della correzione ancora da verificare; non considerare automaticamente valide le pipeline dell'head precedente.
+- Nessuna modifica backend, migrazione, dato operativo, master o dipendenza. Nessun merge. ORG-5 resta IN_PROGRESS; organizzazione 4/6 (66.7%), applicazione 32/48 (66.7%).
+- Beneficio reale: dopo la conferma di una navigazione con bozza aperta, la tastiera resta sulla destinazione corretta; i controlli GitHub devono verificarlo prima dell'integrazione.
 
 ## Ripresa ORG-5 pubblica - 2026-10-16
 

@@ -42,6 +42,17 @@ L'utente ha indicato `AimDefix03` come revisore, ma e l'account autore delle mod
 - Branch `codex/org5-publication-verification` per documentare gli esiti e verificare una PR effettiva. Nessun merge o bypass della review. Il requisito del revisore distinto resta aperto.
 - Evidenze e backup privati: `/Users/aim_defix/GestiscoBackups/ORG5-PUBLIC-20261016`, incluso bundle della baseline. Nessuna credenziale o dato operativo copiati nel repository.
 
+## Ripresa e correzione del gate - 2026-10-17
+
+- La CI baseline 38925595841 ha fallito il test Chromium di navigazione da tastiera anche al retry: 18 E2E passati, uno fallito. Quality gate skipped, non superato. La Security baseline 38925596067 e passata, con Dependency review non applicabile al push.
+- PR [#13](https://github.com/AimDefix03/gestisco-io/pull/13), head iniziale `e85fd267518e4a77743673f18368742c98004779`: CI 38926093331 passata, ma questo non annulla il difetto intermittente precedente. Security 38926093388 inizialmente fallita per Dependency graph non abilitato, non per una vulnerabilita rilevata. Dopo l'abilitazione confermata dall'utente, rerun dei job falliti concluso con successo il 17 ottobre, inclusa Dependency review.
+- Diagnosi verificata in AccessibleDialog: il ripristino differito puo sovrascrivere il focus su una nuova destinazione o su un altro dialog; il selettore di fallback combinato sceglie per ordine DOM e puo preferire Aggiorna alla scheda attiva. Anche il replay degli effetti in StrictMode lasciava un timer obsoleto.
+- Quattro nuovi test deterministici falliti prima della patch e passati dopo. La patch conserva il nuovo focus intenzionale, annulla il timer obsoleto al replay, preserva il controllo di origine e preferisce esplicitamente la scheda attiva. Restano coperti Escape, focus trap e ripristino normale.
+- E2E rafforzato: dopo la conferma deve risultare focalizzata la scheda Magazzino senza chiamare focus dal test; ArrowLeft deve attivare e focalizzare Catalogo. Nessuna attesa fissa, assertion rimossa o test disabilitato.
+- Candidato locale: frontend 209/209 in 42 file, build TypeScript/Vite e typecheck E2E passati. Backend e migrazioni invariati; nessuna nuova verifica backend locale dichiarata. Le prove browser e CI/Security sul commit della correzione restano da acquisire.
+- Modifiche limitate al dialog condiviso, ai relativi test unitari/E2E e a questo checkpoint. Nessuna dipendenza, configurazione operativa, database o master modificati. Pubblicazione soltanto nella branch della PR, senza merge o riduzione delle protezioni.
+- Stop: ORG-5 resta IN_PROGRESS finche gli esiti sul candidato aggiornato non sono verificati. Anche con controlli verdi la PR richiede un revisore distinto dall'autore.
+
 ## Integrita
 
 - `git fsck --full --strict` sul checkout autorevole: exit 0.
