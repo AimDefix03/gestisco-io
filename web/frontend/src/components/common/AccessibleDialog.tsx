@@ -20,15 +20,20 @@ const FOCUSABLE_SELECTOR = [
 
 export default function AccessibleDialog({ labelledBy, describedBy, className = 'modal-card', initialFocusRef, onEscape, children }: Props) {
   const dialogRef = useRef<HTMLElement>(null);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
+  const restoreTimerRef = useRef<number | undefined>(undefined);
   const escapeHandlerRef = useRef(onEscape);
   const initialFocusRefRef = useRef(initialFocusRef);
   escapeHandlerRef.current = onEscape;
   initialFocusRefRef.current = initialFocusRef;
 
   useEffect(() => {
-    const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    window.clearTimeout(restoreTimerRef.current);
     const dialog = dialogRef.current;
     if (!dialog) return;
+    if (document.activeElement instanceof HTMLElement && !dialog.contains(document.activeElement)) {
+      returnFocusRef.current = document.activeElement;
+    }
 
     const focusable = focusableElements(dialog);
     (initialFocusRefRef.current?.current ?? focusable[0] ?? dialog).focus();
@@ -63,12 +68,19 @@ export default function AccessibleDialog({ labelledBy, describedBy, className = 
     document.addEventListener('keydown', handleKeyDown, true);
     return () => {
       document.removeEventListener('keydown', handleKeyDown, true);
-      window.setTimeout(() => {
+      restoreTimerRef.current = window.setTimeout(() => {
+        const active = document.activeElement;
+        if (active instanceof HTMLElement && active.isConnected && active !== document.body
+          && active !== document.documentElement && !dialog.contains(active)) return;
+
+        const previouslyFocused = returnFocusRef.current;
         if (previouslyFocused?.isConnected && previouslyFocused !== document.body && previouslyFocused !== document.documentElement) {
           previouslyFocused.focus();
-          return;
+          if (document.activeElement === previouslyFocused) return;
         }
-        document.querySelector<HTMLElement>('[aria-current="page"], main button, a[href]')?.focus();
+        const fallback = document.querySelector<HTMLElement>('[aria-current="page"]')
+          ?? document.querySelector<HTMLElement>('main button:not([disabled]), a[href]');
+        fallback?.focus();
       }, 0);
     };
   }, []);
