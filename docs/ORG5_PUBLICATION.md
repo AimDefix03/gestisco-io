@@ -53,6 +53,17 @@ L'utente ha indicato `AimDefix03` come revisore, ma e l'account autore delle mod
 - Modifiche limitate al dialog condiviso, ai relativi test unitari/E2E e a questo checkpoint. Nessuna dipendenza, configurazione operativa, database o master modificati. Pubblicazione soltanto nella branch della PR, senza merge o riduzione delle protezioni.
 - Stop: ORG-5 resta IN_PROGRESS finche gli esiti sul candidato aggiornato non sono verificati. Anche con controlli verdi la PR richiede un revisore distinto dall'autore.
 
+## Verifica del candidato e rigore E2E - 2026-10-18
+
+- Correzione pubblicata con commit `5e57d125ebb4617b43d4a7de4f4582b3faacdaf4`, PR #13. [CI 39013781946](https://github.com/AimDefix03/gestisco-io/actions/runs/39013781946) e [Security 39013781949](https://github.com/AimDefix03/gestisco-io/actions/runs/39013781949) verdi, inclusa Dependency review. Backend Java 17: 320 test, zero errori/skip; frontend: 209 test e build passati. PostgreSQL e backup/restore prod-like verificati dal runner; nessuna risorsa operativa locale coinvolta.
+- Lettura dettagliata E2E: 18 passati al primo tentativo e uno Firefox flaky. Nella trace Firefox tutte le assertion sul cambio scheda e focus sono passate; ultima chiamata pendente e evaluateExpression con l'iniezione di axe, seguita dal timeout globale di 60 secondi. Il retry passa. Questo localizza il timeout ma non ne prova la causa: non equivale a una correzione del problema di stabilita dello strumento/browser.
+- Hardening del gate: `failOnFlakyTests: Boolean(process.env.CI)` in Playwright. Retry mantenuto per acquisire diagnostica, ma un flaky produce exit non zero. Nessun browser escluso, assertion indebolita, pausa fissa o aumento del timeout. Fixture CLI sintetica senza browser: exit 0 prima della configurazione, exit 1 dopo sullo stesso test passato solo al retry; controllo stabile exit 0. La fixture deliberatamente intermittente resta nelle evidenze private, non nella suite applicativa.
+- Typecheck E2E del candidato passato. I nuovi controlli remoti devono verificare il commit che include l'hardening; non si trasferisce automaticamente il verde di 5e57d12.
+- Checkout Desktop: i tentativi aggiuntivi npm test/build sono rimasti senza output e sono stati interrotti, non dichiarati superati. Le prove locali riuscite sono nella copia temporanea; la CI verifica un checkout indipendente. Nessuna causa iCloud/sandbox viene presentata come dimostrata.
+- Main riletta via API: dodici check associati a GitHub Actions, strict, una review, stale dismissal, conversation resolution, admins inclusi, force push e cancellazione vietati. PR REVIEW_REQUIRED/BLOCKED; nessun merge. CodeQL open alerts: zero al controllo, non garanzia di assenza di vulnerabilita.
+- Restano avvisi upstream per Actions Node 20/setup-java v4 deprecati e migrazione ubuntu-latest, gia fuori dalla correzione circoscritta; non soppressi. Resta necessaria una revisione distinta dall'autore.
+- Bundle `pr-candidate-5e57d12.bundle` in `/Users/aim_defix/GestiscoBackups/ORG5-PUBLIC-20261016`, verificato completo; cinque file della patch scansionati offline con Gitleaks, zero rilevazioni.
+
 ## Integrita
 
 - `git fsck --full --strict` sul checkout autorevole: exit 0.

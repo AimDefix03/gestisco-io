@@ -5,7 +5,7 @@
 - Current step: ORG-5 IN_PROGRESS: baseline cabc12f pubblicata, main protetta; CI/Security e PR di verifica da concludere, review distinta necessaria per i merge
 - Next eligible step: completare ORG-5 senza ridurre i gate. Non iniziare ORG-6 o Step 4.4. Collegamento backend/frontend alla copia database recuperata e login web restano da verificare; nessun cutover implicito
 - Last completed step nel repository reale: 4.3, Inventario fisico e rettifiche approvate
-- Last update: 2026-10-17
+- Last update: 2026-10-18
 - Roadmap completion: 32/48 step completati, sincronizzati e verificati nel repository reale (66.7%)
 - Il 66.7% misura gli step completati, non la prontezza produttiva. La precedente stima di maturita 95-97% non e supportata dai gate ancora aperti e viene ritirata.
 - Gate C rivalidato localmente; CI e sicurezza remote verdi su `a3407d3`, inclusa scansione dipendenze backend
@@ -13,6 +13,15 @@
 - Open P1: F-17, F-18, F-19; F-04 rivalidato localmente e confermato dal gate SCA remoto
 - Open P2: F-29, F-30
 - Open P3: nessuno
+
+## Ripresa ORG-5 - 2026-10-18
+
+- Commit applicativo pubblicato nella PR #13: `5e57d125ebb4617b43d4a7de4f4582b3faacdaf4`. CI 39013781946 e Security 39013781949 concluse con successo: backend Java 17 320/320, frontend 209/209, PostgreSQL, scansioni e build passati. Nessun merge; main resta cabc12f.
+- Il risultato E2E non e 19/19 stabili: 18 passati al primo tentativo e uno Firefox passato al retry. La traccia mostra tutte le assertion di navigazione/focus superate, poi un timeout nell'iniezione di axe. La causa del timeout non e dimostrata e non si dichiara risolta con il semplice retry.
+- Per evitare falsi verdi, Playwright ora usa `failOnFlakyTests` in CI, mantenendo il retry per diagnostica. Contratto verificato con fixture sintetica: stesso test intermittente, exit 0 prima ed exit 1 dopo; test stabile exit 0. Nessun test reale disabilitato, soglia allentata o timeout aumentato. Nuova pipeline richiesta sul commit della configurazione.
+- Tentativi aggiuntivi npm test/build nel checkout Desktop interrotti con SIGINT dopo attesa senza output; non contati come superati. Candidato locale e checkout CI verificati separatamente. Backup Git completo del candidato creato e verificato; master invariato.
+- ORG-5 resta IN_PROGRESS; review distinta necessaria prima del merge. Organizzazione 4/6 (66.7%), applicazione 32/48 (66.7%), non stima di vendibilita. ORG-6 e 4.4 non avviati.
+- Beneficio reale: una regressione intermittente nell'uso quotidiano non viene nascosta da un secondo tentativo riuscito durante i controlli prima dell'integrazione.
 
 ## Ripresa ORG-5 - 2026-10-17
 
