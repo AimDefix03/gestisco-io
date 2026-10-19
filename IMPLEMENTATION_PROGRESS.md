@@ -2,10 +2,10 @@
 
 ## Stato generale
 
-- Current step: ORG-5 IN_PROGRESS: repository pubblico autorizzato; consolidamento baseline, diritti riservati, CI/Security e protezioni da verificare sul nuovo repository
+- Current step: ORG-5 IN_PROGRESS: baseline cabc12f pubblicata, main protetta; CI/Security e PR di verifica da concludere, review distinta necessaria per i merge
 - Next eligible step: completare ORG-5 senza ridurre i gate. Non iniziare ORG-6 o Step 4.4. Collegamento backend/frontend alla copia database recuperata e login web restano da verificare; nessun cutover implicito
 - Last completed step nel repository reale: 4.3, Inventario fisico e rettifiche approvate
-- Last update: 2026-10-16
+- Last update: 2026-10-18
 - Roadmap completion: 32/48 step completati, sincronizzati e verificati nel repository reale (66.7%)
 - Il 66.7% misura gli step completati, non la prontezza produttiva. La precedente stima di maturita 95-97% non e supportata dai gate ancora aperti e viene ritirata.
 - Gate C rivalidato localmente; CI e sicurezza remote verdi su `a3407d3`, inclusa scansione dipendenze backend
@@ -14,13 +14,31 @@
 - Open P2: F-29, F-30
 - Open P3: nessuno
 
+## Ripresa ORG-5 - 2026-10-18
+
+- Commit applicativo pubblicato nella PR #13: `5e57d125ebb4617b43d4a7de4f4582b3faacdaf4`. CI 39013781946 e Security 39013781949 concluse con successo: backend Java 17 320/320, frontend 209/209, PostgreSQL, scansioni e build passati. Nessun merge; main resta cabc12f.
+- Il risultato E2E non e 19/19 stabili: 18 passati al primo tentativo e uno Firefox passato al retry. La traccia mostra tutte le assertion di navigazione/focus superate, poi un timeout nell'iniezione di axe. La causa del timeout non e dimostrata e non si dichiara risolta con il semplice retry.
+- Per evitare falsi verdi, Playwright ora usa `failOnFlakyTests` in CI, mantenendo il retry per diagnostica. Contratto verificato con fixture sintetica: stesso test intermittente, exit 0 prima ed exit 1 dopo; test stabile exit 0. Nessun test reale disabilitato, soglia allentata o timeout aumentato. Nuova pipeline richiesta sul commit della configurazione.
+- Tentativi aggiuntivi npm test/build nel checkout Desktop interrotti con SIGINT dopo attesa senza output; non contati come superati. Candidato locale e checkout CI verificati separatamente. Backup Git completo del candidato creato e verificato; master invariato.
+- ORG-5 resta IN_PROGRESS; review distinta necessaria prima del merge. Organizzazione 4/6 (66.7%), applicazione 32/48 (66.7%), non stima di vendibilita. ORG-6 e 4.4 non avviati.
+- Beneficio reale: una regressione intermittente nell'uso quotidiano non viene nascosta da un secondo tentativo riuscito durante i controlli prima dell'integrazione.
+
+## Ripresa ORG-5 - 2026-10-17
+
+- PR #13 su `codex/org5-publication-verification`, precedente head e85fd26. CI passata; Security inizialmente bloccata da Dependency graph non abilitato. Dopo l'abilitazione confermata dall'utente, rerun 38926093388 passato inclusa Dependency review. Nessuna protezione rimossa.
+- Investigato anche il precedente fallimento Chromium sulla baseline main: ripristino del focus differito nel dialog e fallback che poteva selezionare Aggiorna invece della scheda attiva. Quattro nuove regressioni prima rosse, poi verdi; frontend completo 209/209, build e typecheck E2E passati nel candidato locale.
+- Test browser rafforzato senza focus artificiale dopo la conferma. CI/Security sul nuovo commit della correzione ancora da verificare; non considerare automaticamente valide le pipeline dell'head precedente.
+- Nessuna modifica backend, migrazione, dato operativo, master o dipendenza. Nessun merge. ORG-5 resta IN_PROGRESS; organizzazione 4/6 (66.7%), applicazione 32/48 (66.7%).
+- Beneficio reale: dopo la conferma di una navigazione con bozza aperta, la tastiera resta sulla destinazione corretta; i controlli GitHub devono verificarlo prima dell'integrazione.
+
 ## Ripresa ORG-5 pubblica - 2026-10-16
 
 - L'utente ha sostituito la precedente scelta privata con l'autorizzazione esplicita al repository pubblico. API GitHub: `AimDefix03/gestisco-io` PUBLIC e vuoto al preflight; endpoint rulesets accessibile, lista vuota. Nessun acquisto di abbonamento.
 - Scelta esplicita: mantenere i diritti riservati. README e NOTICE non introducono una licenza open source; dipendenze e contenuti di terzi mantengono le proprie condizioni.
-- Consolidamento autorizzato della separazione e dei documenti su `miglioramenti-gestionale`, con pubblicazione iniziale prevista su main del nuovo repository vuoto. Nessun force push, riscrittura della storia o pubblicazione delle branch locali di archivio.
+- Consolidamento della separazione e dei documenti pubblicato su main: `cabc12f52e0a6adeb5712babeb78a5b462562e0e`. Remote `gestisco`; nuova branch di verifica `codex/org5-publication-verification`. Nessun force push, riscrittura della storia o pubblicazione delle branch locali di archivio.
 - L'account indicato per la review e `AimDefix03`, coincidente con l'autore. Non puo approvare le proprie PR: mantenere una approvazione obbligatoria e attendere un revisore distinto per i merge successivi. Nessuna approvazione fittizia o bypass.
-- CI e Security sul nuovo repository non ancora concluse in questo checkpoint. Il controllo `git fsck --full --strict` del checkout attuale e passato; le altre evidenze sono registrate nel [rapporto ORG-5](docs/ORG5_PUBLICATION.md).
+- Baseline locale verificata: backend 320/320, frontend 205/205, build e typecheck E2E passati; 649 file del commit identici al candidato e master invariato. Gitleaks su candidato e 23 commit pubblicati senza rilevazioni. Java locale 23 con release 17, non prova runtime Java 17.
+- Main protetta con una review obbligatoria, dodici check vincolati a GitHub Actions, branch aggiornata, amministratori inclusi e divieto di force push/cancellazione. CI 38925595841 e Security 38925596067 ancora da concludere; Dependency review richiede la PR. Dettagli e limiti nel [rapporto ORG-5](docs/ORG5_PUBLICATION.md).
 - Vecchia PR #2 lasciata aperta e draft per conservare provenienza e review storiche; non usarla per promuovere il prodotto web nel repository legacy. Chiusura/archiviazione richiedono un'azione separata autorizzata.
 - Nessuna funzionalita, migrazione, dato operativo o credenziale modificati. Organizzazione 4/6 (66.7%); applicazione 32/48 (66.7%). Beneficio reale: preparare una fonte pubblica riconoscibile del prodotto con controlli di integrazione verificabili, senza confondere il legacy o concedere una licenza open source.
 

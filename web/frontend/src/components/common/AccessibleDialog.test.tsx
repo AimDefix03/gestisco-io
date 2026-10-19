@@ -1,7 +1,7 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useState } from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { StrictMode, useState } from 'react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import AccessibleDialog from './AccessibleDialog';
 
 function DialogHarness({ onEscape = vi.fn() }: { onEscape?: () => void }) {
@@ -21,6 +21,64 @@ function DialogHarness({ onEscape = vi.fn() }: { onEscape?: () => void }) {
 }
 
 describe('AccessibleDialog', () => {
+  afterEach(() => {
+    cleanup();
+    if (vi.isFakeTimers()) vi.runOnlyPendingTimers();
+    vi.useRealTimers();
+  });
+
+  it('non sottrae il focus a una nuova destinazione dopo la chiusura', () => {
+    vi.useFakeTimers();
+    render(<><DialogHarness /><button type="button">Altra scheda</button></>);
+    const trigger = screen.getByRole('button', { name: 'Apri dialog' });
+    trigger.focus();
+    fireEvent.click(trigger);
+    fireEvent.click(screen.getByRole('button', { name: 'Chiudi' }));
+    const destination = screen.getByRole('button', { name: 'Altra scheda' });
+    destination.focus();
+    act(() => vi.runOnlyPendingTimers());
+    expect(destination).toHaveFocus();
+  });
+
+  it('non sottrae il focus a un nuovo dialog aperto nello stesso ciclo', () => {
+    vi.useFakeTimers();
+    const view = render(<button type="button">Origine</button>);
+    screen.getByRole('button', { name: 'Origine' }).focus();
+    const dialog = (id: string) => (
+      <AccessibleDialog key={id} labelledBy={id}>
+        <h2 id={id}>{id}</h2><button type="button">Azione {id}</button>
+      </AccessibleDialog>
+    );
+    view.rerender(<><button type="button">Origine</button>{dialog('primo')}</>);
+    view.rerender(<><button type="button">Origine</button>{dialog('secondo')}</>);
+    act(() => vi.runOnlyPendingTimers());
+    expect(screen.getByRole('button', { name: 'Azione secondo' })).toHaveFocus();
+  });
+
+  it('mantiene il focus nel dialog in StrictMode e lo restituisce alla vera origine', () => {
+    vi.useFakeTimers();
+    render(<StrictMode><DialogHarness /></StrictMode>);
+    const trigger = screen.getByRole('button', { name: 'Apri dialog' });
+    trigger.focus();
+    fireEvent.click(trigger);
+    act(() => vi.runOnlyPendingTimers());
+    expect(screen.getByRole('button', { name: 'Prima azione' })).toHaveFocus();
+    fireEvent.keyDown(document, { key: 'Escape' });
+    act(() => vi.runOnlyPendingTimers());
+    expect(trigger).toHaveFocus();
+  });
+
+  it('preferisce la scheda attiva ai pulsanti precedenti quando manca il controllo di origine', () => {
+    vi.useFakeTimers();
+    const view = render(<button type="button">Origine rimossa</button>);
+    screen.getByRole('button', { name: 'Origine rimossa' }).focus();
+    const workspace = <main><button type="button">Aggiorna</button><button type="button" aria-current="page">Magazzino</button></main>;
+    view.rerender(<>{workspace}<AccessibleDialog labelledBy="confirm-title"><h2 id="confirm-title">Conferma</h2><button type="button">Apri scheda</button></AccessibleDialog></>);
+    view.rerender(workspace);
+    act(() => vi.runOnlyPendingTimers());
+    expect(screen.getByRole('button', { name: 'Magazzino' })).toHaveFocus();
+  });
+
   it('intrappola il focus, gestisce Escape e ripristina il controllo di origine', async () => {
     const user = userEvent.setup();
     const onEscape = vi.fn();

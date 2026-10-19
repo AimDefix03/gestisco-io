@@ -2,11 +2,11 @@
 
 ## Stato corrente - 2026-10-16
 
-ORG-3 concluso: la fonte web per le prossime attivita e `/Users/aim_defix/Desktop/Gestisco.IO`; Swing e separato in `/Users/aim_defix/Desktop/GestionaleNegozioComputer`. L'originale con i punti e lo spazio finale resta conservato per rollback. Entrambe le nuove copie preservano 25 commit e sei ref, senza remote attivo e senza commit della separazione. Build/test nelle nuove cartelle passati; nessuna modifica al database operativo. Vedere [verifica finale](ORG3_LOCAL_VERIFICATION.md) e [layout locale](LOCAL_LAYOUT.md).
+ORG-3 concluso: la fonte web per le prossime attivita e `/Users/aim_defix/Desktop/Gestisco.IO`; Swing e separato in `/Users/aim_defix/Desktop/GestionaleNegozioComputer`. L'originale con i punti e lo spazio finale resta conservato per rollback. Al termine della separazione entrambe le copie preservavano 25 commit e sei ref, senza remote attivo. ORG-5 ha poi consolidato e pubblicato la sola linea web con `cabc12f`; la copia Swing resta invariata. Vedere [verifica finale ORG-3](ORG3_LOCAL_VERIFICATION.md) e [layout corrente](LOCAL_LAYOUT.md).
 
-ORG-4 concluso: identita documentale Gestisco.IO, istruzioni e descrizione del prodotto allineate. [Addendum](GESTISCO_IDENTITY_ADDENDUM.md) e [verifica](ORG4_VERIFICATION.md) distinguono le decisioni organizzative dallo scope funzionale, che resta invariato. Nessun codice, master, database, UI o riferimento Git modificato; documenti non ancora committati o pubblicati.
+ORG-4 concluso: identita documentale Gestisco.IO, istruzioni e descrizione del prodotto allineate. [Addendum](GESTISCO_IDENTITY_ADDENDUM.md) e [verifica](ORG4_VERIFICATION.md) distinguono le decisioni organizzative dallo scope funzionale, che resta invariato. I documenti allora non committati sono ora inclusi nella baseline ORG-5.
 
-Organizzazione: 4/6 milestone (66.7%). Roadmap applicativa: 32/48 (66.7%), invariata. ORG-5 in corso: dopo il blocco del repository privato, l'utente ha autorizzato il passaggio al pubblico e ha scelto i diritti riservati. Repository `AimDefix03/gestisco-io` pubblico, baseline e gate in preparazione; [rapporto ORG-5](ORG5_PUBLICATION.md). ORG-6 non iniziato. Le sezioni seguenti mantengono l'inventario e le decisioni storiche, incluso lo stato dei percorsi al momento del preflight. Questi conteggi non misurano la prontezza alla vendita.
+Organizzazione: 4/6 milestone (66.7%). Roadmap applicativa: 32/48 (66.7%), invariata. ORG-5 in corso: dopo il blocco del repository privato, l'utente ha autorizzato il passaggio al pubblico e ha scelto i diritti riservati. Repository `AimDefix03/gestisco-io` pubblico, baseline `cabc12f` su main protetta; gate remoti e PR da concludere nel [rapporto ORG-5](ORG5_PUBLICATION.md). ORG-6 non iniziato. Le sezioni seguenti mantengono l'inventario e le decisioni storiche, incluso lo stato dei percorsi al momento del preflight. Questi conteggi non misurano la prontezza alla vendita.
 
 ## ORG-1 - Inventario verificato
 

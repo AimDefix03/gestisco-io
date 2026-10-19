@@ -1,5 +1,11 @@
 # Testing
 
+## Gate E2E e retry
+
+Dal controllo ORG-5 del 2026-10-18, Playwright usa `failOnFlakyTests` quando `CI` e valorizzata. Il retry resta disponibile per raccogliere diagnostica, ma non trasforma un test intermittente in un gate superato. Non aumentare timeout, escludere browser o rimuovere assertion per ottenere un verde.
+
+La trace della CI 39013781946 distingue il focus corretto dall'iniezione axe rimasta pendente in Firefox: 18 test passati al primo tentativo e uno al retry, non 19 prove stabili. Esiti sul candidato successivo e limiti in `docs/ORG5_PUBLICATION.md`. I resoconti sotto restano evidenze storiche datate.
+
 ## Stato verificato
 
 Rivalidazione locale del consolidamento il 2026-10-11, senza iniziare lo Step 4.4:

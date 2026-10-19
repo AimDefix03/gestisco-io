@@ -48,9 +48,10 @@ test('il flusso principale e le bozze sono utilizzabili da tastiera', async ({ p
   await expect(page.getByRole('heading', { name: 'Magazzino', exact: true }).first()).toBeVisible();
 
   const inventoryTab = page.locator('#workspace-tab-inventory');
-  await inventoryTab.focus();
+  await expect(inventoryTab).toBeFocused();
   await page.keyboard.press('ArrowLeft');
   await expect(page.locator('#workspace-tab-catalog')).toHaveAttribute('aria-current', 'page');
+  await expect(page.locator('#workspace-tab-catalog')).toBeFocused();
   await expectNoSeriousAxeViolations(page);
   await expectNoHorizontalOverflow(page);
 });
