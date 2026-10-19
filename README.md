@@ -84,7 +84,7 @@ scripts/ci/run-prod-like-verification.sh
 
 I runner vanno letti e configurati secondo la documentazione: non sostituiscono l'avvio di un ambiente operativo e non vanno adattati per usare volumi esistenti.
 
-Ultima verifica delle cartelle separate, ORG-3 del 14 ottobre 2026: 320 test backend, 205 frontend e 41 legacy passati; build web e Swing riuscite. Quella prova locale usa Java 23 con compilazione release 17 e non equivale a una nuova prova runtime Java 17. Dettagli e limiti nel [rapporto ORG-3](docs/ORG3_LOCAL_VERIFICATION.md). ORG-4 e documentale: non presenta queste suite come rieseguite.
+Verifica PR #13 sul commit `c43e680`, 18 ottobre 2026: backend Java 17 320 test, frontend 209 test in 42 file, PostgreSQL 105 test e browser 19 test senza flaky superati; build web, Docker prod-like e scansioni di sicurezza riusciti. Sul merge `36ca5c7` del 19 ottobre backend, frontend, PostgreSQL e Security passano, ma il gate E2E fallisce per un timeout intermittente Firefox durante il caricamento di axe. ORG-5 non e chiuso; esiti e limiti nel [rapporto ORG-5](docs/ORG5_PUBLICATION.md). Le prove storiche delle cartelle separate e del legacy restano nel [rapporto ORG-3](docs/ORG3_LOCAL_VERIFICATION.md), senza essere presentate come nuove esecuzioni.
 
 ## Avvio e dati
 
@@ -99,6 +99,8 @@ Non includere in commit o pacchetti di review credenziali, `.env.docker`, file `
 La versione Java Swing e conservata separatamente con il nome GestionaleNegozioComputer. Non fa parte della build web e non riceve nuove funzioni. [Politica legacy](docs/LEGACY_SWING.md).
 
 La cronologia comune e conservata senza riscritture. Il repository del prodotto web e [AimDefix03/gestisco-io](https://github.com/AimDefix03/gestisco-io), reso pubblico su autorizzazione dell'autore il 16 ottobre 2026. Questa baseline consolida la separazione Swing/web e l'identita Gestisco.IO. Pubblicazione, protezioni e nuove verifiche CI/Security sono registrate nello [stato ORG-5](docs/ORG5_PUBLICATION.md): la sola presenza dei sorgenti non certifica il superamento dei gate.
+
+Il flusso di sviluppo singolo richiede pull request e dodici controlli automatici, ma non un'approvazione esterna obbligatoria. Main resta protetta anche per l'amministratore, senza force push o cancellazione. La revisione tecnica e documentata; non viene dichiarata una revisione indipendente. Ogni nuovo cambiamento deve superare i propri gate.
 
 Il nome Gestisco.IO e un'identita di progetto: disponibilita del dominio e del marchio non verificate.
 

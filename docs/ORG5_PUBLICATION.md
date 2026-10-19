@@ -1,6 +1,6 @@
 # ORG-5 - Pubblicazione Gestisco.IO
 
-Data: 2026-10-16. Stato: IN_PROGRESS. Fonte locale: `/Users/aim_defix/Desktop/Gestisco.IO`. Destinazione: [AimDefix03/gestisco-io](https://github.com/AimDefix03/gestisco-io).
+Aggiornamento: 2026-10-19. Stato: IN_PROGRESS, CI post-merge fallita per timeout Firefox/axe. Fonte locale: `/Users/aim_defix/Desktop/Gestisco.IO`. Destinazione: [AimDefix03/gestisco-io](https://github.com/AimDefix03/gestisco-io). I resoconti datati sotto conservano le decisioni e gli esiti precedenti, non sostituiscono questo stato corrente.
 
 ## Decisioni autorizzate
 
@@ -25,10 +25,22 @@ Prima di chiudere ORG-5 devono risultare verificati sul nuovo repository:
 1. Snapshot completo e cronologia pubblicata senza rilevazioni Gitleaks, con controllo dei file locali esclusi.
 2. CI su Java 17, frontend, PostgreSQL e stack prod-like; Security con audit dipendenze, Gitleaks e CodeQL.
 3. Dependency review su una PR effettiva, poiche quel job non esegue la revisione delle dipendenze sul push iniziale.
-4. Protezione main: almeno una approvazione, invalidazione delle review obsolete, conversazioni risolte, branch aggiornata, amministratori inclusi, niente force push o cancellazione. Required checks associati ai nomi reali ricevuti da GitHub Actions, inclusi i singoli gate CI e le due lingue CodeQL.
+4. Protezione main: pull request obbligatoria con zero approvazioni esterne secondo la decisione esplicita del 18 ottobre, invalidazione delle eventuali review obsolete, conversazioni risolte, branch aggiornata, amministratori inclusi, niente force push o cancellazione. Dodici required checks associati ai nomi reali ricevuti da GitHub Actions, inclusi i singoli gate CI e le due lingue CodeQL.
 5. Rilettura delle protezioni da API, commit e stato remoto documentati. Nessun merge automatico.
 
-L'utente ha indicato `AimDefix03` come revisore, ma e l'account autore delle modifiche. GitHub non consente di approvare la propria PR: i merge successivi richiedono un revisore distinto. Non creare approvazioni fittizie e non togliere il requisito per sbloccare un merge. Una PR con test verdi ma senza review rimane in attesa.
+L'utente aveva indicato `AimDefix03` come revisore, coincidente con l'autore. Dopo aver chiarito che lavora da solo, il 18 ottobre ha autorizzato la rimozione del solo requisito di approvazione esterna; decisione registrata nella [PR #13](https://github.com/AimDefix03/gestisco-io/pull/13#issuecomment-6251038045). Non creare approvazioni fittizie, usare bypass o ridurre gli altri gate. Resta necessaria la revisione tecnica documentata e l'autorizzazione pertinente al merge; non si dichiara una revisione indipendente.
+
+## Integrazione - 2026-10-19
+
+- Head PR #13 `c43e68075128ef05e545a573a1a012e8124dc7cc`: [CI 39134914015](https://github.com/AimDefix03/gestisco-io/actions/runs/39134914015) e [Security 39134913936](https://github.com/AimDefix03/gestisco-io/actions/runs/39134913936) passate. Backend Java 17 320/320, frontend 209/209 in 42 file, PostgreSQL 105/105, browser 19/19 senza flaky; build e gate prod-like superati.
+- Revisione tecnica del diff: modifiche circoscritte al ripristino focus, quattro regressioni deterministiche, assertion tastiera rafforzate e blocco CI dei flaky; nessuna modifica backend, schema o dipendenza. Master invariato. Nessuna approvazione umana indipendente dichiarata.
+- PR #13 integrata senza bypass tramite merge commit `36ca5c75dc9de6726e2eb4b77ad4ebc6c6c50c31`. Branch della PR conservata, nessun force push, deploy o accesso ai database operativi. Main locale aggiornata solo fast-forward, con upstream `gestisco/main`.
+- Nuovi gate sul merge: [CI 39304147758](https://github.com/AimDefix03/gestisco-io/actions/runs/39304147758) FALLITA e [Security 39304147694](https://github.com/AimDefix03/gestisco-io/actions/runs/39304147694) PASSATA. Dependency review sul push non applicabile, non contata come nuova prova. Backend 320/320, frontend 209/209 e PostgreSQL 105/105 passati; prod-like fallito e Quality gate skipped.
+- E2E post-merge: 18 passati e uno flaky, verifica axe della pagina login su Firefox. Il primo tentativo supera navigazione e visibilita del titolo, poi resta nella prima evaluateExpression di AxeBuilder.analyze (iniezione di axe), fino al timeout globale di 60 secondi. Il retry passa. La ricorrenza e nello stesso stadio tecnico della precedente trace, su un test diverso; non dimostra ancora la causa. `failOnFlakyTests` ha correttamente reso rosso il gate. Nessun rerun usato per dichiarare risolto il problema, nessuna esclusione browser/regola o soglia allentata.
+- Riproduzione temporanea macOS della login statica con stessa CSP: 20 esecuzioni senza tracing e 20 con trace/video, tutte completate, zero violazioni. Nessun accesso al backend o al database. Non e una riproduzione completa della CI Linux o del flusso autenticato. Artifact privati del job 118236773189 conservati fuori dal repository; non pubblicare trace grezze o configurazioni operative.
+- Riproduzione ridotta nel container ufficiale `mcr.microsoft.com/playwright:v1.61.1-noble`, digest `sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48`: altre 20 esecuzioni con tracing/video passate, zero violazioni. Rete esterna disattivata, nessun database o credenziale; durata axe 463-740 ms. Non e l'ambiente completo GitHub Actions e non prova la risoluzione del timeout.
+- Prossima azione: isolare il blocco in ambiente Linux e verificare una correzione motivata; non procedere a ORG-6 o 4.4. Restano gli avvisi di manutenzione Actions e ubuntu-latest.
+- Le decisioni correnti prevalgono sui checkpoint storici sottostanti che riportano una review obbligatoria o pipeline pendenti.
 
 ## Pubblicazione e verifiche - 2026-10-16
 
@@ -68,8 +80,8 @@ L'utente ha indicato `AimDefix03` come revisore, ma e l'account autore delle mod
 
 - `git fsck --full --strict` sul checkout autorevole: exit 0.
 - Il repository non conteneva file LICENSE/COPYING/NOTICE nella cronologia ispezionata; nessuna licenza storica rimossa. Questa verifica non sostituisce l'inventario delle licenze delle dipendenze.
-- Snapshot, scansioni, commit e push conclusi; chiusura delle pipeline e verifica PR ancora necessarie prima di completare ORG-5.
-- Nessun codice applicativo, dipendenza, migrazione o configurazione operativa modificato. Master da mantenere con SHA-256 `cb5fc5a663e4acc2b01c01d94556c0ef1d9cab62ede036426f90b70a521ffa78`.
+- Snapshot, scansioni, commit, push e integrazione della PR #13 conclusi; verifica post-merge richiesta prima della chiusura ORG-5.
+- Rispetto alla prima pubblicazione e stata corretta la gestione del focus con test e hardening del gate Playwright. Nessuna dipendenza, migrazione o configurazione operativa modificata. Master da mantenere con SHA-256 `cb5fc5a663e4acc2b01c01d94556c0ef1d9cab62ede036426f90b70a521ffa78`.
 
 ## Preflight privato precedente
 

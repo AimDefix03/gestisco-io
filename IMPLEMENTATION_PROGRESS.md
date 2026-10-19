@@ -2,10 +2,10 @@
 
 ## Stato generale
 
-- Current step: ORG-5 IN_PROGRESS: baseline cabc12f pubblicata, main protetta; CI/Security e PR di verifica da concludere, review distinta necessaria per i merge
-- Next eligible step: completare ORG-5 senza ridurre i gate. Non iniziare ORG-6 o Step 4.4. Collegamento backend/frontend alla copia database recuperata e login web restano da verificare; nessun cutover implicito
+- Current step: ORG-5 IN_PROGRESS: PR #13 integrata con 36ca5c7, CI post-merge fallita per timeout Firefox/axe; flusso sviluppatore singolo autorizzato
+- Next eligible step: diagnosticare il timeout Firefox/axe e rivalidare il gate ORG-5 senza nascondere i flaky; ORG-6 richiede una nuova autorizzazione. Non iniziare Step 4.4. Collegamento backend/frontend alla copia database recuperata e login web restano da verificare; nessun cutover implicito
 - Last completed step nel repository reale: 4.3, Inventario fisico e rettifiche approvate
-- Last update: 2026-10-18
+- Last update: 2026-10-19
 - Roadmap completion: 32/48 step completati, sincronizzati e verificati nel repository reale (66.7%)
 - Il 66.7% misura gli step completati, non la prontezza produttiva. La precedente stima di maturita 95-97% non e supportata dai gate ancora aperti e viene ritirata.
 - Gate C rivalidato localmente; CI e sicurezza remote verdi su `a3407d3`, inclusa scansione dipendenze backend
@@ -13,6 +13,19 @@
 - Open P1: F-17, F-18, F-19; F-04 rivalidato localmente e confermato dal gate SCA remoto
 - Open P2: F-29, F-30
 - Open P3: nessuno
+
+## Ripresa ORG-5 - 2026-10-19
+
+- PR #13 integrata in main con `36ca5c75dc9de6726e2eb4b77ad4ebc6c6c50c31`; prima del merge tutti i dodici check obbligatori erano verdi su c43e680. Nessun bypass, force push, cancellazione branch o modifica del database operativo.
+- Il 18 ottobre l'utente ha autorizzato il flusso sviluppatore singolo: zero approvazioni esterne obbligatorie, ma PR, dodici check, branch aggiornata, conversazioni risolte e protezioni amministratori invariati. Questa decisione sostituisce il precedente blocco per revisore distinto nei resoconti storici.
+- Main locale allineata esclusivamente fast-forward a gestisco/main; nuove modifiche documentali su codex/org5-closeout. Vecchie branch, ref origin storiche, repository Swing e PR #2 preservati.
+- Controlli post-merge: Security 39304147694 passata (Dependency review non applicabile al push); CI 39304147758 fallita nel job prod-like. Backend 320/320, frontend 209/209 e PostgreSQL 105/105 passati; E2E 18 passati e uno Firefox flaky, Quality gate skipped. La configurazione failOnFlakyTests ha correttamente impedito il falso verde.
+- Trace: login visibile; evaluateExpression per il caricamento iniziale di axe resta pendente fino al timeout globale di 60 secondi. Nessuna analisi WCAG viene completata in quel tentativo. Non e un errore di focus dimostrato, ne una violazione WCAG rilevata; causa browser/tool non ancora provata. Il retry passato non chiude il problema.
+- Riproduzione temporanea sul Mac, pagina login statica con stessa CSP e nessun backend/credenziale: 20 esecuzioni senza tracing e 20 con tracing/video completate, zero violazioni. Queste prove isolate non sostituiscono la CI Linux, il flusso autenticato o un test integrale prod-like.
+- Ulteriori 20 esecuzioni con trace/video nel container ufficiale Playwright 1.61.1 noble, senza rete esterna o database: passate, zero violazioni. La riproduzione ridotta non espone il difetto; resta da confrontare l'esecuzione completa sul runner GitHub. Nessuna correzione speculativa applicata.
+- Master, codice, workflow, dipendenze e migrazioni invariati in questa ripresa. Nessun nuovo finding chiuso o funzione applicativa aggiunta. Il checkpoint documentale registra il fallimento, non dichiara ORG-5 completato.
+- Organizzazione 4/6 (66.7%) fino alla verifica post-merge; applicazione 32/48 (66.7%), non prontezza commerciale. ORG-6 e 4.4 non avviati.
+- Beneficio reale: la versione pubblica principale include le correzioni verificate; lo sviluppatore singolo puo integrare tramite PR senza aggirare i controlli automatici o confondere il prodotto con Swing.
 
 ## Ripresa ORG-5 - 2026-10-18
 
@@ -81,7 +94,7 @@ Questo resoconto precede la successiva autorizzazione esplicita al pubblico; non
 - [x] ORG-2: web senza Swing verificato (backend 320 test, frontend 205 e build); legacy isolato 41 test e JAR. Snapshot `9f9e23a` identico a HEAD per src/pom-legacy. Fsck passato; bundle di tutte le ref recuperato e verificato, inclusi tre commit locali.
 - [x] ORG-3: COMPLETED; recupero isolato precedente e separazione locale dei sorgenti conclusi. Due copie autonome verificate, originale preservato, nessun cutover operativo. Evidenze finali in docs/ORG3_LOCAL_VERIFICATION.md.
 - [x] ORG-4: identita e documentazione allineate a Gestisco.IO; addendum sulle decisioni organizzative approvate, master e perimetro funzionale invariati.
-- [~] ORG-5: pubblicazione pubblica autorizzata, diritti riservati; baseline, CI/Security e protezioni in verifica. Vedere docs/ORG5_PUBLICATION.md.
+- [~] ORG-5: PR #13 integrata, diritti riservati e protezioni confermati; verifica post-merge in corso. Vedere docs/ORG5_PUBLICATION.md.
 - [ ] ORG-6: consegna del contesto, istruzioni avvio/ripristino e verifica di ripresa da una nuova chat.
 - Avanzamento organizzativo: 4/6 milestone (66.7%, conteggio non pesato). Roadmap applicativa invariata: 32/48 (66.7%); nessuna percentuale di prontezza commerciale dedotta.
 - Report, evidenze, criteri di accettazione e stop condition: [Organizzazione repository](docs/REPOSITORY_ORGANIZATION.md).
@@ -223,6 +236,7 @@ Le sezioni successive conservano la cronologia delle verifiche: gli stati PARTIA
 
 ## Decisioni approvate
 
+- Il 2026-10-18 e stata autorizzata la rimozione del solo requisito di approvazione esterna per lo sviluppatore singolo; PR e dodici controlli automatici restano obbligatori. Il 2026-10-19 e stata richiesta la ripresa della chiusura ORG-5, inclusa l'integrazione verificata della PR #13; nessun deploy o avvio ORG-6 implicito.
 - `MASTER_SOURCE_AGENTE_AI.md` e la fonte operativa vincolante.
 - Target produttivo: monolite modulare Spring Boot + React con PostgreSQL.
 - La cartella `src/` e legacy e non riceve nuove funzioni salvo step esplicito.
@@ -784,7 +798,7 @@ Le sezioni successive conservano la cronologia delle verifiche: gli stati PARTIA
 
 - F-20 e chiuso: baseline reale, clone pulito, CI remota e protezione branch sono verificati.
 - Il gate migrazioni obbligatorio usa PostgreSQL 16 reale tramite Testcontainers; H2 resta soltanto feedback rapido della suite standard.
-- I controlli security sono verdi sul commit applicativo `a3407d3`; non sono inclusi tra i quattro status check obbligatori richiesti dallo Step 0.1. Ogni push successivo richiede rivalidazione; non effettuare merge con scansioni fallite o pendenti.
+- I controlli security erano verdi su `a3407d3` nel repository storico. Nel nuovo Gestisco.IO sono obbligatori insieme ai gate CI, per un totale di dodici check associati a GitHub Actions. Gli esiti aggiornati sono nel rapporto ORG-5; non effettuare merge con scansioni fallite o pendenti.
 - La CI segnala Actions con runtime deprecato, migrazione imminente di `ubuntu-latest` e punteggi OpenSSF bassi su alcune dipendenze transitive. Aggiornamenti e pinning sono da trattare nello Step 5.1; non sono stati soppressi gli avvisi. La PR di consolidamento contiene 702 file e richiede revisione per dominio: l'integrazione CodeQL segnala il limite di 300 file nel recupero del diff, pur producendo analisi senza errori e 0 finding.
 - La fonte NVD del manutentore e best-effort: il preflight limita l'eta dichiarata a 48 ore, ma non certifica la completezza dei dati upstream. OSS Index non e verificato per mancanza delle credenziali richieste dal servizio; 0 CVE rilevate non equivale ad assenza assoluta di vulnerabilita.
 - Gli account operativi storici non verificati sono in quarantena; la revisione manuale deve essere completata prima di consentire nuovi login agli eventuali dipendenti legittimi.
