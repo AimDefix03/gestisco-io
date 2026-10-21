@@ -1,6 +1,6 @@
 # ORG-5 - Pubblicazione Gestisco.IO
 
-Aggiornamento: 2026-10-21. Stato: IN_PROGRESS, CI post-merge fallita per timeout Firefox/axe. Fonte locale: `/Users/aim_defix/Desktop/Gestisco.IO`. Destinazione: [AimDefix03/gestisco-io](https://github.com/AimDefix03/gestisco-io). I resoconti datati sotto conservano le decisioni e gli esiti precedenti, non sostituiscono questo stato corrente.
+Aggiornamento: 2026-10-21. Stato: IN_PROGRESS. Timeout Firefox/axe non ricorso sul runner GitHub (49 esecuzioni Firefox, causa non dimostrata); Security della PR #15 bloccata da advisory Vite, correzione locale verificata e non ancora pubblicata. Fonte locale: `/Users/aim_defix/Desktop/Gestisco.IO`. Destinazione: [AimDefix03/gestisco-io](https://github.com/AimDefix03/gestisco-io). I resoconti datati sotto conservano le decisioni e gli esiti precedenti, non sostituiscono questo stato corrente.
 
 ## Decisioni autorizzate
 
@@ -56,6 +56,12 @@ gh workflow run ci.yml --repo AimDefix03/gestisco-io --ref codex/org5-closeout -
 ```
 
 Nove test di contratto passati: default senza effetto, valori ammessi, rifiuto input invalidi, argomenti esatti e propagazione dell'exit code. Il test di contratto usa uno stub senza rete/browser e non sostituisce il controllo reale. I dodici gate obbligatori, timeout e failOnFlakyTests non sono modificati. ORG-5 resta aperto finche il difetto non viene diagnosticato e la verifica remota non e conclusa.
+
+## Esiti remoti della diagnostica e advisory Vite - 2026-10-21
+
+- [CI 39667419307](https://github.com/AimDefix03/gestisco-io/actions/runs/39667419307), dispatch manuale su 99dd82d con `firefox_repetitions=30`: 30/30 login Firefox senza retry e suite E2E 19/19. [CI 39667424034](https://github.com/AimDefix03/gestisco-io/actions/runs/39667424034) della PR #15: tutti i job verdi, E2E 19/19 senza flaky. Sul runner GitHub il timeout non e ricorso; resta un rischio residuo intermittente con causa non dimostrata, non una correzione.
+- [Security 39667423941](https://github.com/AimDefix03/gestisco-io/actions/runs/39667423941): unico job fallito Frontend npm audit, per advisory high su vite 8.0.0-8.1.5 pubblicati dopo il 19 ottobre. Correzione locale con vite 8.1.6, dettagli in [Security scans](SECURITY_SCANS.md). La PR Dependabot #14 resta aperta e separata.
+- Chiusura proposta: dopo la pubblicazione della correzione, CI e Security verdi sul nuovo head della PR #15, merge autorizzato e verifica post-merge su main. Il timeout Firefox resta dichiarato come rischio residuo, con la diagnostica manuale disponibile per una nuova ricorrenza.
 
 ## Pubblicazione e verifiche - 2026-10-16
 

@@ -74,6 +74,12 @@ Aggiornamenti mirati, senza soppressioni o riduzione delle soglie:
 
 Le segnalazioni dipendono anche dai prerequisiti applicativi e non equivalgono a uno sfruttamento dimostrato del gestionale. La chiusura richiede comunque scansione aggiornata e suite verdi; risultati correnti in `IMPLEMENTATION_PROGRESS.md`. Non distribuire artefatti con scan fallito o non verificato.
 
+### Advisory Vite del 2026-10-21
+
+Il run Security `39667423941` della PR #15 ha bloccato correttamente vite 8.1.3: gravita high per la dipendenza launch-editor e due advisory del dev server (GHSA-9jrq-w75r-8gcw, GHSA-rq7h-c2jc-7f22), intervallo vulnerabile 8.0.0-8.1.5. Il 19 ottobre lo stesso audit era verde: gli advisory sono successivi.
+
+Correzione mirata: vite 8.1.6, patch della stessa linea pubblicata il 2026-10-06, con rolldown 1.1.5 nel lockfile. Scartata la 8.3.5 proposta da `npm audit fix --force`, pubblicata il giorno stesso e con cambio di minor. Nessuna soppressione o soglia modificata. Vite serve allo sviluppo e alla build; l'artefatto distribuito e statico via Nginx e non include il dev server. La segnalazione resta comunque bloccante.
+
 ### Avvio a freddo della scansione NVD in CI
 
 Il 2026-10-12 il run `38228668503` e stato interrotto per diagnosticare un caricamento NVD durato oltre due ore: senza API key il runner aveva scaricato solo 140.000 degli oltre 404.000 record, prima di iniziare l'analisi. Non era un test applicativo bloccato e il run annullato non costituisce una verifica superata.

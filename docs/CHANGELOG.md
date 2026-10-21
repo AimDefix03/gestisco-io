@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-21 - Correzione advisory Vite
+
+- Aggiornato vite da 8.1.3 a 8.1.6, patch della stessa linea, per gli advisory high che bloccavano il gate Frontend npm audit; rolldown passa a 1.1.5 nel lockfile.
+- Nessuna modifica a codice applicativo, API, schema, workflow o soglie di scansione. Dettagli in `docs/SECURITY_SCANS.md`, esiti in `IMPLEMENTATION_PROGRESS.md`.
+
 ## 2026-10-12 - Diagnosi e limite temporale della scansione backend
 
 - Diagnosticato il caricamento NVD via API senza chiave che fermava la CI prima dell'analisi delle dipendenze.

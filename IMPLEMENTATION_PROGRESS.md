@@ -2,8 +2,8 @@
 
 ## Stato generale
 
-- Current step: ORG-5 IN_PROGRESS: PR #13 integrata con 36ca5c7, CI post-merge fallita per timeout Firefox/axe; flusso sviluppatore singolo autorizzato
-- Next eligible step: diagnosticare il timeout Firefox/axe e rivalidare il gate ORG-5 senza nascondere i flaky; ORG-6 richiede una nuova autorizzazione. Non iniziare Step 4.4. Collegamento backend/frontend alla copia database recuperata e login web restano da verificare; nessun cutover implicito
+- Current step: ORG-5 IN_PROGRESS: diagnostica Firefox su runner GitHub senza ricorrenze; Security della PR #15 bloccata da advisory Vite, correzione locale verificata e non ancora pubblicata
+- Next eligible step: pubblicare nella PR #15 la correzione Vite e la documentazione, con autorizzazione a commit e push; acquisire CI/Security sul nuovo head e decidere la chiusura ORG-5 con il timeout Firefox come rischio residuo dichiarato; ORG-6 richiede una nuova autorizzazione. Non iniziare Step 4.4. Collegamento backend/frontend alla copia database recuperata e login web restano da verificare; nessun cutover implicito
 - Last completed step nel repository reale: 4.3, Inventario fisico e rettifiche approvate
 - Last update: 2026-10-21
 - Roadmap completion: 32/48 step completati, sincronizzati e verificati nel repository reale (66.7%)
@@ -13,6 +13,16 @@
 - Open P1: F-17, F-18, F-19; F-04 rivalidato localmente e confermato dal gate SCA remoto
 - Open P2: F-29, F-30
 - Open P3: nessuno
+
+## Ripresa ORG-5 e advisory Vite - 2026-10-21
+
+- Ripresa con un nuovo agente (Claude Code). Master, AGENTS e progress riletti; checkout `codex/org5-closeout` pulito su 99dd82d, remote `gestisco` verificato.
+- Diagnostica manuale CI 39667419307 su runner GitHub x64, head 99dd82d: 30/30 ripetizioni del login Firefox senza retry, poi E2E completo 19/19. CI 39667424034 della PR #15: tutti i job verdi, E2E 19/19 senza flaky. Nessuna ricorrenza del timeout axe in 49 esecuzioni Firefox: non prova la rimozione della causa, che resta non dimostrata.
+- Security 39667423941 della PR #15 fallita solo su Frontend npm audit: vite 8.1.3 nell'intervallo vulnerabile 8.0.0-8.1.5, gravita high, advisory successivi al verde del 19 ottobre. Gli altri controlli Security sono passati.
+- Correzione locale: vite 8.1.6 a versione esatta, rolldown 1.1.5 nel lockfile; nessun'altra dipendenza cambiata. Scartati `npm audit fix --force` (8.3.5, pubblicata il giorno stesso) e la PR Dependabot #14, che include major di TypeScript, Vitest, jsdom e jest-dom non necessarie allo step.
+- Verifiche locali con Node 26.8.1: `npm ci` riuscito; `npm test` 209/209 in 42 file; `npm run typecheck` e `npm run typecheck:e2e` passati; `npm run build` riuscito; `npm audit --audit-level=high` 0 vulnerabilita. Backend, PostgreSQL ed E2E non rieseguiti localmente: modifica limitata al tooling frontend, la verifica completa spetta alla CI.
+- Nessun commit, push, merge, migrazione, modifica applicativa, workflow o database. Organizzazione 4/6 (66.7%), applicazione 32/48 (66.7%). ORG-6 e 4.4 non avviati.
+- Caso reale: il gate di sicurezza torna a poter essere verde senza abbassare le soglie, e chi sviluppa non lavora con un dev server vulnerabile.
 
 ## Diagnostica ORG-5 - 2026-10-21
 
