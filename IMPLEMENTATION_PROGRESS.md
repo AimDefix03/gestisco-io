@@ -2,10 +2,10 @@
 
 ## Stato generale
 
-- Current step: ORG-5 IN_PROGRESS: baseline cabc12f pubblicata, main protetta; CI/Security e PR di verifica da concludere, review distinta necessaria per i merge
-- Next eligible step: completare ORG-5 senza ridurre i gate. Non iniziare ORG-6 o Step 4.4. Collegamento backend/frontend alla copia database recuperata e login web restano da verificare; nessun cutover implicito
+- Current step: ORG-5 IN_PROGRESS: diagnostica Firefox su runner GitHub senza ricorrenze; Security della PR #15 bloccata da advisory Vite, correzione locale verificata e non ancora pubblicata
+- Next eligible step: pubblicare nella PR #15 la correzione Vite e la documentazione, con autorizzazione a commit e push; acquisire CI/Security sul nuovo head e decidere la chiusura ORG-5 con il timeout Firefox come rischio residuo dichiarato; ORG-6 richiede una nuova autorizzazione. Non iniziare Step 4.4. Collegamento backend/frontend alla copia database recuperata e login web restano da verificare; nessun cutover implicito
 - Last completed step nel repository reale: 4.3, Inventario fisico e rettifiche approvate
-- Last update: 2026-10-18
+- Last update: 2026-10-21
 - Roadmap completion: 32/48 step completati, sincronizzati e verificati nel repository reale (66.7%)
 - Il 66.7% misura gli step completati, non la prontezza produttiva. La precedente stima di maturita 95-97% non e supportata dai gate ancora aperti e viene ritirata.
 - Gate C rivalidato localmente; CI e sicurezza remote verdi su `a3407d3`, inclusa scansione dipendenze backend
@@ -13,6 +13,38 @@
 - Open P1: F-17, F-18, F-19; F-04 rivalidato localmente e confermato dal gate SCA remoto
 - Open P2: F-29, F-30
 - Open P3: nessuno
+
+## Ripresa ORG-5 e advisory Vite - 2026-10-21
+
+- Ripresa con un nuovo agente (Claude Code). Master, AGENTS e progress riletti; checkout `codex/org5-closeout` pulito su 99dd82d, remote `gestisco` verificato.
+- Diagnostica manuale CI 39667419307 su runner GitHub x64, head 99dd82d: 30/30 ripetizioni del login Firefox senza retry, poi E2E completo 19/19. CI 39667424034 della PR #15: tutti i job verdi, E2E 19/19 senza flaky. Nessuna ricorrenza del timeout axe in 49 esecuzioni Firefox: non prova la rimozione della causa, che resta non dimostrata.
+- Security 39667423941 della PR #15 fallita solo su Frontend npm audit: vite 8.1.3 nell'intervallo vulnerabile 8.0.0-8.1.5, gravita high, advisory successivi al verde del 19 ottobre. Gli altri controlli Security sono passati.
+- Correzione locale: vite 8.1.6 a versione esatta, rolldown 1.1.5 nel lockfile; nessun'altra dipendenza cambiata. Scartati `npm audit fix --force` (8.3.5, pubblicata il giorno stesso) e la PR Dependabot #14, che include major di TypeScript, Vitest, jsdom e jest-dom non necessarie allo step.
+- Verifiche locali con Node 26.8.1: `npm ci` riuscito; `npm test` 209/209 in 42 file; `npm run typecheck` e `npm run typecheck:e2e` passati; `npm run build` riuscito; `npm audit --audit-level=high` 0 vulnerabilita. Backend, PostgreSQL ed E2E non rieseguiti localmente: modifica limitata al tooling frontend, la verifica completa spetta alla CI.
+- Nessun commit, push, merge, migrazione, modifica applicativa, workflow o database. Organizzazione 4/6 (66.7%), applicazione 32/48 (66.7%). ORG-6 e 4.4 non avviati.
+- Caso reale: il gate di sicurezza torna a poter essere verde senza abbassare le soglie, e chi sviluppa non lavora con un dev server vulnerabile.
+
+## Diagnostica ORG-5 - 2026-10-21
+
+- Recuperato il log della prova completa del 19 ottobre sullo snapshot 66c3dec: 19/19 E2E e 30/30 ripetizioni del login Firefox senza retry passati. Migrazioni V1-V35, header browser, hardening, osservabilita, rate limiting, backup/restore, privilegi PostgreSQL e cleanup verificati. Browser nel container ufficiale Playwright 1.61.1 Linux ARM64, non runner GitHub x64.
+- Primo tentativo diagnostico non valido per confronto CI: host.docker.internal su HTTP causava il rifiuto browser di COOP e due test falliti. Risolto solo nel laboratorio usando il namespace di rete del frontend temporaneo e localhost; nessun header indebolito. Il runner containerizzato resta nelle evidenze private, non sostituisce quello CI.
+- Aggiunta diagnostica manuale opzionale al workflow CI: 0, 30 o 100 ripetizioni del solo login Firefox, senza retry, stop al primo errore, trace separata e log pw:browser. Disattivata su push/PR/schedule; i controlli ordinari restano obbligatori. Nove test di contratto coprono disattivazione, argomenti, valori invalidi e propagazione del fallimento.
+- La diagnostica non e una correzione del timeout e non autorizza la chiusura ORG-5. Il prossimo controllo deve acquisire un esito sul runner GitHub del nuovo candidato; un verde isolato non dimostra l'eliminazione del problema intermittente.
+- Nessuna modifica applicativa, dipendenza, migrazione, database operativo, master o protezione main. Organizzazione 4/6 (66.7%), applicazione 32/48 (66.7%). ORG-6 e 4.4 non avviati.
+- Caso reale: un blocco occasionale del controllo qualita diventa ripetibile e ispezionabile, senza pubblicare aggiornamenti dichiarati affidabili sulla sola base di un retry riuscito.
+
+## Ripresa ORG-5 - 2026-10-19
+
+- PR #13 integrata in main con `36ca5c75dc9de6726e2eb4b77ad4ebc6c6c50c31`; prima del merge tutti i dodici check obbligatori erano verdi su c43e680. Nessun bypass, force push, cancellazione branch o modifica del database operativo.
+- Il 18 ottobre l'utente ha autorizzato il flusso sviluppatore singolo: zero approvazioni esterne obbligatorie, ma PR, dodici check, branch aggiornata, conversazioni risolte e protezioni amministratori invariati. Questa decisione sostituisce il precedente blocco per revisore distinto nei resoconti storici.
+- Main locale allineata esclusivamente fast-forward a gestisco/main; nuove modifiche documentali su codex/org5-closeout. Vecchie branch, ref origin storiche, repository Swing e PR #2 preservati.
+- Controlli post-merge: Security 39304147694 passata (Dependency review non applicabile al push); CI 39304147758 fallita nel job prod-like. Backend 320/320, frontend 209/209 e PostgreSQL 105/105 passati; E2E 18 passati e uno Firefox flaky, Quality gate skipped. La configurazione failOnFlakyTests ha correttamente impedito il falso verde.
+- Trace: login visibile; evaluateExpression per il caricamento iniziale di axe resta pendente fino al timeout globale di 60 secondi. Nessuna analisi WCAG viene completata in quel tentativo. Non e un errore di focus dimostrato, ne una violazione WCAG rilevata; causa browser/tool non ancora provata. Il retry passato non chiude il problema.
+- Riproduzione temporanea sul Mac, pagina login statica con stessa CSP e nessun backend/credenziale: 20 esecuzioni senza tracing e 20 con tracing/video completate, zero violazioni. Queste prove isolate non sostituiscono la CI Linux, il flusso autenticato o un test integrale prod-like.
+- Ulteriori 20 esecuzioni con trace/video nel container ufficiale Playwright 1.61.1 noble, senza rete esterna o database: passate, zero violazioni. La riproduzione ridotta non espone il difetto; resta da confrontare l'esecuzione completa sul runner GitHub. Nessuna correzione speculativa applicata.
+- Master, codice, workflow, dipendenze e migrazioni invariati in questa ripresa. Nessun nuovo finding chiuso o funzione applicativa aggiunta. Il checkpoint documentale registra il fallimento, non dichiara ORG-5 completato.
+- Organizzazione 4/6 (66.7%) fino alla verifica post-merge; applicazione 32/48 (66.7%), non prontezza commerciale. ORG-6 e 4.4 non avviati.
+- Beneficio reale: la versione pubblica principale include le correzioni verificate; lo sviluppatore singolo puo integrare tramite PR senza aggirare i controlli automatici o confondere il prodotto con Swing.
 
 ## Ripresa ORG-5 - 2026-10-18
 
@@ -81,7 +113,7 @@ Questo resoconto precede la successiva autorizzazione esplicita al pubblico; non
 - [x] ORG-2: web senza Swing verificato (backend 320 test, frontend 205 e build); legacy isolato 41 test e JAR. Snapshot `9f9e23a` identico a HEAD per src/pom-legacy. Fsck passato; bundle di tutte le ref recuperato e verificato, inclusi tre commit locali.
 - [x] ORG-3: COMPLETED; recupero isolato precedente e separazione locale dei sorgenti conclusi. Due copie autonome verificate, originale preservato, nessun cutover operativo. Evidenze finali in docs/ORG3_LOCAL_VERIFICATION.md.
 - [x] ORG-4: identita e documentazione allineate a Gestisco.IO; addendum sulle decisioni organizzative approvate, master e perimetro funzionale invariati.
-- [~] ORG-5: pubblicazione pubblica autorizzata, diritti riservati; baseline, CI/Security e protezioni in verifica. Vedere docs/ORG5_PUBLICATION.md.
+- [~] ORG-5: PR #13 integrata, diritti riservati e protezioni confermati; verifica post-merge in corso. Vedere docs/ORG5_PUBLICATION.md.
 - [ ] ORG-6: consegna del contesto, istruzioni avvio/ripristino e verifica di ripresa da una nuova chat.
 - Avanzamento organizzativo: 4/6 milestone (66.7%, conteggio non pesato). Roadmap applicativa invariata: 32/48 (66.7%); nessuna percentuale di prontezza commerciale dedotta.
 - Report, evidenze, criteri di accettazione e stop condition: [Organizzazione repository](docs/REPOSITORY_ORGANIZATION.md).
@@ -223,6 +255,7 @@ Le sezioni successive conservano la cronologia delle verifiche: gli stati PARTIA
 
 ## Decisioni approvate
 
+- Il 2026-10-18 e stata autorizzata la rimozione del solo requisito di approvazione esterna per lo sviluppatore singolo; PR e dodici controlli automatici restano obbligatori. Il 2026-10-19 e stata richiesta la ripresa della chiusura ORG-5, inclusa l'integrazione verificata della PR #13; nessun deploy o avvio ORG-6 implicito.
 - `MASTER_SOURCE_AGENTE_AI.md` e la fonte operativa vincolante.
 - Target produttivo: monolite modulare Spring Boot + React con PostgreSQL.
 - La cartella `src/` e legacy e non riceve nuove funzioni salvo step esplicito.
@@ -784,7 +817,7 @@ Le sezioni successive conservano la cronologia delle verifiche: gli stati PARTIA
 
 - F-20 e chiuso: baseline reale, clone pulito, CI remota e protezione branch sono verificati.
 - Il gate migrazioni obbligatorio usa PostgreSQL 16 reale tramite Testcontainers; H2 resta soltanto feedback rapido della suite standard.
-- I controlli security sono verdi sul commit applicativo `a3407d3`; non sono inclusi tra i quattro status check obbligatori richiesti dallo Step 0.1. Ogni push successivo richiede rivalidazione; non effettuare merge con scansioni fallite o pendenti.
+- I controlli security erano verdi su `a3407d3` nel repository storico. Nel nuovo Gestisco.IO sono obbligatori insieme ai gate CI, per un totale di dodici check associati a GitHub Actions. Gli esiti aggiornati sono nel rapporto ORG-5; non effettuare merge con scansioni fallite o pendenti.
 - La CI segnala Actions con runtime deprecato, migrazione imminente di `ubuntu-latest` e punteggi OpenSSF bassi su alcune dipendenze transitive. Aggiornamenti e pinning sono da trattare nello Step 5.1; non sono stati soppressi gli avvisi. La PR di consolidamento contiene 702 file e richiede revisione per dominio: l'integrazione CodeQL segnala il limite di 300 file nel recupero del diff, pur producendo analisi senza errori e 0 finding.
 - La fonte NVD del manutentore e best-effort: il preflight limita l'eta dichiarata a 48 ore, ma non certifica la completezza dei dati upstream. OSS Index non e verificato per mancanza delle credenziali richieste dal servizio; 0 CVE rilevate non equivale ad assenza assoluta di vulnerabilita.
 - Gli account operativi storici non verificati sono in quarantena; la revisione manuale deve essere completata prima di consentire nuovi login agli eventuali dipendenti legittimi.

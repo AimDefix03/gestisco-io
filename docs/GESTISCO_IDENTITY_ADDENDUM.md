@@ -63,3 +63,9 @@ Beneficio reale: un collaboratore o un valutatore riconosce il prodotto web attu
 ## Decisione successiva ORG-5 - 2026-10-16
 
 L'utente ha autorizzato la pubblicazione su `AimDefix03/gestisco-io` e, dopo il blocco delle protezioni private, il passaggio al pubblico. Ha scelto di mantenere i diritti riservati, senza licenza open source; vedere [NOTICE](../NOTICE.md). Questa decisione successiva non altera il resoconto ORG-4 sopra, il master o lo scope. Stato effettivo di pubblicazione e verifiche nel [rapporto ORG-5](ORG5_PUBLICATION.md).
+
+## Flusso sviluppatore singolo - 2026-10-18
+
+L'utente ha dichiarato di lavorare da solo e ha autorizzato di portare a zero soltanto le approvazioni esterne obbligatorie. Restano pull request, tutti i dodici check automatici, branch aggiornata, conversazioni risolte, protezioni applicate agli amministratori e divieti di force push/cancellazione. La revisione tecnica documentata non equivale a una revisione umana indipendente. Nessuna autorizzazione generale a merge, deploy o indebolimento dei gate deriva da questa scelta.
+
+Il 19 ottobre, alla ripresa della chiusura ORG-5 richiesta dall'utente, e stata integrata la PR #13 con merge commit `36ca5c75dc9de6726e2eb4b77ad4ebc6c6c50c31`. Gli esiti successivi al merge sono documentati separatamente nel rapporto ORG-5. La nuova decisione sostituisce il precedente vincolo organizzativo del revisore distinto, senza alterare il master o le invarianti applicative.

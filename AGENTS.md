@@ -16,7 +16,11 @@ La parte Swing congelata e separata in `/Users/aim_defix/Desktop/GestionaleNegoz
 
 ORG-5 ha pubblicato la baseline `cabc12f` su main di `https://github.com/AimDefix03/gestisco-io`, pubblico per decisione esplicita del 16 ottobre 2026. Remote dedicato `gestisco`, main protetta; verifiche remote e chiusura dello step in `docs/ORG5_PUBLICATION.md`. Verificare sempre `git remote -v` prima di qualsiasi push. Le ref origin conservate sono snapshot storici, non stato GitHub aggiornato. Non effettuare checkout di vecchie branch per annullare le rimozioni intenzionali. Leggere `docs/LOCAL_LAYOUT.md`, `docs/ORG3_SEPARATION.md` e `IMPLEMENTATION_PROGRESS.md` prima di intervenire.
 
-Il codice originale resta a diritti riservati: non aggiungere una licenza open source senza una nuova decisione dell'autore. La visibilita pubblica non autorizza a pubblicare segreti, dati operativi o copie di recovery. La baseline iniziale di un repository vuoto non autorizza futuri push diretti su main, merge senza revisione o riduzioni dei gate.
+La PR #13 e stata integrata il 19 ottobre con `36ca5c7`; main locale e aggiornata esclusivamente fast-forward e segue `gestisco/main`. Le altre branch e ref storiche restano conservate. Stato corrente ed evidenze in `docs/ORG5_PUBLICATION.md`.
+
+Il codice originale resta a diritti riservati: non aggiungere una licenza open source senza una nuova decisione dell'autore. La visibilita pubblica non autorizza a pubblicare segreti, dati operativi o copie di recovery. La baseline iniziale di un repository vuoto non autorizza futuri push diretti su main o riduzioni dei gate.
+
+Il 18 ottobre l'utente, sviluppatore singolo, ha autorizzato soltanto la riduzione delle approvazioni esterne obbligatorie da una a zero. Restano obbligatori pull request, dodici check GitHub Actions, aggiornamento alla base e conversazioni risolte; protezioni applicate anche agli amministratori, force push e cancellazione vietati. Documentare la revisione tecnica, senza presentarla come approvazione indipendente. Commit, push e merge richiedono comunque autorizzazione pertinente; non usare bypass o ridurre i controlli per sbloccare una PR.
 
 Il repository originale `/Users/aim_defix/Desktop/Gestionale.Negozio.Computer ` (spazio finale) e conservato per rollback, non per nuove funzionalita. Le configurazioni Docker non sono state migrate: non avviare gli stack predefiniti senza associare esplicitamente ambiente, secret, project e volumi. Non copiare credenziali o dati nei repository.
 
