@@ -1,6 +1,6 @@
 # ORG-5 - Pubblicazione Gestisco.IO
 
-Aggiornamento: 2026-10-19. Stato: IN_PROGRESS, CI post-merge fallita per timeout Firefox/axe. Fonte locale: `/Users/aim_defix/Desktop/Gestisco.IO`. Destinazione: [AimDefix03/gestisco-io](https://github.com/AimDefix03/gestisco-io). I resoconti datati sotto conservano le decisioni e gli esiti precedenti, non sostituiscono questo stato corrente.
+Aggiornamento: 2026-10-21. Stato: IN_PROGRESS, CI post-merge fallita per timeout Firefox/axe. Fonte locale: `/Users/aim_defix/Desktop/Gestisco.IO`. Destinazione: [AimDefix03/gestisco-io](https://github.com/AimDefix03/gestisco-io). I resoconti datati sotto conservano le decisioni e gli esiti precedenti, non sostituiscono questo stato corrente.
 
 ## Decisioni autorizzate
 
@@ -41,6 +41,21 @@ L'utente aveva indicato `AimDefix03` come revisore, coincidente con l'autore. Do
 - Riproduzione ridotta nel container ufficiale `mcr.microsoft.com/playwright:v1.61.1-noble`, digest `sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48`: altre 20 esecuzioni con tracing/video passate, zero violazioni. Rete esterna disattivata, nessun database o credenziale; durata axe 463-740 ms. Non e l'ambiente completo GitHub Actions e non prova la risoluzione del timeout.
 - Prossima azione: isolare il blocco in ambiente Linux e verificare una correzione motivata; non procedere a ORG-6 o 4.4. Restano gli avvisi di manutenzione Actions e ubuntu-latest.
 - Le decisioni correnti prevalgono sui checkpoint storici sottostanti che riportano una review obbligatoria o pipeline pendenti.
+
+## Diagnostica riproducibile - 2026-10-21
+
+La prova completa del 19 ottobre, recuperata alla ripresa, e terminata con 19/19 test E2E e 30/30 ripetizioni del login Firefox senza retry. Passati migrazioni V1-V35, hardening, header browser, osservabilita, rate limiting, backup/restore e separazione privilegi PostgreSQL; cleanup confermato. Il browser gira nell'immagine ufficiale Playwright 1.61.1 Linux ARM64. Non equivale al runner GitHub x64 e non risolve il timeout del controllo remoto.
+
+Il primo tentativo del laboratorio usava host.docker.internal su HTTP: Chromium ignorava COOP per origine non affidabile, facendo fallire correttamente due test. L'ambiente temporaneo e stato corretto condividendo il namespace di rete del frontend e usando localhost, senza modificare CSP, COOP o assertion. Queste modifiche restano solo nella copia diagnostica privata.
+
+Il workflow Gestionale CI espone un input manuale `firefox_repetitions`: 0 (default), 30 o 100. Prima della suite normale, il runner puo eseguire il solo test login Firefox con zero retry, stop al primo errore, trace e output separati in `test-results/firefox-diagnostic`, log launcher `pw:browser`. Le trace contengono la pagina di accesso senza credenziali; non pubblicare artifact grezzi di flussi autenticati. Nessun DEBUG protocollo/API viene abilitato. Su push, PR e schedule la ripetizione aggiuntiva resta disattivata.
+
+```bash
+node --test scripts/ci/firefox-diagnostic.test.mjs
+gh workflow run ci.yml --repo AimDefix03/gestisco-io --ref codex/org5-closeout -f firefox_repetitions=30
+```
+
+Nove test di contratto passati: default senza effetto, valori ammessi, rifiuto input invalidi, argomenti esatti e propagazione dell'exit code. Il test di contratto usa uno stub senza rete/browser e non sostituisce il controllo reale. I dodici gate obbligatori, timeout e failOnFlakyTests non sono modificati. ORG-5 resta aperto finche il difetto non viene diagnosticato e la verifica remota non e conclusa.
 
 ## Pubblicazione e verifiche - 2026-10-16
 

@@ -296,6 +296,7 @@ else
   npx playwright install chromium firefox webkit
 fi
 npm run typecheck:e2e
+sh "$ROOT_DIR/scripts/ci/run-firefox-diagnostic.sh"
 npm run test:e2e
 
 cd "$ROOT_DIR"

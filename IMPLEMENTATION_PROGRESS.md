@@ -5,7 +5,7 @@
 - Current step: ORG-5 IN_PROGRESS: PR #13 integrata con 36ca5c7, CI post-merge fallita per timeout Firefox/axe; flusso sviluppatore singolo autorizzato
 - Next eligible step: diagnosticare il timeout Firefox/axe e rivalidare il gate ORG-5 senza nascondere i flaky; ORG-6 richiede una nuova autorizzazione. Non iniziare Step 4.4. Collegamento backend/frontend alla copia database recuperata e login web restano da verificare; nessun cutover implicito
 - Last completed step nel repository reale: 4.3, Inventario fisico e rettifiche approvate
-- Last update: 2026-10-19
+- Last update: 2026-10-21
 - Roadmap completion: 32/48 step completati, sincronizzati e verificati nel repository reale (66.7%)
 - Il 66.7% misura gli step completati, non la prontezza produttiva. La precedente stima di maturita 95-97% non e supportata dai gate ancora aperti e viene ritirata.
 - Gate C rivalidato localmente; CI e sicurezza remote verdi su `a3407d3`, inclusa scansione dipendenze backend
@@ -13,6 +13,15 @@
 - Open P1: F-17, F-18, F-19; F-04 rivalidato localmente e confermato dal gate SCA remoto
 - Open P2: F-29, F-30
 - Open P3: nessuno
+
+## Diagnostica ORG-5 - 2026-10-21
+
+- Recuperato il log della prova completa del 19 ottobre sullo snapshot 66c3dec: 19/19 E2E e 30/30 ripetizioni del login Firefox senza retry passati. Migrazioni V1-V35, header browser, hardening, osservabilita, rate limiting, backup/restore, privilegi PostgreSQL e cleanup verificati. Browser nel container ufficiale Playwright 1.61.1 Linux ARM64, non runner GitHub x64.
+- Primo tentativo diagnostico non valido per confronto CI: host.docker.internal su HTTP causava il rifiuto browser di COOP e due test falliti. Risolto solo nel laboratorio usando il namespace di rete del frontend temporaneo e localhost; nessun header indebolito. Il runner containerizzato resta nelle evidenze private, non sostituisce quello CI.
+- Aggiunta diagnostica manuale opzionale al workflow CI: 0, 30 o 100 ripetizioni del solo login Firefox, senza retry, stop al primo errore, trace separata e log pw:browser. Disattivata su push/PR/schedule; i controlli ordinari restano obbligatori. Nove test di contratto coprono disattivazione, argomenti, valori invalidi e propagazione del fallimento.
+- La diagnostica non e una correzione del timeout e non autorizza la chiusura ORG-5. Il prossimo controllo deve acquisire un esito sul runner GitHub del nuovo candidato; un verde isolato non dimostra l'eliminazione del problema intermittente.
+- Nessuna modifica applicativa, dipendenza, migrazione, database operativo, master o protezione main. Organizzazione 4/6 (66.7%), applicazione 32/48 (66.7%). ORG-6 e 4.4 non avviati.
+- Caso reale: un blocco occasionale del controllo qualita diventa ripetibile e ispezionabile, senza pubblicare aggiornamenti dichiarati affidabili sulla sola base di un retry riuscito.
 
 ## Ripresa ORG-5 - 2026-10-19
 
