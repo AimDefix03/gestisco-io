@@ -2,8 +2,8 @@
 
 ## Stato generale
 
-- Current step: ORG-5 IN_PROGRESS: diagnostica Firefox su runner GitHub senza ricorrenze; Security della PR #15 bloccata da advisory Vite, correzione locale verificata e non ancora pubblicata
-- Next eligible step: pubblicare nella PR #15 la correzione Vite e la documentazione, con autorizzazione a commit e push; acquisire CI/Security sul nuovo head e decidere la chiusura ORG-5 con il timeout Firefox come rischio residuo dichiarato; ORG-6 richiede una nuova autorizzazione. Non iniziare Step 4.4. Collegamento backend/frontend alla copia database recuperata e login web restano da verificare; nessun cutover implicito
+- Current step: ORG-5 COMPLETED il 2026-10-21: PR #15 integrata con b68c5b8, CI e Security post-merge verdi su main
+- Next eligible step: ORG-6, handoff e prova di ripresa, soltanto con nuova autorizzazione dell'utente. Non iniziare Step 4.4. Collegamento backend/frontend alla copia database recuperata e login web restano da verificare; nessun cutover implicito
 - Last completed step nel repository reale: 4.3, Inventario fisico e rettifiche approvate
 - Last update: 2026-10-21
 - Roadmap completion: 32/48 step completati, sincronizzati e verificati nel repository reale (66.7%)
@@ -14,10 +14,20 @@
 - Open P2: F-29, F-30
 - Open P3: nessuno
 
+## Chiusura ORG-5 - 2026-10-21
+
+- PR #15 pubblicata con 4e05700 (commit e push autorizzati dall'utente): CI 39676174169 e Security 39676174338 verdi, 13 controlli su 13. Backend Java 17 320/320, frontend 209/209, PostgreSQL 105/105, E2E 19/19 senza flaky, Frontend npm audit passato.
+- Merge autorizzato dall'utente ed eseguito da lui nell'interfaccia GitHub: merge commit `b68c5b8`, senza bypass. Main locale aggiornata solo fast-forward.
+- Post-merge su main: CI 39678378207 verde (320, 209, 105 e 19/19 E2E senza flaky; Quality gate passato) e Security 39678378202 verde; Dependency review skipped sul push, non contata come prova.
+- Protezione main riletta via API: zero approvazioni obbligatorie per decisione del 18 ottobre, dodici check, branch aggiornata, invalidazione delle review obsolete, conversazioni risolte, amministratori inclusi, force push e cancellazione vietati. Alert code scanning aperti: zero.
+- Rischio residuo: il timeout Firefox/axe del 19 ottobre non si e ripresentato in 38 esecuzioni Firefox sul runner GitHub (30 ripetizioni diagnostiche del login axe, piu i 2 test Firefox in ciascuna delle 4 suite complete), di cui 34 del test axe, ma la causa non e dimostrata. In caso di ricorrenza usare la diagnostica manuale, senza retry o soglie piu permissive.
+- Restano aperte e separate le PR Dependabot #11, #12 e #14, con aggiornamenti major non necessari alla chiusura. Nessuna modifica applicativa, migrazione o database operativo. Organizzazione 5/6 (83.3%), applicazione 32/48 (66.7%). ORG-6 e 4.4 non avviati.
+- Caso reale: la versione pubblica principale passa tutti i controlli obbligatori, quindi una nuova sessione o un collaboratore riparte da una base verificata.
+
 ## Ripresa ORG-5 e advisory Vite - 2026-10-21
 
 - Ripresa con un nuovo agente (Claude Code). Master, AGENTS e progress riletti; checkout `codex/org5-closeout` pulito su 99dd82d, remote `gestisco` verificato.
-- Diagnostica manuale CI 39667419307 su runner GitHub x64, head 99dd82d: 30/30 ripetizioni del login Firefox senza retry, poi E2E completo 19/19. CI 39667424034 della PR #15: tutti i job verdi, E2E 19/19 senza flaky. Nessuna ricorrenza del timeout axe in 49 esecuzioni Firefox: non prova la rimozione della causa, che resta non dimostrata.
+- Diagnostica manuale CI 39667419307 su runner GitHub x64, head 99dd82d: 30/30 ripetizioni del login Firefox senza retry, poi E2E completo 19/19. CI 39667424034 della PR #15: tutti i job verdi, E2E 19/19 senza flaky. Nessuna ricorrenza del timeout axe in 34 esecuzioni Firefox, 32 delle quali del test axe (la suite E2E da 19 test ne contiene 2 su Firefox; il conteggio di 49 pubblicato con b68c5b8 era errato e viene corretto qui): non prova la rimozione della causa, che resta non dimostrata.
 - Security 39667423941 della PR #15 fallita solo su Frontend npm audit: vite 8.1.3 nell'intervallo vulnerabile 8.0.0-8.1.5, gravita high, advisory successivi al verde del 19 ottobre. Gli altri controlli Security sono passati.
 - Correzione locale: vite 8.1.6 a versione esatta, rolldown 1.1.5 nel lockfile; nessun'altra dipendenza cambiata. Scartati `npm audit fix --force` (8.3.5, pubblicata il giorno stesso) e la PR Dependabot #14, che include major di TypeScript, Vitest, jsdom e jest-dom non necessarie allo step.
 - Verifiche locali con Node 26.8.1: `npm ci` riuscito; `npm test` 209/209 in 42 file; `npm run typecheck` e `npm run typecheck:e2e` passati; `npm run build` riuscito; `npm audit --audit-level=high` 0 vulnerabilita. Backend, PostgreSQL ed E2E non rieseguiti localmente: modifica limitata al tooling frontend, la verifica completa spetta alla CI.
@@ -113,9 +123,9 @@ Questo resoconto precede la successiva autorizzazione esplicita al pubblico; non
 - [x] ORG-2: web senza Swing verificato (backend 320 test, frontend 205 e build); legacy isolato 41 test e JAR. Snapshot `9f9e23a` identico a HEAD per src/pom-legacy. Fsck passato; bundle di tutte le ref recuperato e verificato, inclusi tre commit locali.
 - [x] ORG-3: COMPLETED; recupero isolato precedente e separazione locale dei sorgenti conclusi. Due copie autonome verificate, originale preservato, nessun cutover operativo. Evidenze finali in docs/ORG3_LOCAL_VERIFICATION.md.
 - [x] ORG-4: identita e documentazione allineate a Gestisco.IO; addendum sulle decisioni organizzative approvate, master e perimetro funzionale invariati.
-- [~] ORG-5: PR #13 integrata, diritti riservati e protezioni confermati; verifica post-merge in corso. Vedere docs/ORG5_PUBLICATION.md.
+- [x] ORG-5: COMPLETED il 2026-10-21; PR #13 e #15 integrate, CI e Security verdi su main b68c5b8, protezioni rilette. Timeout Firefox/axe registrato come rischio residuo. Vedere docs/ORG5_PUBLICATION.md.
 - [ ] ORG-6: consegna del contesto, istruzioni avvio/ripristino e verifica di ripresa da una nuova chat.
-- Avanzamento organizzativo: 4/6 milestone (66.7%, conteggio non pesato). Roadmap applicativa invariata: 32/48 (66.7%); nessuna percentuale di prontezza commerciale dedotta.
+- Avanzamento organizzativo: 5/6 milestone (83.3%, conteggio non pesato). Roadmap applicativa invariata: 32/48 (66.7%); nessuna percentuale di prontezza commerciale dedotta.
 - Report, evidenze, criteri di accettazione e stop condition: [Organizzazione repository](docs/REPOSITORY_ORGANIZATION.md).
 
 ### Note storiche dell'inventario ORG-1

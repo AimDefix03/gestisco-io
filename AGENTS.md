@@ -16,7 +16,7 @@ La parte Swing congelata e separata in `/Users/aim_defix/Desktop/GestionaleNegoz
 
 ORG-5 ha pubblicato la baseline `cabc12f` su main di `https://github.com/AimDefix03/gestisco-io`, pubblico per decisione esplicita del 16 ottobre 2026. Remote dedicato `gestisco`, main protetta; verifiche remote e chiusura dello step in `docs/ORG5_PUBLICATION.md`. Verificare sempre `git remote -v` prima di qualsiasi push. Le ref origin conservate sono snapshot storici, non stato GitHub aggiornato. Non effettuare checkout di vecchie branch per annullare le rimozioni intenzionali. Leggere `docs/LOCAL_LAYOUT.md`, `docs/ORG3_SEPARATION.md` e `IMPLEMENTATION_PROGRESS.md` prima di intervenire.
 
-La PR #13 e stata integrata il 19 ottobre con `36ca5c7`; main locale e aggiornata esclusivamente fast-forward e segue `gestisco/main`. Le altre branch e ref storiche restano conservate. Stato corrente ed evidenze in `docs/ORG5_PUBLICATION.md`.
+La PR #13 e stata integrata il 19 ottobre con `36ca5c7` e la PR #15 il 21 ottobre con `b68c5b8`, che chiude ORG-5; main locale e aggiornata esclusivamente fast-forward e segue `gestisco/main`. Le altre branch e ref storiche restano conservate. Stato corrente ed evidenze in `docs/ORG5_PUBLICATION.md`.
 
 Il codice originale resta a diritti riservati: non aggiungere una licenza open source senza una nuova decisione dell'autore. La visibilita pubblica non autorizza a pubblicare segreti, dati operativi o copie di recovery. La baseline iniziale di un repository vuoto non autorizza futuri push diretti su main o riduzioni dei gate.
 

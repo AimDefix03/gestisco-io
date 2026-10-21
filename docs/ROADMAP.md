@@ -18,7 +18,7 @@ Stato corrente:
 
 ## Classificazione del backlog
 
-Prima di riprendere lo Step 4.4 e in corso il percorso organizzativo: ORG-1 inventario, ORG-2 indipendenza e cronologia, ORG-3 separazione e ORG-4 identita documentale conclusi; ORG-5 in corso dopo autorizzazione al repository pubblico, con diritti riservati, baseline e gate da verificare; ORG-6 handoff non iniziato. Avanzamento organizzativo 4/6 (66.7%), distinto dalla roadmap applicativa 32/48 (66.7%). Il nome Gestisco.IO non modifica scope, dipendenze o gate del master. Vedere [organizzazione](REPOSITORY_ORGANIZATION.md), [ORG-5](ORG5_PUBLICATION.md) e [addendum](GESTISCO_IDENTITY_ADDENDUM.md).
+Prima di riprendere lo Step 4.4 e in corso il percorso organizzativo: ORG-1 inventario, ORG-2 indipendenza e cronologia, ORG-3 separazione e ORG-4 identita documentale conclusi; ORG-5 pubblicazione concluso il 21 ottobre, con repository pubblico a diritti riservati e gate verdi su main; ORG-6 handoff non iniziato. Avanzamento organizzativo 5/6 (83.3%), distinto dalla roadmap applicativa 32/48 (66.7%). Il nome Gestisco.IO non modifica scope, dipendenze o gate del master. Vedere [organizzazione](REPOSITORY_ORGANIZATION.md), [ORG-5](ORG5_PUBLICATION.md) e [addendum](GESTISCO_IDENTITY_ADDENDUM.md).
 
 | Classe | Step | Scopo | Gate |
 |---|---|---|---|
