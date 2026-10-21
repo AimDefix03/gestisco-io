@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Reject tracked local environment files
         run: |
@@ -90,7 +90,7 @@ jobs:
         working-directory: web/backend
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -121,7 +121,7 @@ jobs:
         working-directory: web/frontend
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -156,7 +156,7 @@ jobs:
       - repository-hygiene
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -185,7 +185,7 @@ jobs:
       PLAYWRIGHT_FIREFOX_DIAGNOSTIC_REPEATS: ${{ inputs.firefox_repetitions || '0' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node
         uses: actions/setup-node@v4
