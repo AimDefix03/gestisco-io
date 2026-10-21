@@ -18,7 +18,7 @@ La baseline `cabc12f` e stata creata su `miglioramenti-gestionale` e pubblicata 
 
 Il nome Gestisco.IO e recepito in ORG-4 nell'[addendum](GESTISCO_IDENTITY_ADDENDUM.md). Il 16 ottobre 2026, dopo il preflight privato, l'utente ha autorizzato il repository pubblico `AimDefix03/gestisco-io`, mantenendo i diritti riservati. UI, package e nomi tecnici restano invariati. Vedere [pubblicazione e gate](ORG5_PUBLICATION.md).
 
-Il master originale resta invariato. Il piano applicativo resta fermo dopo 4.3; ORG-5 e in corso. Completare pubblicazione, controlli remoti e protezioni senza passare automaticamente a ORG-6 o 4.4. Consultare i rapporti datati ORG-3, ORG-4 e ORG-5 per gli esiti di verifica effettivi.
+Il master originale resta invariato. Il piano applicativo resta fermo dopo 4.3; ORG-5 e concluso il 21 ottobre con main `b68c5b8`. Non passare automaticamente a ORG-6 o 4.4. Consultare i rapporti datati ORG-3, ORG-4 e ORG-5 per gli esiti di verifica effettivi.
 
 ## Dati e Docker
 

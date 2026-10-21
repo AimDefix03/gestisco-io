@@ -1,6 +1,6 @@
 # ORG-5 - Pubblicazione Gestisco.IO
 
-Aggiornamento: 2026-10-21. Stato: IN_PROGRESS. Timeout Firefox/axe non ricorso sul runner GitHub (49 esecuzioni Firefox, causa non dimostrata); Security della PR #15 bloccata da advisory Vite, correzione locale verificata e non ancora pubblicata. Fonte locale: `/Users/aim_defix/Desktop/Gestisco.IO`. Destinazione: [AimDefix03/gestisco-io](https://github.com/AimDefix03/gestisco-io). I resoconti datati sotto conservano le decisioni e gli esiti precedenti, non sostituiscono questo stato corrente.
+Aggiornamento: 2026-10-21. Stato: COMPLETED. PR #15 integrata con `b68c5b8`, CI e Security post-merge verdi su main; timeout Firefox/axe registrato come rischio residuo con causa non dimostrata. Fonte locale: `/Users/aim_defix/Desktop/Gestisco.IO`. Destinazione: [AimDefix03/gestisco-io](https://github.com/AimDefix03/gestisco-io). I resoconti datati sotto conservano le decisioni e gli esiti precedenti, non sostituiscono questo stato corrente.
 
 ## Decisioni autorizzate
 
@@ -56,6 +56,13 @@ gh workflow run ci.yml --repo AimDefix03/gestisco-io --ref codex/org5-closeout -
 ```
 
 Nove test di contratto passati: default senza effetto, valori ammessi, rifiuto input invalidi, argomenti esatti e propagazione dell'exit code. Il test di contratto usa uno stub senza rete/browser e non sostituisce il controllo reale. I dodici gate obbligatori, timeout e failOnFlakyTests non sono modificati. ORG-5 resta aperto finche il difetto non viene diagnosticato e la verifica remota non e conclusa.
+
+## Chiusura - 2026-10-21
+
+- PR #15, head `4e05700`: [CI 39676174169](https://github.com/AimDefix03/gestisco-io/actions/runs/39676174169) e [Security 39676174338](https://github.com/AimDefix03/gestisco-io/actions/runs/39676174338) verdi, 13 controlli su 13, E2E 19/19 senza flaky.
+- Merge commit `b68c5b8` creato dall'utente nell'interfaccia GitHub dopo autorizzazione esplicita, senza bypass. [CI 39678378207](https://github.com/AimDefix03/gestisco-io/actions/runs/39678378207) e [Security 39678378202](https://github.com/AimDefix03/gestisco-io/actions/runs/39678378202) su main verdi: backend 320/320, frontend 209/209, PostgreSQL 105/105, E2E 19/19, npm audit, Gitleaks e CodeQL passati. Dependency review skipped sul push, coperta dalla PR.
+- Protezione main riletta via API: zero approvazioni, dodici check, strict, review obsolete invalidate, conversazioni risolte, amministratori inclusi, force push e cancellazione vietati. Code scanning: zero alert aperti, non garanzia di assenza di vulnerabilita.
+- Gate 1-5 di questo rapporto soddisfatti. Rischio residuo dichiarato: timeout Firefox/axe intermittente con causa non dimostrata, assente in 38 esecuzioni Firefox sul runner GitHub (30 ripetizioni diagnostiche del login axe, piu i 2 test Firefox in ciascuna delle 4 suite complete), di cui 34 del test axe. Il conteggio di 49 riportato nell'aggiornamento precedente era errato: sommava l'intera suite E2E, che su Firefox esegue 2 test; la diagnostica manuale resta disponibile.
 
 ## Esiti remoti della diagnostica e advisory Vite - 2026-10-21
 
