@@ -4,6 +4,7 @@
 
 - Aggiornati soltanto @playwright/test 1.64.1 e @axe-core/playwright 4.14.0, versione ora esatta come le altre dipendenze; nessun altro pacchetto del gruppo Dependabot #14.
 - L'analisi axe ha un limite di 20 secondi con diagnostica allegata al fallimento; nessun retry aggiunto, timeout globale, browser, regole o assertion invariati. Dettagli in `docs/TESTING.md`.
+- Corretta una corsa nel gate E2E: la creazione della vendita assistita attende le ricerche cliente e prodotto e la riga nel carrello prima di cliccare `Crea bozza ordine`.
 
 ## 2026-10-21 - Correzione advisory Vite
 
