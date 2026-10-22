@@ -2,7 +2,7 @@
 
 ## Stato generale
 
-- Current step: ORG-5 COMPLETED il 2026-10-21: PR #15 integrata con b68c5b8, CI e Security post-merge verdi su main
+- Current step: ORG-5 COMPLETED il 2026-10-21 (main ef2d765). In corso, su richiesta dell'utente: diagnostica del rischio residuo Firefox/axe su `codex/firefox-axe-diagnostics`
 - Next eligible step: ORG-6, handoff e prova di ripresa, soltanto con nuova autorizzazione dell'utente. Non iniziare Step 4.4. Collegamento backend/frontend alla copia database recuperata e login web restano da verificare; nessun cutover implicito
 - Last completed step nel repository reale: 4.3, Inventario fisico e rettifiche approvate
 - Last update: 2026-10-21
@@ -13,6 +13,16 @@
 - Open P1: F-17, F-18, F-19; F-04 rivalidato localmente e confermato dal gate SCA remoto
 - Open P2: F-29, F-30
 - Open P3: nessuno
+
+## Rischio residuo Firefox/axe - 2026-10-21
+
+- Su richiesta dell'utente, step mirato al rischio residuo ORG-5, prima di ORG-6. Branch `codex/firefox-axe-diagnostics` da main ef2d765.
+- Aggiornati soltanto @playwright/test 1.61.1 -> 1.64.1 (Firefox piu recente) e @axe-core/playwright 4.13.0 -> 4.14.0, con axe-core 4.14.0. Le note di rilascio non citano una correzione per questo blocco: non e presentato come rimedio. Breaking change 1.64 verificati: viewport esplicite, nessuno snapshot o iframe nei test.
+- Limite dedicato di 20 secondi sull'analisi axe con allegato testuale `axe-deadline-diagnostics`. Prova con analisi deliberatamente bloccata in un file temporaneo, poi rimosso: fallimento in 2,5 secondi nel passo `analisi axe`, allegato visibile nel log line. Una prova falsa del meccanismo e stata scartata perche non bloccava davvero.
+- Verifiche locali con Node 26.8.1 e browser Playwright 1.64.1: test axe della pagina di accesso passato su Chromium (desktop, mobile, tablet), Firefox e WebKit contro build statica servita da vite preview; test da tastiera saltato senza credenziali, coperto dalla CI prod-like. `npm ci`, `npm test` 209/209 in 42 file, typecheck, typecheck E2E e build passati; contratto diagnostica Firefox 9/9; `npm audit --audit-level=high` exit 0.
+- Nuovo avviso moderato su vitest 4.1.11 e @vitest/mocker (GHSA-qxg6-89mg-rqv8, GHSA-xp26-3454-mjgp): sotto la soglia high del gate, non introdotto da questo step, da trattare separatamente.
+- Prossima verifica: CI della PR, poi diagnostica manuale con 100 ripetizioni. Il rischio si chiude solo con una causa trovata e corretta oppure con un numero di esecuzioni dichiarato; nessuna conclusione dal solo verde della PR.
+- Nessuna modifica applicativa, workflow, soglia, migrazione o database. Organizzazione 5/6, applicazione 32/48. ORG-6 e 4.4 non avviati.
 
 ## Chiusura ORG-5 - 2026-10-21
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-21 - Diagnostica del blocco axe su Firefox
+
+- Aggiornati soltanto @playwright/test 1.64.1 e @axe-core/playwright 4.14.0, versione ora esatta come le altre dipendenze; nessun altro pacchetto del gruppo Dependabot #14.
+- L'analisi axe ha un limite di 20 secondi con diagnostica allegata al fallimento; nessun retry aggiunto, timeout globale, browser, regole o assertion invariati. Dettagli in `docs/TESTING.md`.
+
 ## 2026-10-21 - Correzione advisory Vite
 
 - Aggiornato vite da 8.1.3 a 8.1.6, patch della stessa linea, per gli advisory high che bloccavano il gate Frontend npm audit; rolldown passa a 1.1.5 nel lockfile.
