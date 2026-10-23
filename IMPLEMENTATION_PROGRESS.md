@@ -14,6 +14,14 @@
 - Open P2: F-29, F-30
 - Open P3: nessuno
 
+## Test browser CI nel container Playwright - 2026-10-23
+
+- Problema: il job prod-like dura di norma 4-5 minuti, ma in almeno quattro run del 22-23 ottobre ne ha richiesti 30-55 e su main `660c876` e stato annullato al limite di 60 minuti (CI 39954250594). Log: `Fetched 108 MB in 57min 24s (31.2 kB/s)` durante `playwright install --with-deps`, dal mirror apt dei runner; i test E2E erano appena partiti. Nessun legame con il codice o i test. Rilancio del solo job annullato autorizzato dall'utente.
+- Correzione autorizzata dall'utente: con `PLAYWRIGHT_RUNTIME=container`, impostato nel workflow CI, `run-prod-like-verification.sh` esegue diagnostica Firefox e `npm run test:e2e` tramite il nuovo `scripts/ci/run-playwright-container.sh`, nell'immagine `mcr.microsoft.com/playwright:v<versione>-noble`. La versione e letta da `@playwright/test` installato. Il container usa la rete dell'host, l'utente corrente e `HOME=/tmp`, monta il repository allo stesso percorso, porta le etichette di progetto e run del cleanup (F-03) e riceve le variabili solo per nome. Il valore predefinito `host` conserva il comportamento locale.
+- Lo script della diagnostica Firefox resta invariato e viene eseguito intero nel container: i 9 test di contratto non cambiano. Nuovi 17 test di contratto con `docker` simulato: immagine dalla versione, etichette, variabili senza valori, utente, rifiuto di versioni, progetti e run ID non validi, comando mancante, propagazione dell'exit code. Mutazione verificata: passando il valore di `E2E_PASSWORD` sulla riga di comando il test fallisce.
+- Verifica locale: `sh -n` sui due script e 26/26 test di contratto. La prova reale e la CI della PR; test, timeout, browser e soglie invariati.
+- Nessuna modifica applicativa, migrazione o database. Applicazione 32/48. Step 4.4 non avviato.
+
 ## Dependabot gruppo 2: patch Maven - 2026-10-23
 
 - Su richiesta dell'utente, raggruppate le PR Dependabot #2, #8 e #9 in `web/backend/pom.xml`: maven-surefire-plugin 3.5.3 -> 3.6.0, spring-modulith-bom 2.1.0 -> 2.1.1, maven-dependency-plugin 3.8.1 -> 3.11.0. Il controllo rosso sulle PR originali era Dependency review del 16 ottobre, quando il Dependency graph non era ancora abilitato: non legato agli aggiornamenti.
