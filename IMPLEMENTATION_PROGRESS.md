@@ -14,6 +14,13 @@
 - Open P2: F-29, F-30
 - Open P3: nessuno
 
+## Dependabot gruppo 2: patch Maven - 2026-10-23
+
+- Su richiesta dell'utente, raggruppate le PR Dependabot #2, #8 e #9 in `web/backend/pom.xml`: maven-surefire-plugin 3.5.3 -> 3.6.0, spring-modulith-bom 2.1.0 -> 2.1.1, maven-dependency-plugin 3.8.1 -> 3.11.0. Il controllo rosso sulle PR originali era Dependency review del 16 ottobre, quando il Dependency graph non era ancora abilitato: non legato agli aggiornamenti.
+- Note di rilascio: Spring Modulith 2.1.1 contiene correzioni ed e allineato a Spring Boot 4.1.1 gia in uso; dependency-plugin 3.11 aggiunge goal senza cambiare `dependency:tree`; surefire 3.6.0 esegue anche JUnit 4/TestNG tramite JUnit Platform e migliora la selezione dei test. Il rischio e sulla selezione per tag: i conteggi devono restare 320 nella suite standard e 105 in quella PostgreSQL.
+- Verifica locale con Java 23 e release 17: `mvn -B verify` in `web/backend`, 320 test, zero fallimenti, errori o skip, BUILD SUCCESS, plugin nuovi effettivamente scaricati. I due log ERROR provengono da test negativi attesi (`SecurityHeadersIntegrationTest`, `CanonicalBusinessIdentityMigrationTest`). Suite PostgreSQL non eseguita localmente: la verifica e il job Database migrations della CI.
+- Nessuna modifica applicativa, migrazione, workflow o database. Applicazione 32/48. Step 4.4 non avviato.
+
 ## Dependabot gruppo 1: GitHub Actions su Node 24 - 2026-10-23
 
 - ORG-6 rinviato (DEFERRED) per decisione esplicita dell'utente; motivazione e condizione di ripresa nella lista organizzativa. Organizzazione resta 5/6.
