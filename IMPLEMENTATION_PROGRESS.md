@@ -14,6 +14,13 @@
 - Open P2: F-29, F-30
 - Open P3: nessuno
 
+## Dependabot: dependency-check 13 - 2026-10-23
+
+- PR #5 integrata con `c3ecf83`: CI e Security verdi su main, Dependabot l'ha chiusa.
+- PR #7: dependency-check-maven 12.2.2 -> 13.0.0 in `web/backend/pom.xml`. Compatibile con Maven 3.9.16 e con le opzioni usate; rimossa solo `failBuildOnAnyVulnerability`, non usata. Lo scanner non e legato alla build: gira nel job `Backend dependency inventory`.
+- Prova negativa locale con log4j 2.14.1 e configurazione identica al backend: 12.2.2 e 13.0.0 bloccano entrambe con le stesse 12 vulnerabilita (massimo CVSS 10). Dettagli in `docs/SECURITY_SCANS.md`. La verifica sul backend reale e la scansione CI della PR.
+- Nessuna modifica applicativa, migrazione o database. Applicazione 32/48. Step 4.4 non avviato.
+
 ## Dependabot: React 19.3 - 2026-10-23
 
 - Su richiesta dell'utente si azzera l'arretrato Dependabot prima dello Step 4.4, in quest'ordine: #5 React, #7 dependency-check 13, #1 OpenPDF 3, #18 strumenti frontend divisi in piu passi con TypeScript 7 per ultimo, poi le azioni ancora su Node 20.

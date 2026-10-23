@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-23 - Dependency-Check 13
+
+- OWASP dependency-check-maven 13.0.0 (PR Dependabot #7), con prova negativa: blocca una dipendenza vulnerabile come la 12.2.2. Soglia CVSS 7 invariata.
+
 ## 2026-10-23 - React 19.3
 
 - react e react-dom 19.3.1 (PR Dependabot #5), scheduler 0.28.0 nel lockfile. Nessuna modifica al codice dell'interfaccia.

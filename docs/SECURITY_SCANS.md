@@ -74,6 +74,12 @@ Aggiornamenti mirati, senza soppressioni o riduzione delle soglie:
 
 Le segnalazioni dipendono anche dai prerequisiti applicativi e non equivalgono a uno sfruttamento dimostrato del gestionale. La chiusura richiede comunque scansione aggiornata e suite verdi; risultati correnti in `IMPLEMENTATION_PROGRESS.md`. Non distribuire artefatti con scan fallito o non verificato.
 
+### OWASP Dependency-Check 13 - 2026-10-23
+
+Plugin aggiornato da 12.2.2 a 13.0.0 (PR Dependabot #7). La 13 richiede Maven 3.8.1 o superiore e rimuove le opzioni deprecate; nel plugin Maven l'unica rimossa e `failBuildOnAnyVulnerability`, non usata qui. Restano valide `failBuildOnCVSS`, `failOnError`, `formats`, `nvdDatafeedUrl`, `nvdValidForHours` e `dataDirectory`.
+
+Prova negativa locale, fuori dal repository: un progetto temporaneo con `log4j-core` 2.14.1 e la stessa configurazione del backend (CVSS 7, `failOnError`, mirror NVD della CI) e stato analizzato con entrambe le versioni sullo stesso database. Entrambe falliscono la build per soglia CVSS con risultati identici: 9 vulnerabilita su log4j-core (massimo CVSS 10, CVE-2021-44228) e 3 su log4j-api (massimo 7,5). L'avviso su OSS Index disabilitato per credenziali mancanti e presente con entrambe. La prova non e conservata come test permanente: dimostra che l'aggiornamento non riduce la capacita di blocco, non sostituisce la scansione CI.
+
 ### Advisory Vite del 2026-10-21
 
 Il run Security `39667423941` della PR #15 ha bloccato correttamente vite 8.1.3: gravita high per la dipendenza launch-editor e due advisory del dev server (GHSA-9jrq-w75r-8gcw, GHSA-rq7h-c2jc-7f22), intervallo vulnerabile 8.0.0-8.1.5. Il 19 ottobre lo stesso audit era verde: gli advisory sono successivi.
