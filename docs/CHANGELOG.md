@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-23 - Patch Maven del backend
+
+- maven-surefire-plugin 3.6.0, spring-modulith-bom 2.1.1 e maven-dependency-plugin 3.11.0, raggruppando tre PR Dependabot. Nessuna modifica a codice, test o soglie.
+
 ## 2026-10-23 - GitHub Actions su Node 24
 
 - Aggiornate checkout v7, setup-java v6, setup-node v7, dependency-review-action v5 e gitleaks-action v3, raggruppando cinque PR Dependabot: le versioni precedenti usavano Node 20, rimosso dai runner GitHub. Job, required checks e soglie invariati.
