@@ -413,29 +413,39 @@ async function applyPhysicalInventoryCount(page: Page, code: string, countedQuan
 
 async function createAssistedOrder(page: Page, firstProductQuantity: number, includeSecondProduct: boolean): Promise<Order> {
   await openMenuEntry(page, 'Operazioni', 'Vendita');
+  // Le ricerche partono 300 ms dopo la digitazione e ridisegnano le liste: attenderle evita click durante il refresh.
+  const customerSearch = waitForSearchResponse(page, '/api/partners', partnerCode);
   await page.getByLabel('Cerca cliente').fill(partnerCode);
+  await readJson(await customerSearch);
   await page.getByRole('button', { name: new RegExp(partnerName) }).click();
 
-  await page.getByLabel('Cerca prodotto').fill(firstProductCode);
-  const firstProductRow = page.getByRole('row').filter({ hasText: firstProductCode });
-  await firstProductRow.getByRole('button', { name: 'Aggiungi' }).click();
+  await addProductToCart(page, firstProductCode, firstProductName);
   const firstCartLine = page.getByRole('listitem').filter({ hasText: firstProductName });
   for (let quantity = 1; quantity < firstProductQuantity; quantity += 1) {
     await firstCartLine.getByRole('button', { name: `Aumenta quantita ${firstProductName}` }).click();
   }
 
   if (includeSecondProduct) {
-    await page.getByLabel('Cerca prodotto').fill(secondProductCode);
-    const secondProductRow = page.getByRole('row').filter({ hasText: secondProductCode });
-    await secondProductRow.getByRole('button', { name: 'Aggiungi' }).click();
+    await addProductToCart(page, secondProductCode, secondProductName);
   }
 
+  const createButton = page.getByRole('button', { name: 'Crea bozza ordine' });
+  await expect(createButton).toBeEnabled();
   const responsePromise = waitForApiResponse(page, 'POST', /^\/api\/orders$/);
-  await page.getByRole('button', { name: 'Crea bozza ordine' }).click();
+  await createButton.click();
   const order = await readJson<Order>(await responsePromise);
   await expect(page.locator('.workspace-header h1')).toHaveText('Ordini cliente');
   await expect(page.getByRole('row').filter({ hasText: order.code })).toBeVisible();
   return order;
+}
+
+async function addProductToCart(page: Page, productCode: string, productName: string) {
+  const productSearch = waitForSearchResponse(page, '/api/products', productCode);
+  await page.getByLabel('Cerca prodotto').fill(productCode);
+  await readJson(await productSearch);
+  const productRow = page.getByRole('row').filter({ hasText: productCode });
+  await productRow.getByRole('button', { name: 'Aggiungi' }).click();
+  await expect(page.getByRole('listitem').filter({ hasText: productName })).toBeVisible();
 }
 
 async function openOrderOperations(page: Page, orderCode: string) {
@@ -480,6 +490,13 @@ async function registerCustomer(page: Page, username: string, password: string):
 async function apiGet<T>(page: Page, token: string, path: string): Promise<T> {
   const response = await page.request.get(path, { headers: sessionHeaders(token) });
   return readJson<T>(response);
+}
+
+function waitForSearchResponse(page: Page, pathname: string, q: string): Promise<Response> {
+  return page.waitForResponse((response) => {
+    const url = new URL(response.url());
+    return response.request().method() === 'GET' && url.pathname === pathname && url.searchParams.get('q') === q;
+  });
 }
 
 function waitForApiResponse(page: Page, method: string, path: RegExp): Promise<Response> {

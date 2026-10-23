@@ -2,7 +2,7 @@
 
 ## Stato generale
 
-- Current step: ORG-5 COMPLETED il 2026-10-21: PR #15 integrata con b68c5b8, CI e Security post-merge verdi su main
+- Current step: ORG-5 COMPLETED il 2026-10-21 (main ef2d765). In corso, su richiesta dell'utente: diagnostica del rischio residuo Firefox/axe, PR #17 verde e 100/100 ripetizioni Firefox, merge da autorizzare
 - Next eligible step: ORG-6, handoff e prova di ripresa, soltanto con nuova autorizzazione dell'utente. Non iniziare Step 4.4. Collegamento backend/frontend alla copia database recuperata e login web restano da verificare; nessun cutover implicito
 - Last completed step nel repository reale: 4.3, Inventario fisico e rettifiche approvate
 - Last update: 2026-10-21
@@ -13,6 +13,21 @@
 - Open P1: F-17, F-18, F-19; F-04 rivalidato localmente e confermato dal gate SCA remoto
 - Open P2: F-29, F-30
 - Open P3: nessuno
+
+## Rischio residuo Firefox/axe - 2026-10-21
+
+- Su richiesta dell'utente, step mirato al rischio residuo ORG-5, prima di ORG-6. Branch `codex/firefox-axe-diagnostics` da main ef2d765.
+- Aggiornati soltanto @playwright/test 1.61.1 -> 1.64.1 (Firefox piu recente) e @axe-core/playwright 4.13.0 -> 4.14.0, con axe-core 4.14.0. Le note di rilascio non citano una correzione per questo blocco: non e presentato come rimedio. Breaking change 1.64 verificati: viewport esplicite, nessuno snapshot o iframe nei test.
+- Limite dedicato di 20 secondi sull'analisi axe con allegato testuale `axe-deadline-diagnostics`. Prova con analisi deliberatamente bloccata in un file temporaneo, poi rimosso: fallimento in 2,5 secondi nel passo `analisi axe`, allegato visibile nel log line. Una prova falsa del meccanismo e stata scartata perche non bloccava davvero.
+- Verifiche locali con Node 26.8.1 e browser Playwright 1.64.1: test axe della pagina di accesso passato su Chromium (desktop, mobile, tablet), Firefox e WebKit contro build statica servita da vite preview; test da tastiera saltato senza credenziali, coperto dalla CI prod-like. `npm ci`, `npm test` 209/209 in 42 file, typecheck, typecheck E2E e build passati; contratto diagnostica Firefox 9/9; `npm audit --audit-level=high` exit 0.
+- Nuovo avviso moderato su vitest 4.1.11 e @vitest/mocker (GHSA-qxg6-89mg-rqv8, GHSA-xp26-3454-mjgp): sotto la soglia high del gate, non introdotto da questo step, da trattare separatamente.
+- PR #17, head ae65e98: CI 39764838539 e Security 39764838680 verdi, 13/13 controlli; backend 320/320, frontend 209/209, PostgreSQL 105/105, E2E 19/19 senza flaky.
+- Diagnostica manuale CI 39771639739 su ae65e98 con `firefox_repetitions=100`, runner GitHub x64, Firefox 157.0 (Playwright 1.64.1): 100/100 login axe senza retry, poi suite completa 19/19. Limite axe mai scattato.
+- Esecuzioni del test axe di accesso su Firefox nel runner GitHub dopo il fallimento del 19 ottobre: 34 con Playwright 1.61.1 e 102 con 1.64.1, nessun blocco. Con zero eventi su 136 la frequenza resta compatibile con circa il 2% al 95% di confidenza: rischio fortemente ridotto, non escluso. Causa ancora non dimostrata; in caso di ricorrenza la diagnostica allegata indica il punto del blocco.
+- CI 39776709207 sul commit documentale 237f9d7: prod-like rosso per un test Chromium passato solo al retry, `acconto, annullo e storno restano atomici`; `failOnFlakyTests` ha bloccato correttamente il gate. Trace scaricata: dopo il click su `Crea bozza ordine` nessuna `POST /api/orders` parte e nessun avviso compare; il click cade mentre il carrello si e appena aggiornato e parte la ricerca prodotti debounced (300 ms). Schermata finale coerente: cliente, riga e pulsante abilitato.
+- Correzione del test, stesso schema del 12 ottobre: `createAssistedOrder` attende le risposte delle ricerche cliente e prodotto con il valore digitato, verifica la riga nel carrello e il pulsante abilitato prima del click. Nessun retry, timeout o assertion allentati. Non e dimostrato se il click perso dipenda da uno spostamento del layout o dall'applicazione; se il test fallisse di nuovo con queste attese, va trattato come difetto applicativo. Non si esclude un effetto di Playwright 1.64 sui tempi: un caso su tre suite complete con 1.64.
+- Verifica locale: typecheck E2E passato; il test richiede lo stack completo e viene eseguito dalla CI prod-like.
+- Nessuna modifica applicativa, workflow, soglia, migrazione o database. Organizzazione 5/6, applicazione 32/48. ORG-6 e 4.4 non avviati.
 
 ## Chiusura ORG-5 - 2026-10-21
 

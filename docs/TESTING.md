@@ -6,6 +6,8 @@ Dal controllo ORG-5 del 2026-10-18, Playwright usa `failOnFlakyTests` quando `CI
 
 La trace della CI 39013781946 distingue il focus corretto dall'iniezione axe rimasta pendente in Firefox: 18 test passati al primo tentativo e uno al retry, non 19 prove stabili. Esiti sul candidato successivo e limiti in `docs/ORG5_PUBLICATION.md`. I resoconti sotto restano evidenze storiche datate.
 
+Dal 2026-10-21 l'analisi axe dei test di accessibilita ha un limite dedicato di 20 secondi, contro un'esecuzione normale inferiore al secondo. Se scade, il test fallisce nel passo `analisi axe` con un messaggio esplicito e allega `axe-deadline-diagnostics` in testo: browser e versione, URL, frame, esito di una sonda `evaluate` limitata a 5 secondi ed eventi recenti della pagina (navigazioni, load, errori, crash, console error/warning). Il limite non e un retry e non sostituisce il timeout globale: rende leggibile un blocco che prima esauriva i 60 secondi senza indicazioni.
+
 ## Stato verificato
 
 Rivalidazione locale del consolidamento il 2026-10-11, senza iniziare lo Step 4.4:
