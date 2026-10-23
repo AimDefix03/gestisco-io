@@ -6,7 +6,7 @@ ORG-3 concluso: la fonte web per le prossime attivita e `/Users/aim_defix/Deskto
 
 ORG-4 concluso: identita documentale Gestisco.IO, istruzioni e descrizione del prodotto allineate. [Addendum](GESTISCO_IDENTITY_ADDENDUM.md) e [verifica](ORG4_VERIFICATION.md) distinguono le decisioni organizzative dallo scope funzionale, che resta invariato. I documenti allora non committati sono ora inclusi nella baseline ORG-5.
 
-Organizzazione: 5/6 milestone (83.3%). Roadmap applicativa: 32/48 (66.7%), invariata. ORG-5 concluso il 21 ottobre: repository `AimDefix03/gestisco-io` pubblico a diritti riservati, PR #13 e #15 integrate, CI e Security verdi su main `b68c5b8`. Main locale aggiornata solo fast-forward e associata a gestisco/main. Il 18 ottobre l'utente ha autorizzato zero approvazioni esterne obbligatorie per lavorare da solo; PR, dodici check, branch aggiornata, conversazioni risolte e protezioni amministratori restano attivi. Esiti nel [rapporto ORG-5](ORG5_PUBLICATION.md). ORG-6 non iniziato. Le sezioni seguenti mantengono l'inventario e le decisioni storiche, incluso lo stato dei percorsi al momento del preflight. Questi conteggi non misurano la prontezza alla vendita.
+Organizzazione: 5/6 milestone (83.3%). Roadmap applicativa: 32/48 (66.7%), invariata. ORG-5 concluso il 21 ottobre: repository `AimDefix03/gestisco-io` pubblico a diritti riservati, PR #13 e #15 integrate, CI e Security verdi su main `b68c5b8`. Main locale aggiornata solo fast-forward e associata a gestisco/main. Il 18 ottobre l'utente ha autorizzato zero approvazioni esterne obbligatorie per lavorare da solo; PR, dodici check, branch aggiornata, conversazioni risolte e protezioni amministratori restano attivi. Esiti nel [rapporto ORG-5](ORG5_PUBLICATION.md). ORG-6 rinviato (DEFERRED) il 23 ottobre per decisione dell'utente. Le sezioni seguenti mantengono l'inventario e le decisioni storiche, incluso lo stato dei percorsi al momento del preflight. Questi conteggi non misurano la prontezza alla vendita.
 
 ## ORG-1 - Inventario verificato
 
@@ -83,7 +83,7 @@ Ogni milestone richiede una nuova autorizzazione a procedere. La roadmap funzion
 | [x] | ORG-3 | Recupero isolato e separazione locale conclusi; 25 commit e sei ref in ciascuna copia | Backend 320, frontend 205, Swing 41 test e build passati nelle nuove destinazioni; nessun cutover implicito |
 | [x] | ORG-4 | Identita documentale Gestisco.IO allineata dopo ORG-3 | README, AGENTS, progress e addendum sulle decisioni approvate concordano su root, comandi, scope e limiti; master invariato; verifica documentale dedicata |
 | [x] | ORG-5 | Repository pubblico autorizzato, diritti riservati; gate verdi su main `b68c5b8` | Repository nuovo con CI/Security verdi, branch protetta e storia/provenienza chiara; nessun merge o archivio implicito |
-| [ ] | ORG-6 | Dopo ORG-5: handoff e prova di ripresa | Avvio e verifiche riproducibili seguendo i documenti; nuova chat agganciabile alla root corretta con prossimo step univoco |
+| [-] | ORG-6 | DEFERRED il 2026-10-23 per decisione dell'utente: handoff e prova di ripresa | Avvio e verifiche riproducibili seguendo i documenti; nuova chat agganciabile alla root corretta con prossimo step univoco |
 
 Destinazione verificata ORG-5: `https://github.com/AimDefix03/gestisco-io`, proprietario `AimDefix03`. La creazione e il successivo passaggio al pubblico sono autorizzati; questo non implica che i gate siano gia passati.
 

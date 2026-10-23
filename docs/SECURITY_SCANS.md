@@ -21,7 +21,7 @@ Viene eseguita su:
 
 ### Gitleaks
 
-Gitleaks analizza la storia Git completa e il contenuto del checkout tramite `gitleaks/gitleaks-action@v2`. Il checkout usa `fetch-depth: 0` per non limitare il controllo all'ultimo commit.
+Gitleaks analizza la storia Git completa e il contenuto del checkout tramite `gitleaks/gitleaks-action@v3`. Il checkout usa `fetch-depth: 0` per non limitare il controllo all'ultimo commit.
 
 Ogni rilevazione deve essere verificata. Un valore reale committato va revocato anche se il commit viene successivamente corretto. Le eccezioni possono essere aggiunte solo per falsi positivi dimostrati, con regole strette e revisionate.
 
