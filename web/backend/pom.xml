@@ -27,7 +27,7 @@
         <postgresql.version>42.7.12</postgresql.version>
         <log4j2.version>2.25.5</log4j2.version>
         <apache-poi.version>5.5.1</apache-poi.version>
-        <openpdf.version>2.0.5</openpdf.version>
+        <openpdf.version>3.0.5</openpdf.version>
         <gestionale.postgresql.it.enabled>false</gestionale.postgresql.it.enabled>
     </properties>
 
