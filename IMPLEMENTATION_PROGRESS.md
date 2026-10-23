@@ -14,6 +14,14 @@
 - Open P2: F-29, F-30
 - Open P3: nessuno
 
+## Dependabot: OpenPDF bloccato a Java 17 - 2026-10-23
+
+- PR #7 integrata con `42880b1`.
+- PR #1 (OpenPDF 2.0.5 -> 3.0.5) non applicabile: OpenPDF 3 rinomina i package da `com.lowagie` a `org.openpdf` e, soprattutto, e compilato per Java 21 (bytecode 65). Verifica sui jar di Maven Central: 2.0.5 e l'ultima versione con bytecode 61 (Java 17); dalla 2.1.0 alla 2.4.0 e in tutte le 3.x il bytecode e 65. Il backend resta su Java 17 per il master (A.8): l'aggiornamento non compilerebbe.
+- Decisione dell'utente (opzione A): restare su Java 17 e OpenPDF 2.0.5. `dependabot.yml` ignora `com.github.librepdf:openpdf` dalla 2.1.0 in su, con motivazione nel file; la PR #1 viene chiusa con commento. OpenPDF resta sorvegliata dalla scansione dependency-check settimanale e di ogni PR, oggi senza vulnerabilita note (0 su 66 dipendenze).
+- Debito tecnico registrato: un futuro passaggio a Java 21, da autorizzare come step separato perche modifica il master, porterebbe con se OpenPDF 3 e la migrazione degli import di `PdfReportWriter.java`, unico file che usa la libreria.
+- Nessuna modifica applicativa, migrazione o database. Applicazione 32/48. Step 4.4 non avviato.
+
 ## Dependabot: dependency-check 13 - 2026-10-23
 
 - PR #5 integrata con `c3ecf83`: CI e Security verdi su main, Dependabot l'ha chiusa.

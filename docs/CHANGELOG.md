@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-23 - OpenPDF fermo a Java 17
+
+- Dependabot ignora OpenPDF dalla 2.1.0, compilata per Java 21; il backend resta su Java 17 con OpenPDF 2.0.5. Il passaggio a OpenPDF 3 e rinviato a un eventuale step Java 21.
+
 ## 2026-10-23 - Dependency-Check 13
 
 - OWASP dependency-check-maven 13.0.0 (PR Dependabot #7), con prova negativa: blocca una dipendenza vulnerabile come la 12.2.2. Soglia CVSS 7 invariata.

@@ -74,6 +74,10 @@ Aggiornamenti mirati, senza soppressioni o riduzione delle soglie:
 
 Le segnalazioni dipendono anche dai prerequisiti applicativi e non equivalgono a uno sfruttamento dimostrato del gestionale. La chiusura richiede comunque scansione aggiornata e suite verdi; risultati correnti in `IMPLEMENTATION_PROGRESS.md`. Non distribuire artefatti con scan fallito o non verificato.
 
+### OpenPDF fermo alla 2.0.5 - 2026-10-23
+
+OpenPDF 2.1.0 e successive, incluse le 3.x, sono compilate per Java 21; il backend resta su Java 17. Dependabot ignora quindi OpenPDF dalla 2.1.0 in su (`.github/dependabot.yml`). La versione 2.0.5 resta coperta dalla scansione dependency-check con soglia CVSS 7: una vulnerabilita grave pubblicata in futuro bloccherebbe la CI e richiederebbe di decidere tra mitigazione e passaggio a Java 21.
+
 ### OWASP Dependency-Check 13 - 2026-10-23
 
 Plugin aggiornato da 12.2.2 a 13.0.0 (PR Dependabot #7). La 13 richiede Maven 3.8.1 o superiore e rimuove le opzioni deprecate; nel plugin Maven l'unica rimossa e `failBuildOnAnyVulnerability`, non usata qui. Restano valide `failBuildOnCVSS`, `failOnError`, `formats`, `nvdDatafeedUrl`, `nvdValidForHours` e `dataDirectory`.

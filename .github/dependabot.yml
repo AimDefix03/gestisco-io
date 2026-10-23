@@ -11,6 +11,11 @@ updates:
     labels:
       - dependencies
       - backend
+    ignore:
+      # OpenPDF 2.1.0 e successive sono compilate per Java 21; il backend resta su Java 17
+      # (master A.8). Da rivalutare insieme a un eventuale passaggio a Java 21.
+      - dependency-name: "com.github.librepdf:openpdf"
+        versions: [">= 2.1.0"]
     commit-message:
       prefix: deps
       include: scope
