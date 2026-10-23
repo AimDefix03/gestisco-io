@@ -3,7 +3,7 @@
 ## Stato generale
 
 - Current step: ORG-5 COMPLETED il 2026-10-21; rischio residuo Firefox/axe ridotto e diagnosticabile con la PR #17, integrata il 2026-10-23 come `6416717` con CI e Security verdi su main
-- Next eligible step: ORG-6, handoff e prova di ripresa, soltanto con nuova autorizzazione dell'utente. Non iniziare Step 4.4. Collegamento backend/frontend alla copia database recuperata e login web restano da verificare; nessun cutover implicito
+- Next eligible step: riordino delle PR Dependabot a piccoli gruppi, ciascuno con autorizzazione; ORG-6 DEFERRED per decisione dell'utente del 2026-10-23. Non iniziare Step 4.4. Collegamento backend/frontend alla copia database recuperata e login web restano da verificare; nessun cutover implicito
 - Last completed step nel repository reale: 4.3, Inventario fisico e rettifiche approvate
 - Last update: 2026-10-21
 - Roadmap completion: 32/48 step completati, sincronizzati e verificati nel repository reale (66.7%)
@@ -13,6 +13,15 @@
 - Open P1: F-17, F-18, F-19; F-04 rivalidato localmente e confermato dal gate SCA remoto
 - Open P2: F-29, F-30
 - Open P3: nessuno
+
+## Dependabot gruppo 1: GitHub Actions su Node 24 - 2026-10-23
+
+- ORG-6 rinviato (DEFERRED) per decisione esplicita dell'utente; motivazione e condizione di ripresa nella lista organizzativa. Organizzazione resta 5/6.
+- Raggruppate in una branch le cinque PR Dependabot delle azioni: checkout v4 -> v7 (10 occorrenze), setup-java v4 -> v6 (4), setup-node v4 -> v7 (4), dependency-review-action v4 -> v5, gitleaks-action v2 -> v3. Motivo: le versioni precedenti usano Node 20, rimosso dai runner GitHub il 2026-09-16; i log CI mostravano l'esecuzione forzata su Node 24 con avviso.
+- Note di rilascio controllate: checkout v6 salva le credenziali in un file separato, irrilevante perche i workflow non fanno push; setup-java v6 rimuove le distribuzioni Adopt, qui si usa Temurin; setup-node v5 attiva la cache automatica solo con `packageManager`, assente, e la cache npm resta esplicita; gitleaks v3 e dependency-review v5 cambiano soltanto il runtime. Nessuna licenza Gitleaks richiesta per repository personale.
+- Nomi dei job, required checks, soglie, permessi e input invariati. YAML dei due workflow valido; la verifica reale e l'esecuzione CI e Security della PR.
+- Restano su Node 20 `actions/upload-artifact@v4` e `github/codeql-action@v3`, senza PR Dependabot aperte al momento: da trattare in un gruppo successivo. Le PR #3, #4, #6, #11 e #12 saranno superate dall'integrazione.
+- Nessuna modifica applicativa, dipendenza runtime, migrazione o database. Applicazione 32/48. Step 4.4 non avviato.
 
 ## Rischio residuo Firefox/axe - 2026-10-21
 
@@ -142,7 +151,7 @@ Questo resoconto precede la successiva autorizzazione esplicita al pubblico; non
 - [x] ORG-3: COMPLETED; recupero isolato precedente e separazione locale dei sorgenti conclusi. Due copie autonome verificate, originale preservato, nessun cutover operativo. Evidenze finali in docs/ORG3_LOCAL_VERIFICATION.md.
 - [x] ORG-4: identita e documentazione allineate a Gestisco.IO; addendum sulle decisioni organizzative approvate, master e perimetro funzionale invariati.
 - [x] ORG-5: COMPLETED il 2026-10-21; PR #13 e #15 integrate, CI e Security verdi su main b68c5b8, protezioni rilette. Timeout Firefox/axe registrato come rischio residuo. Vedere docs/ORG5_PUBLICATION.md.
-- [ ] ORG-6: consegna del contesto, istruzioni avvio/ripristino e verifica di ripresa da una nuova chat.
+- [ ] ORG-6: DEFERRED il 2026-10-23 per decisione esplicita dell'utente: il lavoro prosegue con lo stesso agente in una sessione recente, quindi la prova da una nuova chat non aggiunge valore ora. Da riprendere prima di una pausa lunga, di un cambio di strumento o di un collaboratore; nel frattempo progress e documenti restano aggiornati a ogni step.
 - Avanzamento organizzativo: 5/6 milestone (83.3%, conteggio non pesato). Roadmap applicativa invariata: 32/48 (66.7%); nessuna percentuale di prontezza commerciale dedotta.
 - Report, evidenze, criteri di accettazione e stop condition: [Organizzazione repository](docs/REPOSITORY_ORGANIZATION.md).
 
