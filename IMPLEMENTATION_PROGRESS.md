@@ -2,7 +2,7 @@
 
 ## Stato generale
 
-- Current step: ORG-5 COMPLETED il 2026-10-21 (main ef2d765). In corso, su richiesta dell'utente: diagnostica del rischio residuo Firefox/axe, PR #17 verde e 100/100 ripetizioni Firefox, merge da autorizzare
+- Current step: ORG-5 COMPLETED il 2026-10-21; rischio residuo Firefox/axe ridotto e diagnosticabile con la PR #17, integrata il 2026-10-23 come `6416717` con CI e Security verdi su main
 - Next eligible step: ORG-6, handoff e prova di ripresa, soltanto con nuova autorizzazione dell'utente. Non iniziare Step 4.4. Collegamento backend/frontend alla copia database recuperata e login web restano da verificare; nessun cutover implicito
 - Last completed step nel repository reale: 4.3, Inventario fisico e rettifiche approvate
 - Last update: 2026-10-21
@@ -27,6 +27,9 @@
 - CI 39776709207 sul commit documentale 237f9d7: prod-like rosso per un test Chromium passato solo al retry, `acconto, annullo e storno restano atomici`; `failOnFlakyTests` ha bloccato correttamente il gate. Trace scaricata: dopo il click su `Crea bozza ordine` nessuna `POST /api/orders` parte e nessun avviso compare; il click cade mentre il carrello si e appena aggiornato e parte la ricerca prodotti debounced (300 ms). Schermata finale coerente: cliente, riga e pulsante abilitato.
 - Correzione del test, stesso schema del 12 ottobre: `createAssistedOrder` attende le risposte delle ricerche cliente e prodotto con il valore digitato, verifica la riga nel carrello e il pulsante abilitato prima del click. Nessun retry, timeout o assertion allentati. Non e dimostrato se il click perso dipenda da uno spostamento del layout o dall'applicazione; se il test fallisse di nuovo con queste attese, va trattato come difetto applicativo. Non si esclude un effetto di Playwright 1.64 sui tempi: un caso su tre suite complete con 1.64.
 - Verifica locale: typecheck E2E passato; il test richiede lo stack completo e viene eseguito dalla CI prod-like.
+- Commit 860e30c: CI della PR 39803177389 e due esecuzioni manuali sequenziali 39803207068 e 39822049394, tutte verdi; ciascuna con backend 320/320, frontend 209/209, PostgreSQL 105/105 ed E2E 19/19 senza flaky. Security 39803177694 verde. Le esecuzioni manuali erano richieste tutte verdi, non un retry fino al verde.
+- PR #17 integrata dall'utente nell'interfaccia GitHub con merge commit `6416717`. Su main: CI 39921304618 verde (320, 209, 105 ed E2E 19/19 senza flaky) e Security 39921304495 verde; Dependency review skipped sul push.
+- Rischio residuo aggiornato: blocco Firefox/axe raro e diagnosticabile, causa non dimostrata; click perso nella vendita assistita non ripresentato con le nuove attese. Nessun dato utente o applicativo coinvolto. Restano 12 PR Dependabot aperte e l'avviso moderato su vitest, da trattare separatamente.
 - Nessuna modifica applicativa, workflow, soglia, migrazione o database. Organizzazione 5/6, applicazione 32/48. ORG-6 e 4.4 non avviati.
 
 ## Chiusura ORG-5 - 2026-10-21
