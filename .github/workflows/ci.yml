@@ -104,7 +104,7 @@ jobs:
 
       - name: Upload backend artifact
         if: github.event_name == 'push'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: gestionale-api-${{ github.sha }}
           path: web/backend/target/*.jar
@@ -141,7 +141,7 @@ jobs:
 
       - name: Upload frontend artifact
         if: github.event_name == 'push'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: gestionale-frontend-${{ github.sha }}
           path: web/frontend/dist
@@ -201,7 +201,7 @@ jobs:
 
       - name: Upload prod-like diagnostics
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: prod-like-diagnostics-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: /tmp/prod-like-diagnostics
