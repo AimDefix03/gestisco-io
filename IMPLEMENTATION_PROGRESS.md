@@ -14,6 +14,14 @@
 - Open P2: F-29, F-30
 - Open P3: nessuno
 
+## Dependabot: React 19.3 - 2026-10-23
+
+- Su richiesta dell'utente si azzera l'arretrato Dependabot prima dello Step 4.4, in quest'ordine: #5 React, #7 dependency-check 13, #1 OpenPDF 3, #18 strumenti frontend divisi in piu passi con TypeScript 7 per ultimo, poi le azioni ancora su Node 20.
+- PR #5: react e react-dom 19.2.7 -> 19.3.1 a versione esatta; nel lockfile cambia anche scheduler 0.27.0 -> 0.28.0. `@types/react` resta 19.2.17 come nella PR Dependabot. Note di rilascio senza modifiche incompatibili: Fragment refs, avvisi DEV, correzioni Fast Refresh, StrictMode e form.
+- Verifiche locali con Node 26.8.1: `npm ci`, `npm test` 209/209 in 42 file, typecheck, typecheck E2E, build e `npm audit --audit-level=high` passati. Zero avvisi React nei test sia con 19.2.7 sia con 19.3.1. Test axe di accesso passato su Chromium desktop/mobile/tablet, Firefox e WebKit contro la build servita da vite preview; test da tastiera coperto dalla CI.
+- Esito post-merge della PR #22 (`6a2acc7`): CI 39975747339 e Security 39975747469 verdi; job prod-like 3 minuti e 40 secondi, contro i 55 del rilancio con installazione apt (39954250594, tentativo 2, verde).
+- Nessuna modifica applicativa, migrazione o database. Applicazione 32/48. Step 4.4 non avviato.
+
 ## Test browser CI nel container Playwright - 2026-10-23
 
 - Problema: il job prod-like dura di norma 4-5 minuti, ma in almeno quattro run del 22-23 ottobre ne ha richiesti 30-55 e su main `660c876` e stato annullato al limite di 60 minuti (CI 39954250594). Log: `Fetched 108 MB in 57min 24s (31.2 kB/s)` durante `playwright install --with-deps`, dal mirror apt dei runner; i test E2E erano appena partiti. Nessun legame con il codice o i test. Rilancio del solo job annullato autorizzato dall'utente.
