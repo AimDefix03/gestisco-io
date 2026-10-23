@@ -51,11 +51,19 @@ Comando:
 scripts/ci/run-prod-like-verification.sh
 ```
 
-Su una macchina CI Linux che deve installare anche le dipendenze di sistema di Chromium:
+Su una macchina Linux che deve installare anche le dipendenze di sistema dei browser:
 
 ```bash
 PLAYWRIGHT_INSTALL_WITH_DEPS=true scripts/ci/run-prod-like-verification.sh
 ```
+
+In CI i test browser girano nell'immagine ufficiale Playwright, con browser e librerie di sistema gia presenti:
+
+```bash
+PLAYWRIGHT_RUNTIME=container scripts/ci/run-prod-like-verification.sh
+```
+
+`scripts/ci/run-playwright-container.sh` ricava il tag `mcr.microsoft.com/playwright:v<versione>-noble` da `@playwright/test` installato, quindi un aggiornamento del pacchetto aggiorna anche l'immagine. Il container usa la rete dell'host per raggiungere lo stack, gira con l'utente corrente, porta le etichette di progetto e run usate dal cleanup e riceve le variabili d'ambiente solo per nome. Accetta soltanto progetti `gestionale-prodlike-*`. Il valore predefinito `host` mantiene l'installazione locale dei browser. Motivo: con `--with-deps` lo scaricamento apt dal mirror dei runner GitHub ha impiegato fino a 57 minuti (108 MB a 31 kB/s), portando il job oltre il limite di 60 minuti senza eseguire i test.
 
 Le porte possono essere personalizzate con:
 

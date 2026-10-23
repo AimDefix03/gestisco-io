@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-23 - Test browser della CI nell'immagine Playwright
+
+- Il job prod-like esegue diagnostica Firefox e suite E2E nell'immagine ufficiale Playwright della stessa versione del pacchetto, senza `playwright install --with-deps`. Lo scaricamento apt dal mirror dei runner aveva portato piu run a 30-60 minuti e una run di main oltre il limite. Test, timeout e soglie invariati; 17 nuovi test di contratto per lo script del container.
+
 ## 2026-10-23 - Patch Maven del backend
 
 - maven-surefire-plugin 3.6.0, spring-modulith-bom 2.1.1 e maven-dependency-plugin 3.11.0, raggruppando tre PR Dependabot. Nessuna modifica a codice, test o soglie.

@@ -180,7 +180,7 @@ jobs:
     needs:
       - repository-hygiene
     env:
-      PLAYWRIGHT_INSTALL_WITH_DEPS: "true"
+      PLAYWRIGHT_RUNTIME: container
       PRODLIKE_DIAGNOSTICS_DIR: /tmp/prod-like-diagnostics
       PLAYWRIGHT_FIREFOX_DIAGNOSTIC_REPEATS: ${{ inputs.firefox_repetitions || '0' }}
     steps:
@@ -196,7 +196,7 @@ jobs:
 
       - name: Run recurring prod-like verification
         run: |
-          node --test scripts/ci/firefox-diagnostic.test.mjs
+          node --test scripts/ci/firefox-diagnostic.test.mjs scripts/ci/playwright-container.test.mjs
           sh scripts/ci/run-prod-like-verification.sh
 
       - name: Upload prod-like diagnostics

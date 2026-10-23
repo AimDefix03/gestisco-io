@@ -290,14 +290,30 @@ sh "$ROOT_DIR/scripts/observability/verify-prometheus-hardening.sh" \
 
 cd "$ROOT_DIR/web/frontend"
 npm ci
-if [ "${PLAYWRIGHT_INSTALL_WITH_DEPS:-false}" = true ]; then
-  npx playwright install --with-deps chromium firefox webkit
-else
-  npx playwright install chromium firefox webkit
-fi
+case "${PLAYWRIGHT_RUNTIME:-host}" in
+  container)
+    run_playwright() {
+      sh "$ROOT_DIR/scripts/ci/run-playwright-container.sh" "$PROJECT_NAME" "$RUN_ID" "$@"
+    }
+    ;;
+  host)
+    if [ "${PLAYWRIGHT_INSTALL_WITH_DEPS:-false}" = true ]; then
+      npx playwright install --with-deps chromium firefox webkit
+    else
+      npx playwright install chromium firefox webkit
+    fi
+    run_playwright() {
+      "$@"
+    }
+    ;;
+  *)
+    printf 'PLAYWRIGHT_RUNTIME non valido: %s. Usare host o container.\n' "$PLAYWRIGHT_RUNTIME" >&2
+    exit 1
+    ;;
+esac
 npm run typecheck:e2e
-sh "$ROOT_DIR/scripts/ci/run-firefox-diagnostic.sh"
-npm run test:e2e
+run_playwright sh "$ROOT_DIR/scripts/ci/run-firefox-diagnostic.sh"
+run_playwright npm run test:e2e
 
 cd "$ROOT_DIR"
 sh "$ROOT_DIR/scripts/security/verify-login-rate-limit.sh" "$PLAYWRIGHT_BASE_URL"
