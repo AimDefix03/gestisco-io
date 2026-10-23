@@ -16,8 +16,8 @@
     "audit": "npm audit --audit-level=high"
   },
   "dependencies": {
-    "react": "19.2.7",
-    "react-dom": "19.2.7"
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.14.0",

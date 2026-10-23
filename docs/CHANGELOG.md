@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-23 - React 19.3
+
+- react e react-dom 19.3.1 (PR Dependabot #5), scheduler 0.28.0 nel lockfile. Nessuna modifica al codice dell'interfaccia.
+
 ## 2026-10-23 - Test browser della CI nell'immagine Playwright
 
 - Il job prod-like esegue diagnostica Firefox e suite E2E nell'immagine ufficiale Playwright della stessa versione del pacchetto, senza `playwright install --with-deps`. Lo scaricamento apt dal mirror dei runner aveva portato piu run a 30-60 minuti e una run di main oltre il limite. Test, timeout e soglie invariati; 17 nuovi test di contratto per lo script del container.
