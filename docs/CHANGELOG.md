@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-24 - Strumenti frontend minori e upload-artifact v7
+
+- vite 8.3.4, @vitejs/plugin-react 6.1.2, Testing Library e tipi aggiornati (prima parte della PR Dependabot #24). upload-artifact v7 (PR #28).
+- Nota: il bundle JS e cresciuto da 392 a 421 kB con React 19.3 (PR #23); vite 8.3 non lo aumenta.
+
 ## 2026-10-23 - OpenPDF fermo a Java 17
 
 - Dependabot ignora OpenPDF dalla 2.1.0, compilata per Java 21; il backend resta su Java 17 con OpenPDF 2.0.5. Il passaggio a OpenPDF 3 e rinviato a un eventuale step Java 21.
