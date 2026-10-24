@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-24 - Stato di avanzamento compatto
+
+- `IMPLEMENTATION_PROGRESS.md` ridotto a stato corrente, step, decisioni, blocker, rischi e registro di una riga per step; lo storico completo e archiviato invariato in `docs/archive/IMPLEMENTATION_LOG_2026-10.md`.
+- Avanzamento autonomo tra step della stessa fase, con stop a ogni gate, registrato in `AGENTS.md`.
+
 ## 2026-10-24 - Benchmark retail e glossario
 
 - Schede WB-007 - WB-010 (varianti, cassa, resi e cambi, listini e saldi) da documentazione ufficiale Odoo ed ERPNext; glossario della roadmap di prodotto in `DOMAIN_MODEL.md`.
