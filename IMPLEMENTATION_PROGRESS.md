@@ -2,17 +2,27 @@
 
 ## Stato generale
 
-- Current step: ORG-5 COMPLETED il 2026-10-21; rischio residuo Firefox/axe ridotto e diagnosticabile con la PR #17, integrata il 2026-10-23 come `6416717` con CI e Security verdi su main
-- Next eligible step: riordino delle PR Dependabot a piccoli gruppi, ciascuno con autorizzazione; ORG-6 DEFERRED per decisione dell'utente del 2026-10-23. Non iniziare Step 4.4. Collegamento backend/frontend alla copia database recuperata e login web restano da verificare; nessun cutover implicito
+- Current step: P0.1 IN_PROGRESS, decisione di direzione (ADR 0008) e roadmap di prodotto `docs/ROADMAP_PRODOTTO.md`
+- Next eligible step: P0.2 benchmark e glossario di dominio, poi P0.3 snellimento documentale e P1.1 categorie configurabili, ciascuno con autorizzazione. ORG-6 DEFERRED. PR Dependabot #27 (Apache POI 6) in attesa per scelta: rivalutare a inizio novembre o alla 6.0.1
 - Last completed step nel repository reale: 4.3, Inventario fisico e rettifiche approvate
-- Last update: 2026-10-21
-- Roadmap completion: 32/48 step completati, sincronizzati e verificati nel repository reale (66.7%)
+- Last update: 2026-10-24
+- Roadmap completion: storico del master 32/48 (66.7%), fino allo Step 4.3. Dal 2026-10-24 l'avanzamento segue le fasi P0-P11 e i gate G1-G7 di `docs/ROADMAP_PRODOTTO.md` (ADR 0008).
 - Il 66.7% misura gli step completati, non la prontezza produttiva. La precedente stima di maturita 95-97% non e supportata dai gate ancora aperti e viene ritirata.
 - Gate C rivalidato localmente; CI e sicurezza remote verdi su `a3407d3`, inclusa scansione dipendenze backend
 - Open P0: nessuno
 - Open P1: F-17, F-18, F-19; F-04 rivalidato localmente e confermato dal gate SCA remoto
 - Open P2: F-29, F-30
 - Open P3: nessuno
+
+## P0.1 Direzione di prodotto - 2026-10-24
+
+- Su richiesta dell'utente, analisi del prodotto per la vendibilita: inventario di pagine, API, modello dati e ruoli. Limiti principali: categorie fisse nel codice, giacenza unica per prodotto, IVA unica aziendale, nessuna cassa, nessun codice a barre, documenti non stampabili, nessun router e login a ogni ricarica, nessun adempimento fiscale.
+- Decisioni dell'utente: gestionale generalista e adattabile; segmento pilota abbigliamento e calzature; prodotto vendibile e completo, non beta; obiettivo 2-3 mesi. Registrate in ADR 0008 con le alternative scartate (verticale informatica, versione affiancata senza fiscale, sequenza del master).
+- Nuova roadmap `docs/ROADMAP_PRODOTTO.md`: fasi P0-P11, gate G1-G7, validazioni V1-V3, tabella di tracciabilita di tutti gli step aperti del master e dei finding, costi esterni e rischi. Stime di 38-57 settimane di lavoro effettivo dichiarate insieme all'obiettivo dell'utente, da rivedere a fine fase.
+- `PRODUCT_SCOPE.md` e `ROADMAP.md` rinviano alla nuova roadmap mantenendo lo storico. Master invariato.
+- Attivita esterne da avviare subito a cura dell'utente: intermediari per corrispettivi e SDI, commercialista, preventivi per penetration test, contratti e privacy.
+- Autorizzazione permanente dell'utente, registrata in `AGENTS.md`: commit, push di branch dedicate e PR per gli step della roadmap di prodotto; merge sempre all'utente.
+- Nessuna modifica a codice, test, migrazioni, workflow o database.
 
 ## Dependabot: ambiente di test frontend e rinvio di TypeScript 7 - 2026-10-24
 

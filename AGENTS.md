@@ -10,7 +10,7 @@ L'addendum `docs/GESTISCO_IDENTITY_ADDENDUM.md` recepisce soltanto il nome Gesti
 
 ## Stato del progetto
 
-Gestisco.IO contiene esclusivamente la linea web in `web/`, con backend Spring Boot e frontend React. Root locale: `/Users/aim_defix/Desktop/Gestisco.IO`. Scope corrente: una sola azienda, un solo magazzino, pagamenti manuali e documenti simulati non fiscali. La direzione SaaS non autorizza multi-tenancy o ampliamenti automatici.
+Gestisco.IO contiene esclusivamente la linea web in `web/`, con backend Spring Boot e frontend React. Root locale: `/Users/aim_defix/Desktop/Gestisco.IO`. Scope corrente: una sola azienda, un solo magazzino, pagamenti manuali e documenti simulati non fiscali. La direzione SaaS non autorizza multi-tenancy o ampliamenti automatici. Dal 2026-10-24 l'ordine dei lavori segue `docs/ROADMAP_PRODOTTO.md` (ADR 0008): nucleo generalista, segmento pilota abbigliamento e calzature, uno step per volta con autorizzazione.
 
 La parte Swing congelata e separata in `/Users/aim_defix/Desktop/GestionaleNegozioComputer`. Non ricreare qui `src/` nella root o `pom-legacy.xml`; `web/backend/src/` resta necessario. La cronologia Git contiene ancora entrambe le linee per preservarne la provenienza.
 
@@ -20,7 +20,7 @@ La PR #13 e stata integrata il 19 ottobre con `36ca5c7` e la PR #15 il 21 ottobr
 
 Il codice originale resta a diritti riservati: non aggiungere una licenza open source senza una nuova decisione dell'autore. La visibilita pubblica non autorizza a pubblicare segreti, dati operativi o copie di recovery. La baseline iniziale di un repository vuoto non autorizza futuri push diretti su main o riduzioni dei gate.
 
-Il 18 ottobre l'utente, sviluppatore singolo, ha autorizzato soltanto la riduzione delle approvazioni esterne obbligatorie da una a zero. Restano obbligatori pull request, dodici check GitHub Actions, aggiornamento alla base e conversazioni risolte; protezioni applicate anche agli amministratori, force push e cancellazione vietati. Documentare la revisione tecnica, senza presentarla come approvazione indipendente. Commit, push e merge richiedono comunque autorizzazione pertinente; non usare bypass o ridurre i controlli per sbloccare una PR.
+Il 18 ottobre l'utente, sviluppatore singolo, ha autorizzato soltanto la riduzione delle approvazioni esterne obbligatorie da una a zero. Restano obbligatori pull request, dodici check GitHub Actions, aggiornamento alla base e conversazioni risolte; protezioni applicate anche agli amministratori, force push e cancellazione vietati. Documentare la revisione tecnica, senza presentarla come approvazione indipendente. Commit, push e merge richiedono comunque autorizzazione pertinente; non usare bypass o ridurre i controlli per sbloccare una PR. Il 2026-10-24 l'utente ha autorizzato in modo permanente commit, push di branch dedicate e apertura di PR verso main per gli step di `docs/ROADMAP_PRODOTTO.md`, uno step per volta; il merge resta sempre all'utente. L'autorizzazione non copre push diretti su main, force push, cancellazione di branch o ref, modifiche alle protezioni, operazioni su database o ambienti operativi, chiusura di PR altrui o lavoro fuori dalla roadmap.
 
 Il repository originale `/Users/aim_defix/Desktop/Gestionale.Negozio.Computer ` (spazio finale) e conservato per rollback, non per nuove funzionalita. Le configurazioni Docker non sono state migrate: non avviare gli stack predefiniti senza associare esplicitamente ambiente, secret, project e volumi. Non copiare credenziali o dati nei repository.
 

@@ -1,5 +1,9 @@
 # Gestisco.IO - Product Scope
 
+## Revisione dello scope - 2026-10-24
+
+Con [ADR 0008](DECISIONS/0008-product-direction-generalist-core-apparel-pilot.md) l'utente ha chiuso il congelamento del 2026-07-28: Gestisco.IO diventa un gestionale generalista e adattabile per il commercio al dettaglio, con segmento pilota abbigliamento e calzature, da rendere vendibile come prodotto completo. Gli step ammessi sono quelli di [ROADMAP_PRODOTTO.md](ROADMAP_PRODOTTO.md), uno alla volta e con autorizzazione. Restano fuori, fino alla fase P11, multi-azienda, SaaS condiviso, multi-negozio ed e-commerce; corrispettivi e fattura elettronica entrano in P8 tramite intermediario. Le sezioni seguenti descrivono lo scope congelato precedente e restano come storico.
+
 ## Stato dello scope
 
 Lo scope e stato congelato dal 2026-07-28 per concentrare il lavoro sulla stabilizzazione. Al 2026-10-15 la roadmap applicativa conta 32/48 step completati (66.7%), fino al 4.3; questo conteggio non misura la maturita produttiva. Le precedenti stime percentuali di maturita non sono mantenute. Il Gate C ha evidenze tecniche, ma la prova con operatore e i gate produttivi restano aperti: il prodotto non e dichiarato pronto per produzione o vendita. Lo stato puntuale dei finding e in `IMPLEMENTATION_PROGRESS.md` nella root.
