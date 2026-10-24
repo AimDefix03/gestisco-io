@@ -14,6 +14,15 @@
 - Open P2: F-29, F-30
 - Open P3: nessuno
 
+## Dependabot: strumenti frontend minori e upload-artifact - 2026-10-24
+
+- PR #26 integrata con `be1790a`; Dependabot ha chiuso da solo la #1 leggendo la nuova regola. Il nuovo giro ha aperto #27 (Apache POI 6, compilato per Java 17: compatibile) e #28 (upload-artifact v4 -> v7).
+- PR #28 integrata direttamente con `3783dc6`, dopo verifica delle note di rilascio (Node 24, nuova opzione `archive` non usata). Su main CI e Security verdi con tutti e cinque gli artifact caricati (JAR, build frontend, diagnostica prod-like, report dependency-check, SARIF Gitleaks). Restano su Node 20 solo le azioni `codeql-action`.
+- Prima parte della PR #24, aggiornamenti minori e patch: @testing-library/react 16.3.3, @testing-library/user-event 14.6.8, @types/node 26.6.5, @types/react e @types/react-dom 19.3.0, @vitejs/plugin-react 6.1.2, vite 8.3.4 (versione proposta da Dependabot; scartata la 8.3.5 uscita pochi giorni prima). Nel lockfile anche rolldown 1.2.15 e postcss 8.5.31.
+- Verifiche locali: `npm ci`, `npm test` 209/209 senza avvisi, typecheck, typecheck E2E, build e audit high passati.
+- Dimensione del bundle: 420,8 kB (115,2 kB gzip) contro 421,1 kB su main con vite 8.1.6. L'aumento rispetto ai 391,8 kB del 21 ottobre e dovuto a React 19.3 (PR #23), non rilevato allora perche le dimensioni non erano state confrontate.
+- Restano della #24: Vitest 5, jsdom 30 e jest-dom 7 (passo successivo) e TypeScript 7 (da rinviare). Nessuna modifica applicativa, migrazione o database. Applicazione 32/48.
+
 ## Dependabot: OpenPDF bloccato a Java 17 - 2026-10-23
 
 - PR #7 integrata con `42880b1`.
