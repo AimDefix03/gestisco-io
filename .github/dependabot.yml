@@ -31,6 +31,11 @@ updates:
     labels:
       - dependencies
       - frontend
+    ignore:
+      # TypeScript 7 (compilatore riscritto) rinviato per decisione del 2026-10-24: da rivalutare
+      # entro gennaio 2027. Le versioni minori e patch della linea 6 restano proposte.
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
     groups:
       frontend-runtime:
         patterns:
