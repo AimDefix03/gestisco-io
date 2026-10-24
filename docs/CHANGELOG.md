@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-24 - Direzione di prodotto e nuova roadmap
+
+- ADR 0008: gestionale generalista per il commercio al dettaglio, segmento pilota abbigliamento e calzature, erogazione iniziale per istanza dedicata.
+- Nuova roadmap operativa `docs/ROADMAP_PRODOTTO.md` (fasi P0-P11, gate G1-G7), con tracciabilita degli step aperti del master.
+
 ## 2026-10-24 - Ambiente di test frontend
 
 - Vitest 5.0.5, jsdom 30.1.3 e jest-dom 7.0.1 (seconda parte della PR Dependabot #24): risolto l'avviso moderato su Vitest, npm audit a zero.
