@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-24 - Benchmark retail e glossario
+
+- Schede WB-007 - WB-010 (varianti, cassa, resi e cambi, listini e saldi) da documentazione ufficiale Odoo ed ERPNext; glossario della roadmap di prodotto in `DOMAIN_MODEL.md`.
+
 ## 2026-10-24 - Direzione di prodotto e nuova roadmap
 
 - ADR 0008: gestionale generalista per il commercio al dettaglio, segmento pilota abbigliamento e calzature, erogazione iniziale per istanza dedicata.

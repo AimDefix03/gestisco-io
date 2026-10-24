@@ -2,8 +2,8 @@
 
 ## Stato generale
 
-- Current step: P0.1 IN_PROGRESS, decisione di direzione (ADR 0008) e roadmap di prodotto `docs/ROADMAP_PRODOTTO.md`
-- Next eligible step: P0.2 benchmark e glossario di dominio, poi P0.3 snellimento documentale e P1.1 categorie configurabili, ciascuno con autorizzazione. ORG-6 DEFERRED. PR Dependabot #27 (Apache POI 6) in attesa per scelta: rivalutare a inizio novembre o alla 6.0.1
+- Current step: P0.2 benchmark e glossario di dominio (P0.1 in PR #34)
+- Next eligible step: P0.3 snellimento documentale e P1.1 categorie configurabili, ciascuno con autorizzazione. ORG-6 DEFERRED. PR Dependabot #27 (Apache POI 6) in attesa per scelta: rivalutare a inizio novembre o alla 6.0.1
 - Last completed step nel repository reale: 4.3, Inventario fisico e rettifiche approvate
 - Last update: 2026-10-24
 - Roadmap completion: storico del master 32/48 (66.7%), fino allo Step 4.3. Dal 2026-10-24 l'avanzamento segue le fasi P0-P11 e i gate G1-G7 di `docs/ROADMAP_PRODOTTO.md` (ADR 0008).
@@ -13,6 +13,13 @@
 - Open P1: F-17, F-18, F-19; F-04 rivalidato localmente e confermato dal gate SCA remoto
 - Open P2: F-29, F-30
 - Open P3: nessuno
+
+## P0.2 Benchmark e glossario di dominio - 2026-10-24
+
+- Documentazione ufficiale consultata il 2026-10-24: Odoo 18.0 (varianti, cassa, codici a barre, sconti, resi, carte regalo, listini, promozioni) ed ERPNext (varianti, cassa, regole di prezzo, fedelta, coupon). Parte dei contenuti Odoo proviene da riassunti automatici di pagine lunghe: segnalato nelle fonti, da riverificare prima di implementare. Pagina di apertura cassa ERPNext non disponibile (HTTP 404).
+- Schede in `docs/WORKFLOW_BENCHMARKS.md`: WB-007 modelli e varianti (`READY_FOR_IMPLEMENTATION`), WB-008 sessione di cassa e vendita al banco (`DRAFT`, una sola fonte per apertura e chiusura), WB-009 resi, cambi e buoni (`DRAFT`, cambi e resi senza scontrino non documentati), WB-010 listini, promozioni e saldi (`READY_FOR_IMPLEMENTATION`, precedenza da approvare in P4.2).
+- Glossario in `docs/DOMAIN_MODEL.md`: modello, variante/SKU, attributi, griglia, collezione, listino, promozione, sessione di cassa, cambio, buono, modulo attivabile, istanza dedicata.
+- Da completare prima di P3: seconda fonte per WB-008 e WB-009 e validazione V1 con chi lavora in un negozio. Nessuna modifica a codice, test, migrazioni o database.
 
 ## P0.1 Direzione di prodotto - 2026-10-24
 
