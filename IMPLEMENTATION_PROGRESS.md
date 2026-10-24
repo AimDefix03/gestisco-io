@@ -14,6 +14,14 @@
 - Open P2: F-29, F-30
 - Open P3: nessuno
 
+## Dependabot: ambiente di test frontend e rinvio di TypeScript 7 - 2026-10-24
+
+- PR #29 integrata con `221c93a`.
+- Seconda parte della PR #24: vitest 4.1.11 -> 5.0.5, jsdom 27.0.1 -> 30.1.3, @testing-library/jest-dom 6.9.1 -> 7.0.1. Note di rilascio: Vitest 5 richiede Node 22 (usato in CI) e azzera i mock prima di ogni test, gia configurato qui con `clearMocks` e `restoreMocks`; jest-dom 7 richiede `@testing-library/dom`, gia presente come 10.4.1. Nel lockfile 54 pacchetti rimossi.
+- Verifiche locali: `npm ci`, `npm test` 209/209 senza avvisi, typecheck, typecheck E2E e build passati; bundle identico (stesso hash). `npm audit` ora 0 vulnerabilita: risolto l'avviso moderato su vitest 4.1.11 e @vitest/mocker. Prova con un test temporaneo, poi rimosso: `toBeEnabled` su un pulsante disabilitato fallisce come atteso, quindi i matcher jest-dom restano attivi.
+- TypeScript 7 rinviato come concordato con l'utente: `dependabot.yml` ignora gli aggiornamenti major di `typescript` fino a nuova valutazione entro gennaio 2027; minori e patch della linea 6 restano proposti. Con questa PR la #24 risulta coperta.
+- Nessuna modifica applicativa, migrazione o database. Applicazione 32/48.
+
 ## Dependabot: strumenti frontend minori e upload-artifact - 2026-10-24
 
 - PR #26 integrata con `be1790a`; Dependabot ha chiuso da solo la #1 leggendo la nuova regola. Il nuovo giro ha aperto #27 (Apache POI 6, compilato per Java 17: compatibile) e #28 (upload-artifact v4 -> v7).

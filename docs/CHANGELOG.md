@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-24 - Ambiente di test frontend
+
+- Vitest 5.0.5, jsdom 30.1.3 e jest-dom 7.0.1 (seconda parte della PR Dependabot #24): risolto l'avviso moderato su Vitest, npm audit a zero.
+- TypeScript 7 rinviato: Dependabot ignora gli aggiornamenti major di `typescript` fino a nuova valutazione entro gennaio 2027.
+
 ## 2026-10-24 - Strumenti frontend minori e upload-artifact v7
 
 - vite 8.3.4, @vitejs/plugin-react 6.1.2, Testing Library e tipi aggiornati (prima parte della PR Dependabot #24). upload-artifact v7 (PR #28).
