@@ -2,6 +2,10 @@
 
 Allineamento documentale del 2026-10-15; le date delle prove tecniche sono riportate in `IMPLEMENTATION_PROGRESS.md`, senza implicare nuove esecuzioni.
 
+## Aggiornamento 2026-10-24
+
+La roadmap operativa e ora [ROADMAP_PRODOTTO.md](ROADMAP_PRODOTTO.md), approvata con [ADR 0008](DECISIONS/0008-product-direction-generalist-core-apparel-pilot.md). Gli step 4.4-6.5 del master sono riassegnati alle fasi P5-P10 secondo la tabella di tracciabilita della nuova roadmap. Il contenuto seguente resta come storico della sequenza del master fino allo Step 4.3.
+
 ## Fonte e stato reale
 
 `MASTER_SOURCE_AGENTE_AI.md` definisce ordine, dipendenze, test, criteri di accettazione e stop condition. Questa roadmap ne espone la classificazione operativa senza sostituirlo.

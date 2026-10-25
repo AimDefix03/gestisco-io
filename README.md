@@ -12,7 +12,9 @@ Il perimetro corrente resta una sola azienda e un solo magazzino, con pagamenti 
 
 La roadmap applicativa e arrivata allo Step 4.3: 32/48 step (66,7%). E un conteggio di attivita, non una percentuale di affidabilita o prontezza commerciale. Restano, tra gli altri, validazione con operatori, backup off-site, recovery e alert operativi, verifiche di sicurezza indipendenti e gate produttivi. Il sistema non e dichiarato conforme alla fatturazione elettronica, alla normativa fiscale o al GDPR.
 
-[Stato e verifiche](IMPLEMENTATION_PROGRESS.md) | [Scope](docs/PRODUCT_SCOPE.md) | [Roadmap](docs/ROADMAP.md) | [Identita e vincoli](docs/GESTISCO_IDENTITY_ADDENDUM.md)
+Dal 24 ottobre 2026 la direzione e un gestionale generalista per il commercio al dettaglio, con segmento pilota abbigliamento e calzature: vedere [ADR 0008](docs/DECISIONS/0008-product-direction-generalist-core-apparel-pilot.md) e la [roadmap di prodotto](docs/ROADMAP_PRODOTTO.md).
+
+[Stato e verifiche](IMPLEMENTATION_PROGRESS.md) | [Scope](docs/PRODUCT_SCOPE.md) | [Roadmap di prodotto](docs/ROADMAP_PRODOTTO.md) | [Roadmap storica](docs/ROADMAP.md) | [Identita e vincoli](docs/GESTISCO_IDENTITY_ADDENDUM.md)
 
 ## Flussi implementati
 
