@@ -45,7 +45,7 @@ test('il flusso principale e le bozze sono utilizzabili da tastiera', async ({ p
   await page.keyboard.press('Enter');
   await expect(page.getByRole('heading', { name: 'Catalogo prodotti', exact: true }).first()).toBeVisible();
 
-  await page.getByLabel('Codice').fill('BOZZA-A11Y');
+  await page.getByLabel('Codice', { exact: true }).fill('BOZZA-A11Y');
   const operationsTrigger = mainMenu.getByRole('button', { name: /^Operazioni/ });
   await operationsTrigger.focus();
   await page.keyboard.press('Enter');
