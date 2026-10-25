@@ -1,5 +1,26 @@
 # Domain Model
 
+## Glossario della roadmap di prodotto (ADR 0008)
+
+Termini usati da `ROADMAP_PRODOTTO.md` e dalle schede WB-007 - WB-010. Valgono per ogni segmento; tra parentesi l'esempio dell'abbigliamento.
+
+| Termine | Significato |
+|---|---|
+| Modello | Articolo commerciale con descrizione, categoria, marca e prezzo base, senza giacenza propria (la sneaker "Runner X") |
+| Variante / SKU | Combinazione vendibile di un modello, unita di stock, di movimento e di riga documento, con codice a barre proprio (Runner X, nero, 42) |
+| Attributo di variante | Dimensione che distingue le varianti, con valori ammessi (taglia, colore) |
+| Griglia | Insieme ordinato di valori di un attributo, riusabile tra modelli (36-46, XS-XXL) |
+| Attributo personalizzato | Informazione descrittiva definita dall'utente, che non genera varianti (materiale, vestibilita) |
+| Collezione / stagione | Raggruppamento commerciale di modelli per periodo (primavera-estate 2027) |
+| Listino | Insieme di prezzi di riferimento con periodo di validita |
+| Promozione | Regola temporanea che modifica il prezzo per ambito e periodo (saldi 30% sulla collezione) |
+| Sessione di cassa | Intervallo tra apertura con fondo e chiusura con conteggio di una cassa |
+| Vendita al banco | Vendita immediata in cassa, con incasso e scarico della variante nello stesso comando |
+| Cambio | Reso di una variante e vendita di un'altra nella stessa operazione, con differenza pagata o accreditata |
+| Buono / credito cliente | Valore spendibile con codice univoco e saldo derivato da un ledger dedicato |
+| Modulo attivabile | Insieme di funzioni abilitabile per installazione (cassa, varianti, fedelta) |
+| Istanza dedicata | Installazione separata per un cliente, con database proprio (ADR 0005) |
+
 ## Modello attuale backend web
 
 ### UserAccount

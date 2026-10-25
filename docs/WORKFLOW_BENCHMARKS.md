@@ -881,3 +881,165 @@ Evidenze da registrare: identificativo valutatore, data, build, sessione, prodot
 | Inventario fisico | 4.3 | WB-007 | IMPLEMENTED |
 | Riordino | 4.4 | Da creare prima dello step | PENDING |
 | Importazione prodotti | 4.5 | Da creare prima dello step | PENDING |
+
+## Fonti delle schede WB-007 - WB-010
+
+Consultazione del 2026-10-24 della documentazione ufficiale di Odoo 18.0 (odoo.com/documentation/18.0) e di ERPNext (docs.frappe.io/erpnext). Parte dei contenuti Odoo deriva dal riassunto automatico di pagine lunghe e non da citazione letterale: ogni regola tratta da quelle parti va riverificata sulla pagina prima dell'implementazione. Pagine non disponibili alla consultazione: apertura cassa ERPNext (`pos-opening-entry`, HTTP 404); la pagina di chiusura ERPNext rimanda alla chiusura di magazzino, non alla cassa.
+
+Pagine lette: Odoo `sales/products_prices/products/variants`, `point_of_sale`, `point_of_sale/shop/barcode`, `point_of_sale/pricing/discounts`, `sales/products_prices/returns`, `sales/products_prices/ewallets_giftcards`, `sales/products_prices/prices/pricing`, `sales/products_prices/loyalty_discount`; ERPNext `item-variants`, `point-of-sale`, `pricing-rule`, `loyalty-program`, `coupon-code`.
+
+## Scheda WB-007 - Modelli e varianti
+
+### Identificazione
+
+- Workflow: catalogo per modello con varianti (per esempio taglia e colore), giacenza e codice a barre per variante.
+- Step roadmap: P2.1-P2.6 (ADR 0008).
+- Responsabile decisionale: Giovanni De Filippo.
+- Data benchmark: 2026-10-24.
+- Stato: `READY_FOR_IMPLEMENTATION`.
+
+### 1. Problema operativo
+
+Un negozio di abbigliamento vende lo stesso articolo in decine di combinazioni. Senza varianti ogni combinazione diventa un prodotto separato: inserimento lento, report per modello impossibili, errori di cassa sul codice sbagliato. Frequenza: ogni arrivo merce e ogni vendita.
+
+### 2. Comportamento osservato in due o piu gestionali maturi
+
+- **Odoo 18.0 (`variants`).** Attributi (per esempio colore, taglia) con valori; modalita di creazione delle varianti: subito tutte le combinazioni, solo quando servono in un ordine, oppure mai; la modalita non e modificabile dopo l'uso. Ogni variante puo avere codice a barre proprio; un sovrapprezzo per valore di attributo; la giacenza e conteggiata per variante. Limite: dettagli parzialmente da riassunto.
+- **ERPNext (`item-variants`).** Un articolo modello con "Has Variants" non e usabile direttamente nelle transazioni; gli attributi si definiscono sul modello, anche numerici con intervallo; la creazione multipla genera tutte le combinazioni scelte (2 colori x 3 taglie = 6 varianti); i campi ereditati dal modello sono configurabili. Codice, prezzo e giacenza per variante non descritti nella pagina letta.
+
+Esito: `ADOPT` per modello non vendibile e varianti come unita di stock; `ADAPT` per la creazione (solo combinazioni selezionate dalla matrice, mai automatica in vendita); `DEFER` per il sovrapprezzo per attributo (prezzo per variante sufficiente in P2).
+
+### 3. Regola di dominio da preservare
+
+- La variante (SKU) e l'unica unita di stock, di movimento, di riserva e di riga documento; il modello non ha giacenza propria.
+- Codice a barre univoco a livello di database tra tutte le varianti.
+- Ledger, idempotenza, ownership e audit invariati; le righe storiche conservano lo snapshot di modello, taglia e colore.
+- Migrazione non distruttiva: ogni prodotto esistente diventa un modello con una variante, con valori di magazzino identici prima e dopo.
+
+### 4. Adattamento al monolite attuale
+
+Moduli `product`, `inventory`, `order`, `purchase`, `reporting`; nuove tabelle modello, variante, attributo e valore con migrazioni Flyway e test di upgrade popolato; API per variante con compatibilita transitoria degli endpoint prodotto; UI a matrice. Cambiamento minimo: P2.2-P2.4; matrice e acquisti in P2.5-P2.6.
+
+### 5. Cosa non implementare
+
+Creazione automatica di varianti durante la vendita; varianti senza codice a barre; prezzi per attributo cumulativi; configuratori di prodotto complessi.
+
+### 6. Test di accettazione con un operatore reale
+
+Un operatore crea un modello con 2 colori e 8 taglie, riceve la merce e vende due taglie diverse; le giacenze per variante e il totale per modello sono corretti. Da eseguire nella validazione V2.
+
+## Scheda WB-008 - Sessione di cassa e vendita al banco
+
+### Identificazione
+
+- Workflow: apertura e chiusura della cassa, vendita rapida con lettore di codici a barre.
+- Step roadmap: P3.1, P3.2, P3.5.
+- Responsabile decisionale: Giovanni De Filippo.
+- Data benchmark: 2026-10-24.
+- Stato: `DRAFT`: una sola fonte documentata per apertura e chiusura; completare con un secondo prodotto prima di P3.
+
+### 1. Problema operativo
+
+Il commesso deve vendere in pochi secondi, con contanti, carta o pagamento misto, e a fine giornata il fondo cassa deve tornare con le differenze spiegate. Errori tipici: scansione doppia, resto sbagliato, ammanchi non tracciati.
+
+### 2. Comportamento osservato in due o piu gestionali maturi
+
+- **Odoo 18.0 (`point_of_sale`, `shop/barcode`, `pricing/discounts`).** Apertura sessione con controllo del contante iniziale; piu utenti sulla stessa sessione; chiusura dopo il controllo degli importi, eventualmente consentita solo se il contante atteso coincide con quello contato. La scansione aggiunge il prodotto al carrello e una nuova scansione ne aumenta la quantita. Sconto per riga e sconto globale opzionale. Limiti: conteggio per metodo di pagamento, pagamento misto e limiti di sconto per utente non descritti nelle pagine lette.
+- **ERPNext (`point-of-sale`).** La cassa aggiorna le giacenze in tempo reale e supporta piu metodi di pagamento; apertura e chiusura non disponibili alla consultazione.
+
+Esito provvisorio: `ADOPT` per sessione con fondo iniziale, conteggio e chiusura auditata, scansione che aggiunge o incrementa; `ADAPT` per le differenze di cassa, ammesse con motivazione anziche bloccanti; `DEFER` per piu operatori sulla stessa cassa.
+
+### 3. Regola di dominio da preservare
+
+- Ogni vendita al banco e un comando idempotente che scarica lo stock della variante e registra il pagamento nel ledger.
+- Sessione di cassa con apertura, movimenti e chiusura immutabili dopo la chiusura; differenze motivate e auditate.
+- Sconti oltre soglia solo con permesso; prezzi e IVA calcolati dal server.
+
+### 4. Adattamento al monolite attuale
+
+Nuovo modulo `pos` che riusa `order` per il ledger dei pagamenti e `inventory` per lo scarico; schermata cassa dedicata nel frontend con input da tastiera e lettore in emulazione tastiera.
+
+### 5. Cosa non implementare
+
+Esecuzione di pagamenti elettronici (il POS bancario resta esterno, P9.7); scontrino fiscale prima di P8; funzionamento offline.
+
+### 6. Test di accettazione con un operatore reale
+
+Apertura con fondo, vendita di tre articoli scansionati in meno di 20 secondi con pagamento misto, chiusura con conteggio e una differenza motivata.
+
+## Scheda WB-009 - Resi, cambi e buoni al banco
+
+### Identificazione
+
+- Workflow: reso con o senza scontrino, cambio taglia, buono reso e carta regalo.
+- Step roadmap: P3.3, P3.4.
+- Responsabile decisionale: Giovanni De Filippo.
+- Data benchmark: 2026-10-24.
+- Stato: `DRAFT`: cambi e resi senza scontrino non documentati nelle pagine lette; da completare con fonte aggiuntiva e con la validazione V1.
+
+### 1. Problema operativo
+
+Nell'abbigliamento il cambio taglia e frequentissimo; il negozio spesso non rimborsa ma emette un buono. Errori da prevenire: reso di merce mai venduta, buono usato due volte, giacenza non reintegrata.
+
+### 2. Comportamento osservato in due o piu gestionali maturi
+
+- **Odoo 18.0.** Rimborso in cassa selezionando l'ordine originale, con nota di credito che lo richiama; nel flusso ordini il reso crea un'operazione di magazzino in entrata da validare. Carte regalo ed eWallet con emissione anonima o nominativa, validita configurabile e utilizzo come metodo di pagamento in cassa. Cambio di taglia e reso senza scontrino non descritti.
+- **ERPNext.** Programmi fedelta a punti dalle fatture confermate, con scadenza e riscatto in fattura; i codici "gift card" sono legati a regole di prezzo e la pagina li descrive come non equivalenti a un portafoglio con saldo. Resi e cambi in cassa non descritti nelle pagine lette.
+
+Esito provvisorio: `ADOPT` per reso collegato alla vendita originale e reintegro tramite movimento; `ADAPT` per buoni come credito con saldo e ledger proprio (non come sconto); `DEFER` per la fedelta a punti (modulo opzionale in P6.4).
+
+### 3. Regola di dominio da preservare
+
+- Quantita restituibile limitata al venduto residuo, come gia avviene per i resi d'ordine.
+- Cambio come operazione unica: reso della variante A e vendita della variante B, con differenza pagata o accreditata.
+- Buono con codice univoco, saldo derivato dal ledger, scadenza e uso idempotente.
+
+### 4. Adattamento al monolite attuale
+
+Riuso dei resi multi-riga (`order`) e del ledger dei pagamenti; nuovo ledger del credito cliente; UI cambio in cassa.
+
+### 5. Cosa non implementare
+
+Rimborsi automatici su carta; buoni trasferibili tra negozi diversi; resi senza alcun riferimento oltre una soglia senza permesso.
+
+### 6. Test di accettazione con un operatore reale
+
+Cambio di una taglia con differenza di prezzo e reso con emissione di buono, poi utilizzo parziale del buono in una nuova vendita.
+
+## Scheda WB-010 - Listini, promozioni e saldi
+
+### Identificazione
+
+- Workflow: prezzi di listino, promozioni con periodo e saldi stagionali.
+- Step roadmap: P4.2, P4.3.
+- Responsabile decisionale: Giovanni De Filippo.
+- Data benchmark: 2026-10-24.
+- Stato: `READY_FOR_IMPLEMENTATION`, salvo la regola di precedenza da approvare in P4.2.
+
+### 1. Problema operativo
+
+Ai saldi il negozio applica percentuali diverse per collezione o categoria per un periodo preciso e deve mostrare il prezzo barrato; a fine periodo i prezzi tornano normali. Errori: saldi dimenticati attivi, sconti sommati per errore.
+
+### 2. Comportamento osservato in due o piu gestionali maturi
+
+- **Odoo 18.0 (`pricing`, `loyalty_discount`).** Listini con periodo di validita e regole per prodotto o categoria; la regola del prodotto prevale su quella della categoria; listino predefinito come ripiego. Programmi di sconto con date di inizio e fine. Comportamento con piu programmi applicabili non descritto.
+- **ERPNext (`pricing-rule`).** Regole applicabili per articolo, gruppo, marca o transazione, con date di validita, condizioni di quantita e importo e risultato in prezzo, percentuale o importo; la regola idonea prevale sul prezzo base; priorita esplicita per le regole sovrapposte; cumulo solo se abilitato.
+
+Esito: `ADOPT` per regole con periodo e ambito (variante, modello, collezione, categoria) e per il non cumulo predefinito; `ADAPT` per la precedenza: la regola piu specifica vince, poi la priorita esplicita, con anteprima prima dell'attivazione.
+
+### 3. Regola di dominio da preservare
+
+- Il prezzo applicato e calcolato dal server al momento della vendita e copiato sulla riga; modifiche successive non toccano lo storico.
+- Le promozioni non si sommano salvo regola esplicita; ogni attivazione e disattivazione e auditata.
+
+### 4. Adattamento al monolite attuale
+
+Nuove entita listino e promozione nel modulo `product` o in un modulo `pricing`; calcolo del prezzo centralizzato usato da ordini e cassa; etichette con prezzo barrato (P5.3).
+
+### 5. Cosa non implementare
+
+Motori di regole generici; prezzi dinamici per cliente in P4; promozioni "3x2" prima della validazione con operatore.
+
+### 6. Test di accettazione con un operatore reale
+
+Impostazione dei saldi al 30% su una collezione per due settimane con anteprima, vendita con prezzo barrato e ripristino automatico a fine periodo.
