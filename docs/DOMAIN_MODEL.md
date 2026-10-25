@@ -69,7 +69,7 @@ Campi principali:
 - codice univoco;
 - nome;
 - descrizione;
-- categoria `HARDWARE` o `SOFTWARE`;
+- categoria configurabile (`ProductCategory`, riferimento `category_id`, V36);
 - brand;
 - tipo prodotto;
 - utilizzo opzionale;
@@ -92,6 +92,10 @@ Regole attuali:
 - un prodotto con ordini o riserve va disattivato, non eliminato;
 - un prodotto disattivato non puo essere acquistato in nuovi ordini;
 - un prodotto disattivato resta consultabile nello storico e gli ordini gia confermati restano evadibili.
+
+### ProductCategory
+
+Categoria configurabile e gerarchica (V36, step P1.1). Campi: codice univoco canonico e non modificabile, nome univoco tra fratelli (`parent_key` + nome canonico), categoria padre opzionale, stato attivo, date di creazione e modifica. Massimo tre livelli, nessun ciclo, nessuna eliminazione fisica. Le categorie storiche `HARDWARE` e `SOFTWARE` sono le prime due voci; ogni altro valore presente nei prodotti al momento della migrazione diventa una categoria radice.
 
 ### StockMovement
 

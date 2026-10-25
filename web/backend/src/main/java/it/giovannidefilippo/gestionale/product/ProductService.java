@@ -1,5 +1,6 @@
 package it.giovannidefilippo.gestionale.product;
 
+import it.giovannidefilippo.gestionale.common.BusinessIdentifierCanonicalizer;
 import it.giovannidefilippo.gestionale.audit.AuditCategory;
 import it.giovannidefilippo.gestionale.audit.AuditService;
 import it.giovannidefilippo.gestionale.audit.AuditSeverity;
@@ -21,6 +22,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.Objects;
 
 @Service
@@ -30,12 +32,14 @@ public class ProductService {
     private final AuditService auditService;
     private final ProductOrderUsage productOrderUsage;
     private final ProductProcurementUsage productProcurementUsage;
+    private final ProductCategoryService categoryService;
 
-    ProductService(ProductRepository repository, AuditService auditService, ProductOrderUsage productOrderUsage, ProductProcurementUsage productProcurementUsage) {
+    ProductService(ProductRepository repository, AuditService auditService, ProductOrderUsage productOrderUsage, ProductProcurementUsage productProcurementUsage, ProductCategoryService categoryService) {
         this.repository = repository;
         this.auditService = auditService;
         this.productOrderUsage = productOrderUsage;
         this.productProcurementUsage = productProcurementUsage;
+        this.categoryService = categoryService;
     }
 
     public List<ProductResponse> findAll() {
@@ -44,17 +48,17 @@ public class ProductService {
                 .toList();
     }
 
-    public PageResponse<ProductResponse> search(String q, ProductCategory category, String brand, String productType, String stock, String sort, int page, int size) {
+    public PageResponse<ProductResponse> search(String q, String category, String brand, String productType, String stock, String sort, int page, int size) {
         return PageResponse.from(repository.findAll(specification(q, category, brand, productType, stock, false), PageRequests.of(page, size, sort(sort)))
                 .map(ProductMapper::toResponse));
     }
 
-    public PageResponse<ProductResponse> search(String q, ProductCategory category, String brand, String productType, String stock, String sort, int page, int size, AuthenticatedUser actor) {
+    public PageResponse<ProductResponse> search(String q, String category, String brand, String productType, String stock, String sort, int page, int size, AuthenticatedUser actor) {
         return PageResponse.from(repository.findAll(specification(q, category, brand, productType, stock, false), PageRequests.of(page, size, sort(sort)))
                 .map(product -> ProductMapper.toResponse(product, capabilities(product, actor))));
     }
 
-    public PageResponse<CustomerProductResponse> searchCustomerCatalog(String q, ProductCategory category, String brand, String productType, String stock, String sort, int page, int size) {
+    public PageResponse<CustomerProductResponse> searchCustomerCatalog(String q, String category, String brand, String productType, String stock, String sort, int page, int size) {
         return PageResponse.from(repository.findAll(specification(q, category, brand, productType, stock, true), PageRequests.of(page, size, customerSort(sort)))
                 .map(CustomerProductResponse::from));
     }
@@ -115,7 +119,7 @@ public class ProductService {
 
     @Transactional
     public ProductResponse create(ProductRequest request) {
-        Product product = saveAndFlush(new Product(request));
+        Product product = saveAndFlush(new Product(request, categoryService.requireAssignable(request.category())));
         return ProductMapper.toResponse(product);
     }
 
@@ -128,7 +132,7 @@ public class ProductService {
 
     @Transactional
     public ProductResponse create(ProductRequest request, AuthenticatedUser actor) {
-        Product product = saveAndFlush(new Product(request));
+        Product product = saveAndFlush(new Product(request, categoryService.requireAssignable(request.category())));
         ProductResponse response = ProductMapper.toResponse(product, capabilities(product, actor));
         auditService.record(actor.username(), actor.roleLabel(), "CREATE_PRODUCT", response.code(), "Creata anagrafica " + response.name() + " - brand " + response.brand() + " - tipo " + response.productType() + " - prezzo " + response.price(), AuditCategory.PRODUCT, AuditSeverity.INFO, "PRODUCT");
         return response;
@@ -138,7 +142,7 @@ public class ProductService {
     public ProductResponse update(String code, ProductRequest request) {
         Product product = requireProduct(code);
         validateCodeChangeAllowed(product, request.code());
-        product.update(request);
+        product.update(request, assignableCategory(product, request.category()));
         flushCanonicalCode();
         return ProductMapper.toResponse(product);
     }
@@ -148,7 +152,7 @@ public class ProductService {
         Product product = requireProduct(code);
         ProductResponse before = ProductMapper.toResponse(product);
         validateCodeChangeAllowed(product, request.code());
-        product.update(request);
+        product.update(request, assignableCategory(product, request.category()));
         flushCanonicalCode();
         ProductResponse response = ProductMapper.toResponse(product);
         auditService.record(actor, role, "UPDATE_PRODUCT", response.code(), "Aggiornato " + response.name() + " - modifiche: " + changeSummary(before, response), AuditCategory.PRODUCT, AuditSeverity.INFO, "PRODUCT");
@@ -160,7 +164,7 @@ public class ProductService {
         Product product = requireProduct(code);
         ProductResponse before = ProductMapper.toResponse(product);
         validateCodeChangeAllowed(product, request.code());
-        product.update(request);
+        product.update(request, assignableCategory(product, request.category()));
         flushCanonicalCode();
         ProductResponse response = ProductMapper.toResponse(product, capabilities(product, actor));
         auditService.record(actor.username(), actor.roleLabel(), "UPDATE_PRODUCT", response.code(), "Aggiornato " + response.name() + " - modifiche: " + changeSummary(before, response), AuditCategory.PRODUCT, AuditSeverity.INFO, "PRODUCT");
@@ -346,7 +350,8 @@ public class ProductService {
         return new StockAdjustment(product.getId(), product.getCode(), product.getName(), previousQuantity, product.getQuantity());
     }
 
-    private Specification<Product> specification(String q, ProductCategory category, String brand, String productType, String stock, boolean activeOnly) {
+    private Specification<Product> specification(String q, String category, String brand, String productType, String stock, boolean activeOnly) {
+        Set<Long> categoryIds = categoryService.filterIds(category).orElse(null);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             if (activeOnly) {
@@ -363,8 +368,8 @@ public class ProductService {
                         criteriaBuilder.like(criteriaBuilder.lower(root.get("usageContext")), term)
                 ));
             }
-            if (category != null) {
-                predicates.add(criteriaBuilder.equal(root.get("category"), category));
+            if (categoryIds != null) {
+                predicates.add(root.get("category").get("id").in(categoryIds));
             }
             if (hasText(brand) && !"ALL".equalsIgnoreCase(brand)) {
                 predicates.add(criteriaBuilder.equal(criteriaBuilder.lower(root.get("brand")), brand.trim().toLowerCase(Locale.ROOT)));
@@ -435,6 +440,14 @@ public class ProductService {
         if (threshold <= 0) {
             throw new IllegalArgumentException("La soglia scorte basse deve essere maggiore di zero.");
         }
+    }
+
+    /** La categoria attuale resta valida anche se disattivata; un cambio richiede una categoria attiva. */
+    private ProductCategory assignableCategory(Product product, String requestedCode) {
+        if (product.getCategory().getCodeCanonical().equals(BusinessIdentifierCanonicalizer.canonical(requestedCode))) {
+            return product.getCategory();
+        }
+        return categoryService.requireAssignable(requestedCode);
     }
 
     private Product saveAndFlush(Product product) {

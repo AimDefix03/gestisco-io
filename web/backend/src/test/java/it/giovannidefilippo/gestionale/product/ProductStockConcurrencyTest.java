@@ -66,7 +66,7 @@ class ProductStockConcurrencyTest extends PostgreSqlIntegrationTestSupport {
                 code,
                 "Prodotto concorrente",
                 "Prodotto creato per verificare gli aggiornamenti concorrenti dello stock.",
-                ProductCategory.HARDWARE,
+                "HARDWARE",
                 "TestBrand",
                 "Scheda di test",
                 "",

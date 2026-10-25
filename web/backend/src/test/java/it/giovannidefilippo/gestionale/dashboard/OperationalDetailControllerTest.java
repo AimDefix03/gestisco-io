@@ -6,7 +6,6 @@ import it.giovannidefilippo.gestionale.order.OrderRequests;
 import it.giovannidefilippo.gestionale.order.OrderResponse;
 import it.giovannidefilippo.gestionale.order.OrderService;
 import it.giovannidefilippo.gestionale.order.PaymentMethod;
-import it.giovannidefilippo.gestionale.product.ProductCategory;
 import it.giovannidefilippo.gestionale.product.ProductRequest;
 import it.giovannidefilippo.gestionale.product.ProductService;
 import it.giovannidefilippo.gestionale.user.AuthenticatedUser;
@@ -98,7 +97,7 @@ class OperationalDetailControllerTest {
                 code,
                 "Prodotto dettaglio operativo",
                 "Prodotto creato per verificare lo storico operativo mirato.",
-                ProductCategory.HARDWARE,
+                "HARDWARE",
                 "DetailBrand",
                 "Componente test",
                 "",

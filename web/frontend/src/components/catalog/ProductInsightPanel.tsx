@@ -31,7 +31,7 @@ export default function ProductInsightPanel({ product, movements, orders, loadin
       </div>
       <div className="insight-summary"><span className={`status-badge ${status.className}`}>{status.label}</span><strong>{money.format(potentialRetailValue)}</strong><small>Valore potenziale a prezzo vendita</small></div>
       <div className="insight-grid">
-        <div><span>Categoria</span><strong>{product.category}</strong></div>
+        <div><span>Categoria</span><strong>{product.categoryName || product.category}</strong></div>
         <div><span>Giacenza</span><strong>{product.quantity}</strong></div>
         <div><span>Riservato</span><strong>{product.reservedQuantity}</strong></div>
         <div><span>Disponibile</span><strong>{product.availableQuantity}</strong></div>

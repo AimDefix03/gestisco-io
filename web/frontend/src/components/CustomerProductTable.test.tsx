@@ -8,6 +8,7 @@ const limitedProduct = {
   name: 'Scheda grafica',
   description: 'Prodotto visibile nel catalogo cliente.',
   category: 'HARDWARE' as const,
+  categoryName: 'Hardware',
   brand: 'Example Brand',
   productType: 'Scheda grafica',
   usageContext: 'Professionale',

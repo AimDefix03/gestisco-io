@@ -9,7 +9,6 @@ import it.giovannidefilippo.gestionale.order.SalesOrderReportSource;
 import it.giovannidefilippo.gestionale.order.SalesReportingUsage;
 import it.giovannidefilippo.gestionale.product.InventoryProductReportSource;
 import it.giovannidefilippo.gestionale.product.InventoryReportingUsage;
-import it.giovannidefilippo.gestionale.product.ProductCategory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -85,7 +84,7 @@ public class ReportingService {
         );
     }
 
-    public InventoryReportResponse inventory(String query, ProductCategory category, String stock, Boolean discontinued) {
+    public InventoryReportResponse inventory(String query, String category, String stock, Boolean discontinued) {
         List<InventoryProductReportSource> sources = inventoryReportingUsage.findForReport(query, category, stock, discontinued, MAX_REPORT_ROWS);
         List<InventoryReportResponse.InventoryProductRow> rows = sources.stream()
                 .map(ReportingService::toInventoryRow)
@@ -174,8 +173,8 @@ public class ReportingService {
         return new InventoryReportResponse.InventoryProductRow(
                 source.code(),
                 source.name(),
-                source.category().name(),
-                source.category().getLabel(),
+                source.category(),
+                source.categoryName(),
                 source.brand(),
                 source.productType(),
                 source.quantity(),

@@ -4,7 +4,6 @@ import it.giovannidefilippo.gestionale.audit.AuditCategory;
 import it.giovannidefilippo.gestionale.audit.AuditService;
 import it.giovannidefilippo.gestionale.audit.AuditSeverity;
 import it.giovannidefilippo.gestionale.order.OrderStatus;
-import it.giovannidefilippo.gestionale.product.ProductCategory;
 import it.giovannidefilippo.gestionale.user.AuthSessionService;
 import it.giovannidefilippo.gestionale.user.AuthenticatedUser;
 import it.giovannidefilippo.gestionale.user.UserPermission;
@@ -67,7 +66,7 @@ class ReportingController {
     InventoryReportResponse inventory(
             @RequestHeader(value = "X-Session-Token", required = false) String token,
             @RequestParam(required = false) String q,
-            @RequestParam(required = false) ProductCategory category,
+            @RequestParam(required = false) String category,
             @RequestParam(defaultValue = "ALL") String stock,
             @RequestParam(required = false) Boolean discontinued
     ) {
@@ -79,7 +78,7 @@ class ReportingController {
     ResponseEntity<byte[]> exportInventory(
             @RequestHeader(value = "X-Session-Token", required = false) String token,
             @RequestParam(required = false) String q,
-            @RequestParam(required = false) ProductCategory category,
+            @RequestParam(required = false) String category,
             @RequestParam(defaultValue = "ALL") String stock,
             @RequestParam(required = false) Boolean discontinued,
             @RequestParam(defaultValue = "CSV") ReportFormat format

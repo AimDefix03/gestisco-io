@@ -41,6 +41,7 @@ const product: Product = {
   name: 'Scheda video',
   description: 'Prodotto di test',
   category: 'HARDWARE',
+  categoryName: 'Hardware',
   brand: 'Example Brand',
   productType: 'GPU',
   usageContext: 'Gaming',

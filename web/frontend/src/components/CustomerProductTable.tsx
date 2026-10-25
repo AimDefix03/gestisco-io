@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { CustomerProduct, PageResponse, ProductQuery } from '../api';
 import PaginationControls from './PaginationControls';
+import { categoryOptionLabel, useProductCategories } from '../features/catalog/ProductCategoriesContext';
 
 type Props = {
   page: PageResponse<CustomerProduct>;
@@ -18,6 +19,7 @@ type CustomerSortMode = 'NAME_ASC' | 'PRICE_ASC' | 'PRICE_DESC';
 const money = new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' });
 
 export default function CustomerProductTable({ page, query, context = 'catalog', busy, onQueryChange, onPageChange, onAddToCart }: Props) {
+  const { categories } = useProductCategories();
   const brands = useMemo(() => uniqueValues(page.content.map((product) => product.brand)), [page.content]);
   const productTypes = useMemo(() => uniqueValues(page.content.map((product) => product.productType)), [page.content]);
 
@@ -49,8 +51,7 @@ export default function CustomerProductTable({ page, query, context = 'catalog',
           Categoria
           <select value={query.category ?? 'ALL'} onChange={(event) => updateQuery({ category: event.target.value as ProductQuery['category'] })}>
             <option value="ALL">Tutte</option>
-            <option value="HARDWARE">Hardware</option>
-            <option value="SOFTWARE">Software</option>
+            {categories.map((category) => <option key={category.code} value={category.code}>{categoryOptionLabel(category)}</option>)}
           </select>
         </label>
         <label>
@@ -98,7 +99,7 @@ export default function CustomerProductTable({ page, query, context = 'catalog',
               <tr key={product.code}>
                 <th scope="row" className="strong">{product.code}</th>
                 <td><div className="product-cell"><strong>{product.name}</strong><span>{product.description}</span></div></td>
-                <td><div className="classification-stack"><strong>{product.brand}</strong><span>{product.productType}</span><small>{product.category}{product.usageContext ? ` · ${product.usageContext}` : ''}</small></div></td>
+                <td><div className="classification-stack"><strong>{product.brand}</strong><span>{product.productType}</span><small>{product.categoryName || product.category}{product.usageContext ? ` · ${product.usageContext}` : ''}</small></div></td>
                 <td><span className={`status-badge ${availabilityClass(product.availability)}`}>{product.availabilityLabel}</span></td>
                 <td><div className="price-stack"><strong>{money.format(product.discountedPrice)}</strong>{product.discount > 0 && <span>{product.discount}% sconto</span>}</div></td>
                 {onAddToCart && <td><button className="link-button" disabled={busy || product.availability === 'UNAVAILABLE'} onClick={() => onAddToCart(product)}>Aggiungi</button></td>}

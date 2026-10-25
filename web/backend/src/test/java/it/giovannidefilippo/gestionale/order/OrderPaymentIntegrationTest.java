@@ -1,7 +1,6 @@
 package it.giovannidefilippo.gestionale.order;
 
 import it.giovannidefilippo.gestionale.inventory.InventoryService;
-import it.giovannidefilippo.gestionale.product.ProductCategory;
 import it.giovannidefilippo.gestionale.product.ProductRequest;
 import it.giovannidefilippo.gestionale.product.ProductService;
 import it.giovannidefilippo.gestionale.user.AuthenticatedUser;
@@ -300,7 +299,7 @@ class OrderPaymentIntegrationTest extends PostgreSqlIntegrationTestSupport {
                 productCode,
                 "Prodotto pagamento",
                 "Prodotto creato per verificare il modello pagamento strutturato.",
-                ProductCategory.HARDWARE,
+                "HARDWARE",
                 "TestBrand",
                 "Componente di test",
                 "",
@@ -344,7 +343,7 @@ class OrderPaymentIntegrationTest extends PostgreSqlIntegrationTestSupport {
                 code,
                 name,
                 "Prodotto creato per verificare i resi multi-riga.",
-                ProductCategory.HARDWARE,
+                "HARDWARE",
                 "TestBrand",
                 "Componente di test",
                 "",

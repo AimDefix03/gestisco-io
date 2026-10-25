@@ -2,6 +2,7 @@ import { PageResponse, Product, ProductLookup, ProductOrderHistory, ProductPaylo
 import ProductForm from '../components/ProductForm';
 import ProductTable from '../components/ProductTable';
 import ProductInsightPanel from '../components/catalog/ProductInsightPanel';
+import CategoryManager from '../components/catalog/CategoryManager';
 
 type Props = {
   productPage: PageResponse<Product>;
@@ -66,6 +67,7 @@ export default function CatalogPage(props: Props) {
         {props.canManageProducts && (
           <section className="panel form-panel"><ProductForm editingProduct={props.editingProduct} busy={props.busy} onSubmit={props.onProductSubmit} onCancel={props.onCancelEdit} /></section>
         )}
+        {props.canManageProducts && <CategoryManager disabled={props.busy} />}
       </aside>
     </div>
   );

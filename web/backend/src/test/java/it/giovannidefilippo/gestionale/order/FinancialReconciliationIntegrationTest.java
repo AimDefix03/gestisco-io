@@ -1,7 +1,6 @@
 package it.giovannidefilippo.gestionale.order;
 
 import it.giovannidefilippo.gestionale.inventory.InventoryService;
-import it.giovannidefilippo.gestionale.product.ProductCategory;
 import it.giovannidefilippo.gestionale.product.ProductRequest;
 import it.giovannidefilippo.gestionale.product.ProductService;
 import it.giovannidefilippo.gestionale.user.AuthenticatedUser;
@@ -174,7 +173,7 @@ class FinancialReconciliationIntegrationTest extends PostgreSqlIntegrationTestSu
                 productCode,
                 "Prodotto " + prefix,
                 "Prodotto sintetico per la riconciliazione finanziaria.",
-                ProductCategory.HARDWARE,
+                "HARDWARE",
                 "TestBrand",
                 "Componente",
                 "",

@@ -13,7 +13,6 @@ import it.giovannidefilippo.gestionale.order.PaymentMethod;
 import it.giovannidefilippo.gestionale.partner.BusinessPartnerRequest;
 import it.giovannidefilippo.gestionale.partner.BusinessPartnerService;
 import it.giovannidefilippo.gestionale.partner.BusinessPartnerType;
-import it.giovannidefilippo.gestionale.product.ProductCategory;
 import it.giovannidefilippo.gestionale.product.ProductRequest;
 import it.giovannidefilippo.gestionale.product.ProductService;
 import it.giovannidefilippo.gestionale.user.AuthenticatedUser;
@@ -137,7 +136,7 @@ class FiscalDocumentCustomerSnapshotTest {
                 productCode,
                 "Prodotto snapshot",
                 "Prodotto creato per verificare snapshot cliente nei documenti.",
-                ProductCategory.HARDWARE,
+                "HARDWARE",
                 "TestBrand",
                 "Scheda di test",
                 "",

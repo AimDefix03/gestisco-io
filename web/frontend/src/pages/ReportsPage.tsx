@@ -7,6 +7,7 @@ import type {
   SalesReportQuery
 } from '../api';
 import StatCard from '../components/common/StatCard';
+import { categoryOptionLabel, useProductCategories } from '../features/catalog/ProductCategoriesContext';
 import { dateTime, money } from '../utils/formatters';
 
 type Props = {
@@ -100,6 +101,7 @@ function SalesView(props: Props) {
 }
 
 function InventoryView(props: Props) {
+  const { categories } = useProductCategories();
   const report = props.inventory;
   const lifecycle = props.inventoryQuery.discontinued === undefined ? 'ALL' : props.inventoryQuery.discontinued ? 'DISCONTINUED' : 'ACTIVE';
   return (
@@ -111,7 +113,7 @@ function InventoryView(props: Props) {
         </div>
         <div className="list-filters report-filters inventory-report-filters">
           <label className="search-field">Cerca<input value={props.inventoryQuery.q ?? ''} placeholder="Codice, nome, brand o tipo" onChange={(event) => props.onInventoryQueryChange({ ...props.inventoryQuery, q: event.target.value || undefined })} /></label>
-          <label>Categoria<select value={props.inventoryQuery.category ?? 'ALL'} onChange={(event) => props.onInventoryQueryChange({ ...props.inventoryQuery, category: event.target.value as InventoryReportQuery['category'] })}><option value="ALL">Tutte</option><option value="HARDWARE">Hardware</option><option value="SOFTWARE">Software</option></select></label>
+          <label>Categoria<select value={props.inventoryQuery.category ?? 'ALL'} onChange={(event) => props.onInventoryQueryChange({ ...props.inventoryQuery, category: event.target.value as InventoryReportQuery['category'] })}><option value="ALL">Tutte</option>{categories.map((category) => <option key={category.code} value={category.code}>{categoryOptionLabel(category)}</option>)}</select></label>
           <label>Stock<select value={props.inventoryQuery.stock ?? 'ALL'} onChange={(event) => props.onInventoryQueryChange({ ...props.inventoryQuery, stock: event.target.value as InventoryReportQuery['stock'] })}><option value="ALL">Tutto</option><option value="AVAILABLE">Disponibile</option><option value="LOW">Scorta bassa</option><option value="OUT">Esaurito</option></select></label>
           <label>Prodotto<select value={lifecycle} onChange={(event) => props.onInventoryQueryChange({ ...props.inventoryQuery, discontinued: event.target.value === 'ALL' ? undefined : event.target.value === 'DISCONTINUED' })}><option value="ALL">Tutti</option><option value="ACTIVE">Attivi</option><option value="DISCONTINUED">Disattivati</option></select></label>
         </div>

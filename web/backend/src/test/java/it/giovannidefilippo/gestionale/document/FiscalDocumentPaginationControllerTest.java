@@ -9,7 +9,6 @@ import it.giovannidefilippo.gestionale.order.OrderRequests;
 import it.giovannidefilippo.gestionale.order.OrderResponse;
 import it.giovannidefilippo.gestionale.order.OrderService;
 import it.giovannidefilippo.gestionale.order.PaymentMethod;
-import it.giovannidefilippo.gestionale.product.ProductCategory;
 import it.giovannidefilippo.gestionale.product.ProductRequest;
 import it.giovannidefilippo.gestionale.product.ProductService;
 import it.giovannidefilippo.gestionale.user.AuthenticatedUser;
@@ -120,7 +119,7 @@ class FiscalDocumentPaginationControllerTest {
                 productCode,
                 "Prodotto paginazione documenti",
                 "Prodotto creato per verificare la paginazione dei documenti.",
-                ProductCategory.HARDWARE,
+                "HARDWARE",
                 "TestBrand",
                 "Scheda test",
                 "",

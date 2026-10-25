@@ -195,7 +195,7 @@ class ProductServiceTest {
                 code,
                 name,
                 description,
-                ProductCategory.HARDWARE,
+                "HARDWARE",
                 "NVIDIA",
                 "Scheda grafica",
                 "Gaming",

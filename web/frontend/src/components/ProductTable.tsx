@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { PageResponse, Product, ProductLookup, ProductQuery } from '../api';
 import PaginationControls from './PaginationControls';
+import { categoryOptionLabel, useProductCategories } from '../features/catalog/ProductCategoriesContext';
 
 type Props = {
   page: PageResponse<Product>;
@@ -29,6 +30,7 @@ type SortMode = 'NAME_ASC' | 'PRICE_ASC' | 'PRICE_DESC' | 'QTY_ASC' | 'QTY_DESC'
 const money = new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' });
 
 export default function ProductTable({ page, filterSource, query, selectedCodes, activeProductCode, canManage, canAddToCart = false, context = 'catalog', busy, onQueryChange, onPageChange, onSelectionChange, onView, onEdit, onDeleteOne, onDiscontinue, onDeleteSelected, onAddToCart }: Props) {
+  const { categories } = useProductCategories();
   const products = page.content;
   const brands = useMemo(() => uniqueValues(filterSource.map((product) => product.brand)), [filterSource]);
   const productTypes = useMemo(() => uniqueValues(filterSource.map((product) => product.productType)), [filterSource]);
@@ -82,8 +84,7 @@ export default function ProductTable({ page, filterSource, query, selectedCodes,
           Categoria
           <select value={query.category ?? 'ALL'} onChange={(event) => updateQuery({ category: event.target.value as ProductQuery['category'] })}>
             <option value="ALL">Tutte</option>
-            <option value="HARDWARE">Hardware</option>
-            <option value="SOFTWARE">Software</option>
+            {categories.map((category) => <option key={category.code} value={category.code}>{categoryOptionLabel(category)}</option>)}
           </select>
         </label>
         <label>
@@ -159,7 +160,7 @@ export default function ProductTable({ page, filterSource, query, selectedCodes,
                       <div className="classification-stack">
                         <strong>{product.brand}</strong>
                         <span>{product.productType}</span>
-                        <small>{product.category}{product.usageContext ? ` · ${product.usageContext}` : ''}</small>
+                        <small>{product.categoryName || product.category}{product.usageContext ? ` · ${product.usageContext}` : ''}</small>
                       </div>
                     </td>
                     <td>

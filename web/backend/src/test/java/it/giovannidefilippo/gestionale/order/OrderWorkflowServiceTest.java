@@ -5,7 +5,6 @@ import it.giovannidefilippo.gestionale.document.FiscalDocumentService;
 import it.giovannidefilippo.gestionale.inventory.InventoryService;
 import it.giovannidefilippo.gestionale.common.TestCompanySettings;
 import it.giovannidefilippo.gestionale.company.CompanySettingsService;
-import it.giovannidefilippo.gestionale.product.ProductCategory;
 import it.giovannidefilippo.gestionale.product.ProductRequest;
 import it.giovannidefilippo.gestionale.product.ProductService;
 import it.giovannidefilippo.gestionale.user.AuthenticatedUser;
@@ -153,7 +152,7 @@ class OrderWorkflowServiceTest {
                 code,
                 "Prodotto workflow",
                 "Prodotto creato per verificare il ciclo operativo ordine.",
-                ProductCategory.HARDWARE,
+                "HARDWARE",
                 "TestBrand",
                 "Scheda di test",
                 "",

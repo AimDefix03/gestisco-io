@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-25 - Categorie configurabili (P1.1)
+
+- Categorie di prodotto gerarchiche e configurabili al posto dell'elenco fisso `HARDWARE`/`SOFTWARE`: migrazione V36 senza perdita di dati, API `/api/product-categories`, filtri che includono le sottocategorie, gestione dal catalogo, percorso della categoria su prodotti, catalogo clienti e report.
+
 ## 2026-10-24 - Stato di avanzamento compatto
 
 - `IMPLEMENTATION_PROGRESS.md` ridotto a stato corrente, step, decisioni, blocker, rischi e registro di una riga per step; lo storico completo e archiviato invariato in `docs/archive/IMPLEMENTATION_LOG_2026-10.md`.

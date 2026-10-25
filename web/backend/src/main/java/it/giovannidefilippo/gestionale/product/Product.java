@@ -3,11 +3,11 @@ package it.giovannidefilippo.gestionale.product;
 import it.giovannidefilippo.gestionale.common.BusinessIdentifierCanonicalizer;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 
@@ -37,8 +37,8 @@ public class Product {
     @Column(nullable = false, length = 1200)
     private String description;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "category_id", nullable = false)
     private ProductCategory category;
 
     @Column(nullable = false)
@@ -76,18 +76,18 @@ public class Product {
     protected Product() {
     }
 
-    Product(ProductRequest request) {
+    Product(ProductRequest request, ProductCategory category) {
         this.quantity = 0;
         this.reservedQuantity = 0;
-        update(request);
+        update(request, category);
     }
 
-    void update(ProductRequest request) {
+    void update(ProductRequest request, ProductCategory category) {
         this.code = BusinessIdentifierCanonicalizer.display(request.code());
         this.codeCanonical = BusinessIdentifierCanonicalizer.canonical(request.code());
         this.name = clean(request.name());
         this.description = clean(request.description());
-        this.category = request.category();
+        this.category = category;
         this.brand = clean(request.brand());
         this.productType = clean(request.productType());
         this.usageContext = optional(request.usageContext());

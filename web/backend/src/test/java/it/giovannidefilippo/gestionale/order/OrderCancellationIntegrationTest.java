@@ -1,7 +1,6 @@
 package it.giovannidefilippo.gestionale.order;
 
 import it.giovannidefilippo.gestionale.inventory.InventoryService;
-import it.giovannidefilippo.gestionale.product.ProductCategory;
 import it.giovannidefilippo.gestionale.product.ProductRequest;
 import it.giovannidefilippo.gestionale.product.ProductService;
 import it.giovannidefilippo.gestionale.user.AuthenticatedUser;
@@ -218,7 +217,7 @@ class OrderCancellationIntegrationTest extends PostgreSqlIntegrationTestSupport 
                 code,
                 "Prodotto " + prefix,
                 "Prodotto sintetico per il test di annullamento atomico.",
-                ProductCategory.HARDWARE,
+                "HARDWARE",
                 "TestBrand",
                 "Componente",
                 "",
