@@ -101,6 +101,7 @@ describe('client API di dominio', () => {
       name: 'Scheda video',
       description: 'Descrizione',
       category: 'HARDWARE' as const,
+      categoryName: 'Hardware',
       brand: 'Example Brand',
       productType: 'Scheda grafica',
       usageContext: 'Gaming',

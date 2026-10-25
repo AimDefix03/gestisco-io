@@ -5,7 +5,6 @@ import it.giovannidefilippo.gestionale.partner.BusinessPartnerRequest;
 import it.giovannidefilippo.gestionale.partner.BusinessPartnerResponse;
 import it.giovannidefilippo.gestionale.partner.BusinessPartnerService;
 import it.giovannidefilippo.gestionale.partner.BusinessPartnerType;
-import it.giovannidefilippo.gestionale.product.ProductCategory;
 import it.giovannidefilippo.gestionale.product.ProductRequest;
 import it.giovannidefilippo.gestionale.product.ProductResponse;
 import it.giovannidefilippo.gestionale.product.ProductService;
@@ -43,7 +42,7 @@ class SupplierOrderConcurrencyTest extends PostgreSqlIntegrationTestSupport {
     void concurrentReceiptOfLastUnitIsAppliedOnce() throws Exception {
         String suffix = UUID.randomUUID().toString().substring(0, 8);
         BusinessPartnerResponse supplier = partnerService.create(new BusinessPartnerRequest("FOR-" + suffix, BusinessPartnerType.SUPPLIER, "Fornitore concorrenza", "", "IT12345678901", "supplier@example.com", "", "Via Test", "Napoli", ""), BUYER.username(), BUYER.roleLabel());
-        ProductResponse product = productService.create(new ProductRequest("PURC-" + suffix, "Prodotto concorrente", "Test lock ricezione ordine fornitore.", ProductCategory.HARDWARE, "Test", "Componente", "", new BigDecimal("10.00"), BigDecimal.ZERO), BUYER);
+        ProductResponse product = productService.create(new ProductRequest("PURC-" + suffix, "Prodotto concorrente", "Test lock ricezione ordine fornitore.", "HARDWARE", "Test", "Componente", "", new BigDecimal("10.00"), BigDecimal.ZERO), BUYER);
         SupplierOrderResponse order = service.create(new SupplierOrderRequests.CreateRequest(supplier.id(), LocalDate.now().plusDays(2), "", List.of(new SupplierOrderRequests.CreateItemRequest(product.code(), 1, new BigDecimal("8.00"), null))), BUYER);
         order = service.send(order.code(), BUYER);
         String orderCode = order.code();
@@ -74,7 +73,7 @@ class SupplierOrderConcurrencyTest extends PostgreSqlIntegrationTestSupport {
     void concurrentReceiptsFromDifferentOrdersKeepOneBaselineAndWeightedCost() throws Exception {
         String suffix = UUID.randomUUID().toString().substring(0, 8);
         BusinessPartnerResponse supplier = partnerService.create(new BusinessPartnerRequest("FOR-M-" + suffix, BusinessPartnerType.SUPPLIER, "Fornitore costo concorrente", "", "IT12345678902", "supplier-cost@example.com", "", "Via Test", "Napoli", ""), BUYER.username(), BUYER.roleLabel());
-        ProductResponse product = productService.create(new ProductRequest("PURM-" + suffix, "Prodotto costo concorrente", "Test media ponderata concorrente.", ProductCategory.HARDWARE, "Test", "Componente", "", new BigDecimal("20.00"), BigDecimal.ZERO), BUYER);
+        ProductResponse product = productService.create(new ProductRequest("PURM-" + suffix, "Prodotto costo concorrente", "Test media ponderata concorrente.", "HARDWARE", "Test", "Componente", "", new BigDecimal("20.00"), BigDecimal.ZERO), BUYER);
         SupplierOrderResponse firstOrder = sentOrder(supplier.id(), product.code(), new BigDecimal("8.00"));
         SupplierOrderResponse secondOrder = sentOrder(supplier.id(), product.code(), new BigDecimal("12.00"));
         CountDownLatch ready = new CountDownLatch(2);

@@ -1,4 +1,21 @@
-export type ProductCategory = 'HARDWARE' | 'SOFTWARE';
+/** Codice di una categoria configurabile (per esempio `HARDWARE`). */
+export type ProductCategory = string;
+
+export type ProductCategoryOption = {
+  code: string;
+  name: string;
+  path: string;
+  parentCode: string | null;
+  depth: number;
+  active: boolean;
+};
+
+export type ProductCategoryPayload = {
+  code: string;
+  name: string;
+  parentCode: string | null;
+  active: boolean;
+};
 export type BusinessPartnerType = 'CUSTOMER' | 'SUPPLIER';
 
 export type SellableProduct = {
@@ -6,6 +23,7 @@ export type SellableProduct = {
   name: string;
   description: string;
   category: ProductCategory;
+  categoryName: string;
   brand: string;
   productType: string;
   usageContext: string;

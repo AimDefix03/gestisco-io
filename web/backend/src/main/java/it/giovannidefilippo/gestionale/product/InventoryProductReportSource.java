@@ -5,7 +5,8 @@ import java.math.BigDecimal;
 public record InventoryProductReportSource(
         String code,
         String name,
-        ProductCategory category,
+        String category,
+        String categoryName,
         String brand,
         String productType,
         int quantity,

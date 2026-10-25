@@ -2,7 +2,6 @@ package it.giovannidefilippo.gestionale.inventory;
 
 import it.giovannidefilippo.gestionale.common.PostgreSqlIntegrationTestSupport;
 import it.giovannidefilippo.gestionale.common.ResourceConflictException;
-import it.giovannidefilippo.gestionale.product.ProductCategory;
 import it.giovannidefilippo.gestionale.product.ProductRequest;
 import it.giovannidefilippo.gestionale.product.ProductService;
 import it.giovannidefilippo.gestionale.user.AuthenticatedUser;
@@ -151,7 +150,7 @@ class PhysicalInventoryServiceTest extends PostgreSqlIntegrationTestSupport {
                 code,
                 "Prodotto inventario fisico",
                 "Prodotto creato per verificare il conteggio fisico.",
-                ProductCategory.HARDWARE,
+                "HARDWARE",
                 "InventoryBrand",
                 "Componente",
                 "",

@@ -25,7 +25,7 @@ class CustomerCatalogController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "25") int size,
             @RequestParam(required = false) String q,
-            @RequestParam(required = false) ProductCategory category,
+            @RequestParam(required = false) String category,
             @RequestParam(required = false) String brand,
             @RequestParam(required = false) String productType,
             @RequestParam(required = false) String stock,

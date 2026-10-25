@@ -21,7 +21,6 @@ import it.giovannidefilippo.gestionale.partner.BusinessPartnerRequest;
 import it.giovannidefilippo.gestionale.partner.BusinessPartnerResponse;
 import it.giovannidefilippo.gestionale.partner.BusinessPartnerService;
 import it.giovannidefilippo.gestionale.partner.BusinessPartnerType;
-import it.giovannidefilippo.gestionale.product.ProductCategory;
 import it.giovannidefilippo.gestionale.product.ProductRequest;
 import it.giovannidefilippo.gestionale.product.ProductService;
 import it.giovannidefilippo.gestionale.user.AuthSessionResponse;
@@ -103,7 +102,7 @@ class ApplicationTimeProviderIntegrationTest {
                 productCode,
                 "Prodotto tempo",
                 "Prodotto usato per verificare il clock applicativo.",
-                ProductCategory.HARDWARE,
+                "HARDWARE",
                 "ClockBrand",
                 "Scheda di test",
                 "",

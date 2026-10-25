@@ -33,6 +33,7 @@ import usePurchaseFlow from './features/purchases/usePurchaseFlow';
 import usePhysicalInventoryFlow from './features/inventory/usePhysicalInventoryFlow';
 import { SessionEntry, SessionOverlays } from './features/session/SessionExperience';
 import useSessionFlow from './features/session/useSessionFlow';
+import { ProductCategoriesProvider } from './features/catalog/ProductCategoriesContext';
 import useCommandExecution, { type UiNotice } from './hooks/useCommandExecution';
 import useDraftState from './hooks/useDraftState';
 import useWorkspaceNavigation from './hooks/useWorkspaceNavigation';
@@ -402,7 +403,7 @@ export default function App() {
   ];
 
   return (
-    <>
+    <ProductCategoriesProvider enabled={hasPermission('VIEW_CATALOG')} includeInactive={canManageProducts}>
       <WorkspaceChrome
         currentUser={currentUser!}
         sessionExpiresAt={sessionExpiresAt}
@@ -433,7 +434,7 @@ export default function App() {
           onConfirm={confirmPendingNavigation}
         />
       )}
-    </>
+    </ProductCategoriesProvider>
   );
 
   function resetWorkspaceState() {

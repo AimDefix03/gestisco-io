@@ -3,7 +3,6 @@ package it.giovannidefilippo.gestionale.common;
 import it.giovannidefilippo.gestionale.partner.BusinessPartnerRequest;
 import it.giovannidefilippo.gestionale.partner.BusinessPartnerService;
 import it.giovannidefilippo.gestionale.partner.BusinessPartnerType;
-import it.giovannidefilippo.gestionale.product.ProductCategory;
 import it.giovannidefilippo.gestionale.product.ProductRequest;
 import it.giovannidefilippo.gestionale.product.ProductResponse;
 import it.giovannidefilippo.gestionale.product.ProductService;
@@ -176,7 +175,7 @@ class CanonicalBusinessIdentityIntegrationTest extends PostgreSqlIntegrationTest
                 code,
                 "Canonical product",
                 "Canonical identity integration test",
-                ProductCategory.HARDWARE,
+                "HARDWARE",
                 "Test brand",
                 "Test type",
                 "",

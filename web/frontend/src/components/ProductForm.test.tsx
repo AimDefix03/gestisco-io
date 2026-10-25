@@ -3,15 +3,29 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import ProductForm from './ProductForm';
 import { renderWithDrafts } from '../test/renderWithDrafts';
+import type { ProductCategoryOption } from '../api';
+import { StaticProductCategories } from '../features/catalog/ProductCategoriesContext';
+
+const categories: ProductCategoryOption[] = [
+  { code: 'HARDWARE', name: 'Hardware', path: 'Hardware', parentCode: null, depth: 1, active: true },
+  { code: 'GPU', name: 'Schede video', path: 'Hardware / Schede video', parentCode: 'HARDWARE', depth: 2, active: true },
+  { code: 'OLD', name: 'Fuori catalogo', path: 'Fuori catalogo', parentCode: null, depth: 1, active: false }
+];
+
+function renderForm(ui: Parameters<typeof renderWithDrafts>[0]) {
+  return renderWithDrafts(<StaticProductCategories categories={categories}>{ui}</StaticProductCategories>);
+}
 
 describe('ProductForm', () => {
   it('converte e invia i dati di un nuovo prodotto', async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn().mockResolvedValue(true);
-    renderWithDrafts(<ProductForm editingProduct={null} busy={false} onSubmit={onSubmit} onCancel={vi.fn()} />);
+    renderForm(<ProductForm editingProduct={null} busy={false} onSubmit={onSubmit} onCancel={vi.fn()} />);
 
     await user.type(screen.getByLabelText('Codice'), 'GPU-001');
     await user.type(screen.getByLabelText('Nome'), 'Scheda video');
+    expect(screen.queryByRole('option', { name: /Fuori catalogo/ })).not.toBeInTheDocument();
+    await user.selectOptions(screen.getByLabelText('Categoria'), 'HARDWARE');
     await user.type(screen.getByLabelText('Brand'), 'Example Brand');
     await user.type(screen.getByLabelText('Tipo prodotto'), 'Scheda grafica');
     await user.type(screen.getByLabelText('Utilizzo opzionale'), 'Gaming');
@@ -40,7 +54,7 @@ describe('ProductForm', () => {
   it('mantiene la bozza quando il comando non e confermato', async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn().mockResolvedValue(false);
-    renderWithDrafts(
+    renderForm(
       <ProductForm
         editingProduct={{
           id: 1,
@@ -48,6 +62,7 @@ describe('ProductForm', () => {
           name: 'Processore',
           description: 'Descrizione',
           category: 'HARDWARE',
+          categoryName: 'Hardware',
           brand: 'Example Brand',
           productType: 'CPU',
           usageContext: '',
@@ -79,7 +94,7 @@ describe('ProductForm', () => {
   it('mostra i dati esistenti e consente di annullare la modifica', async () => {
     const user = userEvent.setup();
     const onCancel = vi.fn();
-    renderWithDrafts(
+    renderForm(
       <ProductForm
         editingProduct={{
           id: 1,
@@ -87,6 +102,7 @@ describe('ProductForm', () => {
           name: 'Processore',
           description: 'Descrizione',
           category: 'HARDWARE',
+          categoryName: 'Hardware',
           brand: 'Example Brand',
           productType: 'CPU',
           usageContext: '',
@@ -110,5 +126,18 @@ describe('ProductForm', () => {
     expect(screen.getByRole('button', { name: 'Salva modifiche' })).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Annulla' }));
     expect(onCancel).toHaveBeenCalledOnce();
+  });
+
+  it('offre le sottocategorie indentate e richiede una categoria', async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn().mockResolvedValue(true);
+    renderForm(<ProductForm editingProduct={null} busy={false} onSubmit={onSubmit} onCancel={vi.fn()} />);
+
+    const select = screen.getByLabelText('Categoria');
+    expect(select).toBeRequired();
+    expect(select).toHaveValue('');
+    expect(screen.getByRole('option', { name: /Schede video/ })).toHaveValue('GPU');
+    await user.click(screen.getByRole('button', { name: 'Crea prodotto' }));
+    expect(onSubmit).not.toHaveBeenCalled();
   });
 });

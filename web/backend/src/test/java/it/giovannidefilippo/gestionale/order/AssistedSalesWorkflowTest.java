@@ -6,7 +6,6 @@ import it.giovannidefilippo.gestionale.partner.BusinessPartnerRequest;
 import it.giovannidefilippo.gestionale.partner.BusinessPartnerResponse;
 import it.giovannidefilippo.gestionale.partner.BusinessPartnerService;
 import it.giovannidefilippo.gestionale.partner.BusinessPartnerType;
-import it.giovannidefilippo.gestionale.product.ProductCategory;
 import it.giovannidefilippo.gestionale.product.ProductRequest;
 import it.giovannidefilippo.gestionale.product.ProductService;
 import it.giovannidefilippo.gestionale.user.AuthenticatedUser;
@@ -167,7 +166,7 @@ class AssistedSalesWorkflowTest {
                 code,
                 "Prodotto vendita assistita",
                 description,
-                ProductCategory.HARDWARE,
+                "HARDWARE",
                 "TestBrand",
                 "Componente",
                 "",

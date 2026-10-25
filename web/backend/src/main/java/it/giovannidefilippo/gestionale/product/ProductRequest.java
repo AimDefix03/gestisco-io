@@ -11,7 +11,7 @@ public record ProductRequest(
         @NotBlank String code,
         @NotBlank String name,
         @NotBlank String description,
-        @NotNull ProductCategory category,
+        @NotBlank String category,
         @NotBlank String brand,
         @NotBlank String productType,
         String usageContext,

@@ -9,7 +9,6 @@ import it.giovannidefilippo.gestionale.order.SalesOrderReportSource;
 import it.giovannidefilippo.gestionale.order.SalesReportingUsage;
 import it.giovannidefilippo.gestionale.product.InventoryProductReportSource;
 import it.giovannidefilippo.gestionale.product.InventoryReportingUsage;
-import it.giovannidefilippo.gestionale.product.ProductCategory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -133,12 +132,12 @@ class ReportingServiceTest {
     @Test
     void inventoryReportCalculatesPhysicalReservedAvailableAndDiscountedValue() {
         when(timeProvider.localDateTime()).thenReturn(NOW);
-        when(inventoryUsage.findForReport("gpu", ProductCategory.HARDWARE, "ALL", false, ReportingService.MAX_REPORT_ROWS)).thenReturn(List.of(
+        when(inventoryUsage.findForReport("gpu", "HARDWARE", "ALL", false, ReportingService.MAX_REPORT_ROWS)).thenReturn(List.of(
                 product("GPU-1", 5, 2, "100.00", "10.00", false),
                 product("GPU-2", 2, 2, "50.00", "0.00", false)
         ));
 
-        InventoryReportResponse report = service.inventory("gpu", ProductCategory.HARDWARE, "ALL", false);
+        InventoryReportResponse report = service.inventory("gpu", "HARDWARE", "ALL", false);
 
         assertThat(report.productCount()).isEqualTo(2);
         assertThat(report.physicalUnits()).isEqualTo(7);
@@ -185,7 +184,8 @@ class ReportingServiceTest {
         return new InventoryProductReportSource(
                 code,
                 "Prodotto " + code,
-                ProductCategory.HARDWARE,
+                "HARDWARE",
+                "Hardware",
                 "Brand",
                 "Scheda grafica",
                 quantity,

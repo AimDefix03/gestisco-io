@@ -10,7 +10,6 @@ import it.giovannidefilippo.gestionale.order.OrderRequests;
 import it.giovannidefilippo.gestionale.order.OrderResponse;
 import it.giovannidefilippo.gestionale.order.OrderService;
 import it.giovannidefilippo.gestionale.order.PaymentMethod;
-import it.giovannidefilippo.gestionale.product.ProductCategory;
 import it.giovannidefilippo.gestionale.product.ProductRequest;
 import it.giovannidefilippo.gestionale.product.ProductService;
 import it.giovannidefilippo.gestionale.user.AuthenticatedUser;
@@ -112,7 +111,7 @@ class FiscalDocumentUniquenessTest {
                 productCode,
                 "Prodotto documenti",
                 "Prodotto creato per verificare i vincoli documentali.",
-                ProductCategory.HARDWARE,
+                "HARDWARE",
                 "TestBrand",
                 "Scheda di test",
                 "",

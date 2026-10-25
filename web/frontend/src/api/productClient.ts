@@ -1,5 +1,5 @@
 import { fetchAllPages, request, toQueryString } from './httpClient';
-import type { CustomerProduct, PageResponse, Product, ProductLookup, ProductOperationalDetail, ProductPayload, ProductQuery } from './types';
+import type { CustomerProduct, PageResponse, Product, ProductCategoryOption, ProductCategoryPayload, ProductLookup, ProductOperationalDetail, ProductPayload, ProductQuery } from './types';
 
 const baseUrl = '/api/products';
 
@@ -50,5 +50,23 @@ export async function deleteProducts(codes: string[]): Promise<void> {
   await request<void>(`${baseUrl}/bulk-delete`, {
     method: 'POST',
     body: JSON.stringify({ codes })
+  });
+}
+
+export function fetchProductCategories(includeInactive = false, signal?: AbortSignal): Promise<ProductCategoryOption[]> {
+  return request<ProductCategoryOption[]>(`/api/product-categories${includeInactive ? '?includeInactive=true' : ''}`, { signal });
+}
+
+export function createProductCategory(payload: ProductCategoryPayload): Promise<ProductCategoryOption> {
+  return request<ProductCategoryOption>('/api/product-categories', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
+}
+
+export function updateProductCategory(code: string, payload: ProductCategoryPayload): Promise<ProductCategoryOption> {
+  return request<ProductCategoryOption>(`/api/product-categories/${encodeURIComponent(code)}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload)
   });
 }

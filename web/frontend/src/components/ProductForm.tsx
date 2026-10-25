@@ -1,5 +1,6 @@
 import { FormEvent, useMemo } from 'react';
 import { Product, ProductCategory, ProductPayload } from '../api';
+import { categoryOptionLabel, useProductCategories } from '../features/catalog/ProductCategoriesContext';
 import useDraftState from '../hooks/useDraftState';
 
 type Props = {
@@ -13,7 +14,7 @@ const initialForm = {
   code: '',
   name: '',
   description: '',
-  category: 'HARDWARE' as ProductCategory,
+  category: '' as ProductCategory,
   brand: '',
   productType: '',
   usageContext: '',
@@ -22,6 +23,7 @@ const initialForm = {
 };
 
 export default function ProductForm({ editingProduct, busy, onSubmit, onCancel }: Props) {
+  const { categories } = useProductCategories();
   const initialValue = useMemo(() => editingProduct ? ({
       code: editingProduct.code,
       name: editingProduct.name,
@@ -84,9 +86,14 @@ export default function ProductForm({ editingProduct, busy, onSubmit, onCancel }
         </label>
         <label>
           Categoria
-          <select value={form.category} onChange={(event) => updateField('category', event.target.value as ProductCategory)}>
-            <option value="HARDWARE">Hardware</option>
-            <option value="SOFTWARE">Software</option>
+          <select value={form.category} onChange={(event) => updateField('category', event.target.value as ProductCategory)} required>
+            <option value="" disabled>Seleziona categoria</option>
+            {categories
+              .filter((category) => category.active || category.code === form.category)
+              .map((category) => <option key={category.code} value={category.code}>{categoryOptionLabel(category)}</option>)}
+            {form.category && !categories.some((category) => category.code === form.category) && (
+              <option value={form.category}>{editingProduct?.categoryName ?? form.category}</option>
+            )}
           </select>
         </label>
         <label>

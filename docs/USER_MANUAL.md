@@ -124,6 +124,10 @@ Usare i filtri per cercare per codice, nome, brand, tipo, categoria e stato stoc
 
 Il codice identifica stabilmente il prodotto. Scegliere un codice coerente prima di utilizzare l'articolo negli ordini.
 
+### Categorie
+
+Chi gestisce i prodotti trova il riquadro **Categorie** nella colonna laterale del catalogo. Si possono creare categorie fino a tre livelli (per esempio Abbigliamento, poi Pantaloni, poi Jeans), rinominarle, spostarle sotto un'altra categoria e disattivarle. Il codice di una categoria non si modifica dopo la creazione. Una categoria in uso non si elimina: si disattiva, e i prodotti che la usano la mantengono; i nuovi prodotti possono usare solo categorie attive. Filtrando il catalogo o il report di magazzino per una categoria si vedono anche i prodotti delle sue sottocategorie.
+
 ### Modifica, disattivazione ed eliminazione
 
 - `Modifica` aggiorna l'anagrafica del prodotto.

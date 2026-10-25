@@ -28,7 +28,7 @@ Endpoint paginati:
 
 | Endpoint | Filtri supportati |
 | --- | --- |
-| `GET /api/products` | `page`, `size`, `q`, `category`, `brand`, `productType`, `stock`, `sort` |
+| `GET /api/products` | `page`, `size`, `q`, `category`, `brand`, `productType`, `stock`, `sort`; `category` e il codice di una categoria e include le sue sottocategorie |
 | `GET /api/customer/catalog` | `page`, `size`, `q`, `category`, `brand`, `productType`, `stock`, `sort`; `stock` usa i soli livelli commerciali e gli ordinamenti ammessi sono nome e prezzo |
 | `GET /api/partners` | `page`, `size`, `q`, `type`, `active` |
 | `GET /api/inventory/movements` | `page`, `size`, `q`, `type`, `productCode` |
@@ -217,6 +217,13 @@ Le modifiche sensibili devono registrare un riepilogo operativo chiaro senza inc
 - La projection cliente non contiene ID interni, `quantity`, `reservedQuantity`, `availableQuantity`, `discontinued` o valore potenziale di vendita. I prodotti disattivati sono esclusi prima della serializzazione.
 - `availability` e calcolata nel backend sulla disponibilita vendibile: `AVAILABLE` oltre 3 unita, `LIMITED` da 1 a 3 e `UNAVAILABLE` a 0. Il client non riceve un limite numerico dal quale inferire lo stock.
 - `POST /api/products`, `PUT /api/products/{code}`, `DELETE /api/products/{code}`, `POST /api/products/bulk-delete` e `POST /api/products/{code}/discontinue` richiedono `MANAGE_PRODUCTS`.
+- Dal 2026-10-24 (V36) `category` nelle richieste e nelle risposte prodotto e il codice di una categoria configurabile; le risposte includono `categoryName` con il percorso completo (per esempio `Abbigliamento / Pantaloni`). Un nuovo prodotto o un cambio di categoria richiede una categoria esistente e attiva (`400` altrimenti); un prodotto conserva la propria categoria anche se questa viene disattivata.
+
+## Categorie di prodotto
+
+- `GET /api/product-categories` richiede `VIEW_CATALOG` e restituisce l'elenco ordinato per percorso con `code`, `name`, `path`, `parentCode`, `depth` e `active`. `includeInactive=true` include le categorie disattivate solo per chi ha `MANAGE_PRODUCTS`.
+- `POST /api/product-categories` e `PUT /api/product-categories/{code}` richiedono `MANAGE_PRODUCTS`. Corpo: `code` (lettere, numeri, `-`, `_`, massimo 64), `name` (massimo 120), `parentCode` opzionale, `active` opzionale.
+- Regole: codice univoco ignorando maiuscole e non modificabile; nome univoco tra categorie dello stesso livello; massimo tre livelli; nessuno spostamento sotto se stessa o una sottocategoria (`400`); disattivazione rifiutata se esistono sottocategorie attive (`409`); una categoria attiva non puo stare sotto una disattivata (`400`). Le categorie non si eliminano: si disattivano. Creazione e modifica generano audit `CREATE_PRODUCT_CATEGORY` e `UPDATE_PRODUCT_CATEGORY` nella categoria `PRODUCT`.
 - I payload di creazione e modifica prodotto non contengono `quantity`; eventuali campi aggiuntivi inviati non possono modificare la giacenza.
 - Un nuovo prodotto nasce sempre con giacenza zero e riceve il saldo tramite il modulo inventario.
 - Le risposte prodotto espongono anche `discontinued`.
@@ -346,7 +353,7 @@ Tutti gli endpoint report richiedono una sessione valida e il permesso `VIEW_REP
 
 - `GET /api/reports/inventory` restituisce lo snapshot in JSON.
 - `GET /api/reports/inventory/export` scarica lo stesso dataset in un formato file.
-- Filtri: `q`, `category` (`HARDWARE` o `SOFTWARE`), `stock` (`ALL`, `AVAILABLE`, `LOW` o `OUT`) e `discontinued` (`true` o `false`).
+- Filtri: `q`, `category` (codice di categoria, incluse le sottocategorie), `stock` (`ALL`, `AVAILABLE`, `LOW` o `OUT`) e `discontinued` (`true` o `false`).
 - La risposta distingue unita fisiche, riservate e disponibili, valore potenziale di vendita al prezzo scontato corrente, scorte basse, esauriti e disattivati.
 - `potentialRetailStockValue` e `potentialRetailValue` non rappresentano costo, valore contabile, margine o utile.
 - Lo snapshot rappresenta lo stato corrente del catalogo e non e uno storico di valorizzazione contabile.

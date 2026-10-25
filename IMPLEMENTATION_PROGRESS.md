@@ -4,17 +4,17 @@ Stato corrente del progetto. I resoconti dettagliati fino al 2026-10-24 (step 0.
 
 ## Stato generale
 
-- Current step: P0.3 snellimento documentale
-- Next eligible step: P1.1 categorie gerarchiche configurabili
-- Last completed step: P0.2 benchmark e glossario di dominio (in review); storico master fino allo Step 4.3
-- Last update: 2026-10-24
+- Current step: P1.1 categorie gerarchiche configurabili (in review)
+- Next eligible step: P1.2 attributi e campi personalizzati
+- Last completed step: P0 completata (#34, #35); storico master fino allo Step 4.3
+- Last update: 2026-10-25
 - Roadmap: [ROADMAP_PRODOTTO.md](docs/ROADMAP_PRODOTTO.md), fasi P0-P11 e gate G1-G7 ([ADR 0008](docs/DECISIONS/0008-product-direction-generalist-core-apparel-pilot.md)). Storico master: 32/48 step; nessuno dei due conteggi misura la prontezza alla vendita.
 - Open P0: nessuno
 - Open P1: F-17, F-18 (P9.1), F-19 (P9.2)
 - Open P2: F-29 (P8), F-30 (P9.2)
 - Open P3: nessuno
 - PR in attesa per scelta: Dependabot #27 Apache POI 6, da rivalutare a inizio novembre o alla 6.0.1
-- Main: CI e Security verdi su `e5398e0`; 12 controlli obbligatori, job prod-like nel container Playwright
+- Main: `0e0df4b` dopo #35; 12 controlli obbligatori, job prod-like nel container Playwright
 
 ## Step
 
@@ -22,10 +22,11 @@ Stato corrente del progetto. I resoconti dettagliati fino al 2026-10-24 (step 0.
 |---|---|---|---|
 | 0.1-4.3 master | COMPLETED | storico | Verifiche nel registro archiviato |
 | ORG-1 - ORG-5 | COMPLETED | #13, #15, #16 | ORG-6 DEFERRED per decisione dell'utente del 2026-10-23 |
-| P0.1 Direzione di prodotto | IN_REVIEW | #34 | ADR 0008 e roadmap di prodotto |
-| P0.2 Benchmark e glossario | IN_REVIEW | da aprire dopo #34 | WB-007 - WB-010, glossario in `DOMAIN_MODEL.md` |
-| P0.3 Snellimento documentale | IN_PROGRESS | - | Registro archiviato, stato compatto |
-| P1.1 - P1.6 | PENDING | - | Gate G1 |
+| P0.1 Direzione di prodotto | COMPLETED | #34 | ADR 0008 e roadmap di prodotto |
+| P0.2 Benchmark e glossario | COMPLETED | #35 | WB-007 - WB-010, glossario in `DOMAIN_MODEL.md` |
+| P0.3 Snellimento documentale | COMPLETED | #35 | Registro archiviato, stato compatto |
+| P1.1 Categorie configurabili | IN_REVIEW | da aprire | V36, API categorie, filtri gerarchici, gestione da UI |
+| P1.2 - P1.6 | PENDING | - | Gate G1 |
 | P2 - P11 | PENDING | - | Vedere roadmap di prodotto |
 
 ## Decisioni approvate
@@ -60,8 +61,9 @@ Una riga per step o evento rilevante, dal piu recente.
 
 | Data | Step | PR / commit | Esito |
 |---|---|---|---|
-| 2026-10-24 | P0.3 Snellimento documentale | - | Registro storico archiviato integralmente; stato compatto nel formato del master |
-| 2026-10-24 | P0.2 Benchmark e glossario | `33f85f2` | Schede WB-007 - WB-010 da Odoo 18.0 ed ERPNext; WB-008 e WB-009 in bozza |
+| 2026-10-25 | P1.1 Categorie configurabili | da aprire | Backend 327/327 (+7: migrazione e controller categorie), frontend 213/213 (+4); verifica per mutazione sul controllo dei cicli; ambiente locale lento per memoria esaurita |
+| 2026-10-24 | P0.3 Snellimento documentale | #35 | Registro storico archiviato integralmente; stato compatto nel formato del master |
+| 2026-10-24 | P0.2 Benchmark e glossario | #35 | Schede WB-007 - WB-010 da Odoo 18.0 ed ERPNext; WB-008 e WB-009 in bozza |
 | 2026-10-24 | P0.1 Direzione di prodotto | #34 | ADR 0008 e roadmap P0-P11 |
 | 2026-10-24 | Ambiente di test frontend | #31 | Vitest 5, jsdom 30, jest-dom 7; npm audit a zero |
 | 2026-10-24 | codeql-action v4, vite 8.3.5 | #33, #32 | Nessuna azione su Node 20 |

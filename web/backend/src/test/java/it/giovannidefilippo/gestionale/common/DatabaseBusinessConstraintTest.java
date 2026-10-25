@@ -18,14 +18,14 @@ class DatabaseBusinessConstraintTest {
     @Test
     void databaseRejectsInvalidProductNumbers() {
         assertThatThrownBy(() -> jdbcTemplate.update("""
-                insert into products (code, name, description, category, brand, product_type, usage_context, quantity, price, discount, version, reserved_quantity, discontinued)
-                values (?, 'Prodotto test', 'Descrizione test', 'HARDWARE', 'Brand', 'Scheda grafica', '', -1, 100.00, 0.00, 0, 0, false)
+                insert into products (code, name, description, category_id, brand, product_type, usage_context, quantity, price, discount, version, reserved_quantity, discontinued)
+                values (?, 'Prodotto test', 'Descrizione test', (select id from product_categories where code_canonical = 'hardware'), 'Brand', 'Scheda grafica', '', -1, 100.00, 0.00, 0, 0, false)
                 """, uniqueCode("BAD-PROD")))
                 .isInstanceOf(DataIntegrityViolationException.class);
 
         assertThatThrownBy(() -> jdbcTemplate.update("""
-                insert into products (code, name, description, category, brand, product_type, usage_context, quantity, price, discount, version, reserved_quantity, discontinued)
-                values (?, 'Prodotto test', 'Descrizione test', 'HARDWARE', 'Brand', 'Scheda grafica', '', 1, 100.00, 101.00, 0, 0, false)
+                insert into products (code, name, description, category_id, brand, product_type, usage_context, quantity, price, discount, version, reserved_quantity, discontinued)
+                values (?, 'Prodotto test', 'Descrizione test', (select id from product_categories where code_canonical = 'hardware'), 'Brand', 'Scheda grafica', '', 1, 100.00, 101.00, 0, 0, false)
                 """, uniqueCode("BAD-DISC")))
                 .isInstanceOf(DataIntegrityViolationException.class);
     }
@@ -33,8 +33,8 @@ class DatabaseBusinessConstraintTest {
     @Test
     void databaseRejectsBlankRequiredProductFields() {
         assertThatThrownBy(() -> jdbcTemplate.update("""
-                insert into products (code, name, description, category, brand, product_type, usage_context, quantity, price, discount, version, reserved_quantity, discontinued)
-                values ('   ', 'Prodotto test', 'Descrizione test', 'HARDWARE', 'Brand', 'Scheda grafica', '', 1, 100.00, 0.00, 0, 0, false)
+                insert into products (code, name, description, category_id, brand, product_type, usage_context, quantity, price, discount, version, reserved_quantity, discontinued)
+                values ('   ', 'Prodotto test', 'Descrizione test', (select id from product_categories where code_canonical = 'hardware'), 'Brand', 'Scheda grafica', '', 1, 100.00, 0.00, 0, 0, false)
                 """))
                 .isInstanceOf(DataIntegrityViolationException.class);
     }

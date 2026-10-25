@@ -1,7 +1,6 @@
 package it.giovannidefilippo.gestionale.order;
 
 import it.giovannidefilippo.gestionale.inventory.InventoryService;
-import it.giovannidefilippo.gestionale.product.ProductCategory;
 import it.giovannidefilippo.gestionale.product.ProductRequest;
 import it.giovannidefilippo.gestionale.product.ProductService;
 import it.giovannidefilippo.gestionale.user.AuthenticatedUser;
@@ -34,7 +33,7 @@ class OrderDashboardSummaryTest {
         OrderDashboardSummary before = orderService.dashboardSummary();
         String productCode = "KPI-" + UUID.randomUUID().toString().substring(0, 8);
         productService.create(new ProductRequest(
-                productCode, "Prodotto KPI", "Prodotto per la matrice economica dashboard.", ProductCategory.HARDWARE,
+                productCode, "Prodotto KPI", "Prodotto per la matrice economica dashboard.", "HARDWARE",
                 "TestBrand", "Componente", "", new BigDecimal("100.00"), BigDecimal.ZERO
         ));
         inventoryService.initialBalance(productCode, 10, "Saldo iniziale KPI", "test", "Test");

@@ -2,7 +2,6 @@ package it.giovannidefilippo.gestionale.order;
 
 import it.giovannidefilippo.gestionale.common.PostgreSqlIntegrationTestSupport;
 import it.giovannidefilippo.gestionale.inventory.InventoryService;
-import it.giovannidefilippo.gestionale.product.ProductCategory;
 import it.giovannidefilippo.gestionale.product.ProductRequest;
 import it.giovannidefilippo.gestionale.product.ProductService;
 import it.giovannidefilippo.gestionale.user.AuthenticatedUser;
@@ -46,7 +45,7 @@ class OrderReturnConcurrencyTest extends PostgreSqlIntegrationTestSupport {
                 productCode,
                 "Prodotto reso concorrente",
                 "Prodotto creato per verificare la serializzazione delle richieste di reso.",
-                ProductCategory.HARDWARE,
+                "HARDWARE",
                 "TestBrand",
                 "Componente",
                 "",

@@ -1,6 +1,5 @@
 package it.giovannidefilippo.gestionale.inventory;
 
-import it.giovannidefilippo.gestionale.product.ProductCategory;
 import it.giovannidefilippo.gestionale.product.ProductRequest;
 import it.giovannidefilippo.gestionale.product.ProductResponse;
 import it.giovannidefilippo.gestionale.product.ProductService;
@@ -131,7 +130,7 @@ class InventoryServiceTest extends PostgreSqlIntegrationTestSupport {
                 code,
                 "Prodotto magazzino",
                 "Prodotto creato per verificare i movimenti di magazzino.",
-                ProductCategory.HARDWARE,
+                "HARDWARE",
                 "TestBrand",
                 "Scheda di test",
                 "",

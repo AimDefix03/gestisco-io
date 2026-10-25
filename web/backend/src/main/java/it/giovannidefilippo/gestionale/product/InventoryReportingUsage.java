@@ -5,7 +5,7 @@ import java.util.List;
 public interface InventoryReportingUsage {
     List<InventoryProductReportSource> findForReport(
             String query,
-            ProductCategory category,
+            String category,
             String stock,
             Boolean discontinued,
             int maxRows

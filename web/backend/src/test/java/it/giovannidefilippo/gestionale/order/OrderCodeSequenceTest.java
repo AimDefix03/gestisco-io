@@ -1,7 +1,6 @@
 package it.giovannidefilippo.gestionale.order;
 
 import it.giovannidefilippo.gestionale.inventory.InventoryService;
-import it.giovannidefilippo.gestionale.product.ProductCategory;
 import it.giovannidefilippo.gestionale.product.ProductRequest;
 import it.giovannidefilippo.gestionale.product.ProductService;
 import it.giovannidefilippo.gestionale.user.AuthenticatedUser;
@@ -97,7 +96,7 @@ class OrderCodeSequenceTest extends PostgreSqlIntegrationTestSupport {
                 code,
                 "Prodotto sequenza ordine",
                 "Prodotto creato per verificare la generazione concorrente dei codici ordine.",
-                ProductCategory.HARDWARE,
+                "HARDWARE",
                 "TestBrand",
                 "Scheda di test",
                 "",

@@ -3111,3 +3111,35 @@ textarea:focus {
     flex-basis: auto;
   }
 }
+
+.category-tree {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.category-tree li {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  white-space: pre;
+}
+
+.category-tree li:nth-child(odd) {
+  background: var(--surface-muted, rgba(15, 23, 42, 0.04));
+}
+
+.category-tree li.inactive span {
+  color: var(--muted, #64748b);
+}
+
+.category-tree small {
+  color: var(--muted, #64748b);
+}

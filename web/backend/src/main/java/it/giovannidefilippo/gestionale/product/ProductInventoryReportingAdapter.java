@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 @Component
 @Transactional(readOnly = true)
@@ -17,14 +18,16 @@ class ProductInventoryReportingAdapter implements InventoryReportingUsage {
     private static final int LOW_STOCK_THRESHOLD = 3;
 
     private final ProductRepository repository;
+    private final ProductCategoryService categoryService;
 
-    ProductInventoryReportingAdapter(ProductRepository repository) {
+    ProductInventoryReportingAdapter(ProductRepository repository, ProductCategoryService categoryService) {
         this.repository = repository;
+        this.categoryService = categoryService;
     }
 
     @Override
-    public List<InventoryProductReportSource> findForReport(String query, ProductCategory category, String stock, Boolean discontinued, int maxRows) {
-        Specification<Product> specification = specification(query, category, stock, discontinued);
+    public List<InventoryProductReportSource> findForReport(String query, String category, String stock, Boolean discontinued, int maxRows) {
+        Specification<Product> specification = specification(query, categoryService.filterIds(category).orElse(null), stock, discontinued);
         long totalRows = repository.count(specification);
         if (totalRows > maxRows) {
             throw new IllegalArgumentException("Il report contiene " + totalRows + " prodotti. Restringi i filtri a un massimo di " + maxRows + " righe.");
@@ -35,7 +38,7 @@ class ProductInventoryReportingAdapter implements InventoryReportingUsage {
                 .toList();
     }
 
-    private static Specification<Product> specification(String query, ProductCategory category, String stock, Boolean discontinued) {
+    private static Specification<Product> specification(String query, Set<Long> categoryIds, String stock, Boolean discontinued) {
         return (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             if (hasText(query)) {
@@ -47,8 +50,8 @@ class ProductInventoryReportingAdapter implements InventoryReportingUsage {
                         criteriaBuilder.like(criteriaBuilder.lower(root.get("productType")), term)
                 ));
             }
-            if (category != null) {
-                predicates.add(criteriaBuilder.equal(root.get("category"), category));
+            if (categoryIds != null) {
+                predicates.add(root.get("category").get("id").in(categoryIds));
             }
             if (discontinued != null) {
                 predicates.add(criteriaBuilder.equal(root.get("discontinued"), discontinued));
@@ -84,7 +87,8 @@ class ProductInventoryReportingAdapter implements InventoryReportingUsage {
         return new InventoryProductReportSource(
                 product.getCode(),
                 product.getName(),
-                product.getCategory(),
+                product.getCategory().getCode(),
+                product.getCategory().getPath(),
                 product.getBrand(),
                 product.getProductType(),
                 product.getQuantity(),
