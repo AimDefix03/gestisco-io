@@ -70,6 +70,7 @@ Campi principali:
 - nome;
 - descrizione;
 - categoria configurabile (`ProductCategory`, riferimento `category_id`, V36);
+- codice a barre facoltativo e univoco (EAN-8, UPC-A, EAN-13 con cifra di controllo, oppure codice interno) e unita di misura (pezzo, paio, confezione, chilogrammo, metro, litro), V37; con le varianti (P2) il codice a barre passera alla variante;
 - brand;
 - tipo prodotto;
 - utilizzo opzionale;

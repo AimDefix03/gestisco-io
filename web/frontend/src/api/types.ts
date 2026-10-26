@@ -17,6 +17,7 @@ export type ProductCategoryPayload = {
   active: boolean;
 };
 export type BusinessPartnerType = 'CUSTOMER' | 'SUPPLIER';
+export type UnitOfMeasure = 'PIECE' | 'PAIR' | 'PACK' | 'KILOGRAM' | 'METER' | 'LITER';
 
 export type SellableProduct = {
   code: string;
@@ -34,6 +35,9 @@ export type SellableProduct = {
 
 export type Product = SellableProduct & {
   id: number;
+  barcode: string | null;
+  unitOfMeasure: UnitOfMeasure;
+  unitLabel: string;
   discontinued: boolean;
   quantity: number;
   reservedQuantity: number;
@@ -98,6 +102,8 @@ export type ProductPayload = {
   usageContext: string;
   price: number;
   discount: number;
+  barcode: string | null;
+  unitOfMeasure: UnitOfMeasure;
 };
 
 export type BusinessPartner = {

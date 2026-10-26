@@ -26,6 +26,8 @@ describe('ProductForm', () => {
     await user.type(screen.getByLabelText('Nome'), 'Scheda video');
     expect(screen.queryByRole('option', { name: /Fuori catalogo/ })).not.toBeInTheDocument();
     await user.selectOptions(screen.getByLabelText('Categoria'), 'HARDWARE');
+    await user.type(screen.getByLabelText('Codice a barre'), ' 8001234567897 ');
+    await user.selectOptions(screen.getByLabelText('Unita di misura'), 'PAIR');
     await user.type(screen.getByLabelText('Brand'), 'Example Brand');
     await user.type(screen.getByLabelText('Tipo prodotto'), 'Scheda grafica');
     await user.type(screen.getByLabelText('Utilizzo opzionale'), 'Gaming');
@@ -46,7 +48,9 @@ describe('ProductForm', () => {
       productType: 'Scheda grafica',
       usageContext: 'Gaming',
       price: 899.9,
-      discount: 5
+      discount: 5,
+      barcode: '8001234567897',
+      unitOfMeasure: 'PAIR'
     });
     expect(screen.getByLabelText('Codice')).toHaveValue('');
   });
@@ -63,6 +67,9 @@ describe('ProductForm', () => {
           description: 'Descrizione',
           category: 'HARDWARE',
           categoryName: 'Hardware',
+          barcode: null,
+          unitOfMeasure: 'PIECE',
+          unitLabel: 'Pezzo',
           brand: 'Example Brand',
           productType: 'CPU',
           usageContext: '',
@@ -103,6 +110,9 @@ describe('ProductForm', () => {
           description: 'Descrizione',
           category: 'HARDWARE',
           categoryName: 'Hardware',
+          barcode: null,
+          unitOfMeasure: 'PIECE',
+          unitLabel: 'Pezzo',
           brand: 'Example Brand',
           productType: 'CPU',
           usageContext: '',

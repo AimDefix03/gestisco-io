@@ -3143,3 +3143,10 @@ textarea:focus {
 .category-tree small {
   color: var(--muted, #64748b);
 }
+
+.barcode-text {
+  display: block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-weight: 400;
+  color: var(--muted, #64748b);
+}

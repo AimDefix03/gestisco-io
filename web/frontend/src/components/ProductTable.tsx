@@ -78,7 +78,7 @@ export default function ProductTable({ page, filterSource, query, selectedCodes,
       <div className="catalog-controls">
         <label className="search-field">
           Cerca prodotto
-          <input value={query.q ?? ''} placeholder="Codice, nome, brand o tipo" onChange={(event) => updateQuery({ q: event.target.value })} />
+          <input value={query.q ?? ''} placeholder="Codice, codice a barre, nome, brand o tipo" onChange={(event) => updateQuery({ q: event.target.value })} />
         </label>
         <label>
           Categoria
@@ -149,7 +149,7 @@ export default function ProductTable({ page, filterSource, query, selectedCodes,
                 return (
                   <tr key={product.id} className={activeProductCode === product.code ? 'active-row' : ''}>
                     {canManage && <td><input type="checkbox" aria-label={`Seleziona ${product.code}`} disabled={!product.capabilities.canDelete} checked={selectedCodes.includes(product.code)} onChange={() => toggleProduct(product.code)} /></td>}
-                    <th scope="row" className="strong">{product.code}</th>
+                    <th scope="row" className="strong">{product.code}{product.barcode && <small className="barcode-text">{product.barcode}</small>}</th>
                     <td>
                       <div className="product-cell">
                         <strong>{product.name}</strong>

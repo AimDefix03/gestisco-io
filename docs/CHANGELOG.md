@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-26 - Codici a barre e unita di misura (P1.3)
+
+- Codice a barre facoltativo e univoco sui prodotti, con verifica della cifra di controllo per EAN-8, UPC-A ed EAN-13 e ricerca per codice esatto; unita di misura (pezzo, paio, confezione, chilogrammo, metro, litro). Migrazione V37: i prodotti esistenti diventano a pezzo e senza codice a barre.
+- Nuovo ordine della fase P1: P1.3, P1.4, P1.5, P1.6, poi P1.2 ridotto.
+
 ## 2026-10-25 - Categorie configurabili (P1.1)
 
 - Categorie di prodotto gerarchiche e configurabili al posto dell'elenco fisso `HARDWARE`/`SOFTWARE`: migrazione V36 senza perdita di dati, API `/api/product-categories`, filtri che includono le sottocategorie, gestione dal catalogo, percorso della categoria su prodotti, catalogo clienti e report.
