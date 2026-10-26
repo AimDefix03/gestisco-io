@@ -149,6 +149,31 @@
         "governed-count-approval-schema",
         "physical-adjustment-ledger-link"
       ]
+    },
+    {
+      "version": 36,
+      "baseVersion": 35,
+      "scenarios": [
+        "populated-upgrade-v36",
+        "historical-products-keep-category"
+      ]
+    },
+    {
+      "version": 37,
+      "baseVersion": 36,
+      "scenarios": [
+        "populated-upgrade-v37",
+        "no-invented-historical-barcodes"
+      ]
+    },
+    {
+      "version": 38,
+      "baseVersion": 37,
+      "scenarios": [
+        "populated-upgrade-v38",
+        "historical-vat-uses-company-rate",
+        "one-vat-summary-per-historical-document"
+      ]
     }
   ],
   "findingCoverage": {

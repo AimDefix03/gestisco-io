@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-26 - IVA per prodotto e per riga (P1.4)
+
+- Aliquote IVA configurate a database (22%, 10%, 5%, 4%, Esente con natura N4) con un'aliquota predefinita; ogni prodotto ha la propria aliquota, copiata sulla riga d'ordine e sulla riga documento. I documenti simulati riportano un riepilogo per aliquota con imponibile e imposta, scorporati una volta per gruppo con arrotondamento al centesimo. Migrazione V38: prodotti, righe e documenti esistenti mantengono l'aliquota aziendale con cui erano stati calcolati.
+- Lo sconto per riga passa alla cassa (P3.2), dove servono limiti per permesso.
+
 ## 2026-10-26 - Codici a barre e unita di misura (P1.3)
 
 - Codice a barre facoltativo e univoco sui prodotti, con verifica della cifra di controllo per EAN-8, UPC-A ed EAN-13 e ricerca per codice esatto; unita di misura (pezzo, paio, confezione, chilogrammo, metro, litro). Migrazione V37: i prodotti esistenti diventano a pezzo e senza codice a barre.

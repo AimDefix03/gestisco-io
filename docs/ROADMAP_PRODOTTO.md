@@ -87,6 +87,7 @@ Accettazione: ricerca per codice a barre; duplicati rifiutati dal database.
 
 **P1.4 IVA per prodotto e per riga (M).** Tabella aliquote con natura di esenzione; aliquota sul prodotto copiata sulla riga d'ordine; totali per aliquota; sconto per riga. Documenti simulati con riepilogo IVA multiplo.
 Accettazione: ordine con righe a 22% e 10% e una esente produce imponibili e imposte corretti; arrotondamenti testati; storico invariato.
+Decisioni del 2026-10-26: prezzi IVA inclusa; scorporo una volta per aliquota con arrotondamento `HALF_UP` al centesimo, da confermare con il consulente in P8; lo sconto per riga passa a P3.2.
 
 **P1.5 Indirizzi per pagina (M).** Router con indirizzi per sezione e dettaglio, tasto indietro e link diretti, mantenendo bozze e controllo delle modifiche non salvate.
 Accettazione: ogni pagina ha un indirizzo; E2E di navigazione e ricarica.

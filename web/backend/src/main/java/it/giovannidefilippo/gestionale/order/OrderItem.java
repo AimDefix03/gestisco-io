@@ -41,10 +41,18 @@ public class OrderItem {
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal lineTotal;
 
+    @Column(nullable = false, precision = 5, scale = 4)
+    private BigDecimal vatRate;
+
+    @Column(length = 8)
+    private String vatNature;
+
     protected OrderItem() {
     }
 
-    OrderItem(String productCode, String productName, String productDescription, int quantity, BigDecimal unitPrice) {
+    OrderItem(String productCode, String productName, String productDescription, int quantity, BigDecimal unitPrice, BigDecimal vatRate, String vatNature) {
+        this.vatRate = vatRate;
+        this.vatNature = vatNature;
         this.productCode = productCode;
         this.productName = productName;
         this.productDescription = productDescription == null ? "" : productDescription.trim();
@@ -53,9 +61,6 @@ public class OrderItem {
         this.lineTotal = unitPrice.multiply(BigDecimal.valueOf(quantity));
     }
 
-    OrderItem(String productCode, String productName, int quantity, BigDecimal unitPrice) {
-        this(productCode, productName, "", quantity, unitPrice);
-    }
 
     void assignOrder(CustomerOrder order) {
         this.order = order;
@@ -68,4 +73,6 @@ public class OrderItem {
     public int getQuantity() { return quantity; }
     public BigDecimal getUnitPrice() { return unitPrice; }
     public BigDecimal getLineTotal() { return lineTotal; }
+    public BigDecimal getVatRate() { return vatRate; }
+    public String getVatNature() { return vatNature; }
 }

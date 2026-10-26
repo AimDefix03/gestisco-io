@@ -34,6 +34,9 @@ const product: Product = {
   barcode: null,
   unitOfMeasure: 'PIECE',
   unitLabel: 'Pezzo',
+  vatRateCode: 'IVA22',
+  vatRate: 0.22,
+  vatLabel: 'IVA 22% ordinaria',
   brand: 'Example Brand',
   productType: 'GPU',
   usageContext: 'Gaming',
@@ -87,7 +90,7 @@ const order: Order = {
   canceledAt: null,
   canceledBy: null,
   canceledByRole: null,
-  items: [{ productCode: product.code, productName: product.name, productDescription: product.description, quantity: 1, returnedOrReservedQuantity: 0, returnableQuantity: 1, unitPrice: 810, lineTotal: 810 }],
+  items: [{ productCode: product.code, productName: product.name, productDescription: product.description, quantity: 1, returnedOrReservedQuantity: 0, returnableQuantity: 1, unitPrice: 810, lineTotal: 810, vatRate: 0.22, vatNature: null }],
   returns: [],
   payment: {
     id: 1,

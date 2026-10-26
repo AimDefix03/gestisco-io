@@ -128,6 +128,10 @@ Il codice identifica stabilmente il prodotto. Scegliere un codice coerente prima
 
 Nel form del prodotto il campo **Codice a barre** accetta l'EAN stampato sull'etichetta del fornitore o un codice interno (lettere, cifre, punto, trattino). Un EAN digitato male viene rifiutato perche la cifra di controllo non torna, e lo stesso codice non puo appartenere a due prodotti. L'**unita di misura** indica come si vende l'articolo, per esempio a paio per le calzature. Cercando nel catalogo un codice a barre completo si trova il prodotto corrispondente.
 
+### Aliquota IVA del prodotto
+
+Il campo **Aliquota IVA** del form prodotto indica l'IVA applicata alla vendita: 22%, 10%, 5%, 4% oppure Esente. Lasciando **Predefinita** il prodotto usa l'aliquota predefinita dell'azienda. Il prezzo resta IVA inclusa. L'aliquota viene fotografata sulla riga dell'ordine: cambiarla in seguito non modifica ordini e documenti gia creati. Verificare con il proprio consulente l'aliquota corretta di ciascun articolo.
+
 ### Categorie
 
 Chi gestisce i prodotti trova il riquadro **Categorie** nella colonna laterale del catalogo. Si possono creare categorie fino a tre livelli (per esempio Abbigliamento, poi Pantaloni, poi Jeans), rinominarle, spostarle sotto un'altra categoria e disattivarle. Il codice di una categoria non si modifica dopo la creazione. Una categoria in uso non si elimina: si disattiva, e i prodotti che la usano la mantengono; i nuovi prodotti possono usare solo categorie attive. Filtrando il catalogo o il report di magazzino per una categoria si vedono anche i prodotti delle sue sottocategorie.
@@ -301,7 +305,7 @@ Prima di creare un documento, il super admin deve completare ragione sociale, id
 2. Dalla tabella Ordini premere `Fattura`.
 3. Controllare il documento nella sezione `Documenti`.
 
-Per ogni ordine puo esistere una sola fattura simulata. Il documento conserva snapshot di azienda, cliente, aliquota IVA e righe ordine.
+Per ogni ordine puo esistere una sola fattura simulata. Il documento conserva snapshot di azienda, cliente e righe ordine con la rispettiva aliquota IVA, e un riepilogo con imponibile e imposta per ciascuna aliquota. Nella tabella Documenti un documento con piu aliquote riporta `IVA mista` seguito dall'elenco delle aliquote.
 
 ### Nota credito simulata
 
@@ -436,7 +440,8 @@ Quando un utente segnala un errore, annotare il `Codice richiesta` mostrato dal 
 - Nessuna integrazione con banche o provider di pagamento.
 - Nessuna fatturazione elettronica o trasmissione fiscale.
 - Una sola configurazione aziendale.
-- Una sola aliquota IVA predefinita per documento.
+- Aliquote IVA predefinite non modificabili da interfaccia; nessuno sconto per riga (previsto con la cassa in P3.2).
+- Arrotondamento del riepilogo IVA provvisorio, da confermare con il consulente fiscale (P8).
 - Nessuna gestione multi-sede o multi-magazzino.
 - Nessuna garanzia di conformita legale o GDPR senza valutazione professionale dedicata.
 

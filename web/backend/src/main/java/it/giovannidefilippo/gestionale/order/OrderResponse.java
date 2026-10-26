@@ -79,7 +79,9 @@ public record OrderResponse(
             int returnedOrReservedQuantity,
             int returnableQuantity,
             BigDecimal unitPrice,
-            BigDecimal lineTotal
+            BigDecimal lineTotal,
+            BigDecimal vatRate,
+            String vatNature
     ) {
         static OrderItemResponse from(OrderItem item, int returnedOrReservedQuantity) {
             return new OrderItemResponse(
@@ -90,7 +92,9 @@ public record OrderResponse(
                     returnedOrReservedQuantity,
                     Math.max(0, item.getQuantity() - returnedOrReservedQuantity),
                     item.getUnitPrice(),
-                    item.getLineTotal()
+                    item.getLineTotal(),
+                    item.getVatRate(),
+                    item.getVatNature()
             );
         }
     }

@@ -61,6 +61,10 @@ public class Product {
     @Column(nullable = false, length = 16)
     private UnitOfMeasure unitOfMeasure = UnitOfMeasure.PIECE;
 
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "vat_rate_id", nullable = false)
+    private VatRate vatRate;
+
     @Column(nullable = false)
     private int quantity;
 
@@ -88,13 +92,14 @@ public class Product {
     protected Product() {
     }
 
-    Product(ProductRequest request, ProductCategory category) {
+    Product(ProductRequest request, ProductCategory category, VatRate vatRate) {
         this.quantity = 0;
         this.reservedQuantity = 0;
-        update(request, category);
+        update(request, category, vatRate);
     }
 
-    void update(ProductRequest request, ProductCategory category) {
+    void update(ProductRequest request, ProductCategory category, VatRate vatRate) {
+        this.vatRate = vatRate;
         this.code = BusinessIdentifierCanonicalizer.display(request.code());
         this.codeCanonical = BusinessIdentifierCanonicalizer.canonical(request.code());
         this.name = clean(request.name());
@@ -219,6 +224,10 @@ public class Product {
 
     public String getBarcode() {
         return barcode;
+    }
+
+    public VatRate getVatRate() {
+        return vatRate;
     }
 
     public UnitOfMeasure getUnitOfMeasure() {

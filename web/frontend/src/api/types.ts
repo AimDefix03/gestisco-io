@@ -19,6 +19,23 @@ export type ProductCategoryPayload = {
 export type BusinessPartnerType = 'CUSTOMER' | 'SUPPLIER';
 export type UnitOfMeasure = 'PIECE' | 'PAIR' | 'PACK' | 'KILOGRAM' | 'METER' | 'LITER';
 
+export type VatRateOption = {
+  code: string;
+  rate: number;
+  nature: string | null;
+  description: string;
+  defaultRate: boolean;
+  active: boolean;
+};
+
+export type VatSummary = {
+  vatRate: number;
+  vatNature: string | null;
+  taxableAmount: number;
+  vatAmount: number;
+  totalAmount: number;
+};
+
 export type SellableProduct = {
   code: string;
   name: string;
@@ -38,6 +55,9 @@ export type Product = SellableProduct & {
   barcode: string | null;
   unitOfMeasure: UnitOfMeasure;
   unitLabel: string;
+  vatRateCode: string;
+  vatRate: number;
+  vatLabel: string;
   discontinued: boolean;
   quantity: number;
   reservedQuantity: number;
@@ -104,6 +124,7 @@ export type ProductPayload = {
   discount: number;
   barcode: string | null;
   unitOfMeasure: UnitOfMeasure;
+  vatRateCode: string | null;
 };
 
 export type BusinessPartner = {
@@ -655,6 +676,8 @@ export type OrderItem = {
   returnableQuantity: number;
   unitPrice: number;
   lineTotal: number;
+  vatRate: number;
+  vatNature: string | null;
 };
 
 export type CreateOrderPayload = {
@@ -701,9 +724,10 @@ export type FiscalDocument = {
   customerSnapshotCity: string;
   paymentMethod: string;
   taxableAmount: number;
-  vatRate: number;
+  vatRate: number | null;
   vatAmount: number;
   totalAmount: number;
+  vatSummaries: VatSummary[];
   createdBy: string;
   createdByRole: string;
   reason: string;

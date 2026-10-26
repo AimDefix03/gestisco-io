@@ -4,9 +4,9 @@ Stato corrente del progetto. I resoconti dettagliati fino al 2026-10-24 (step 0.
 
 ## Stato generale
 
-- Current step: P1.3 codici a barre e unita di misura (in review)
-- Next eligible step: P1.4 IVA per prodotto e per riga; ordine P1 rivisto il 2026-10-25 (P1.3, P1.4, P1.5, P1.6, P1.2 ridotto)
-- Last completed step: P1.1 categorie configurabili (#36, `b2f9e2f`)
+- Current step: P1.4 IVA per prodotto e per riga (in review)
+- Next eligible step: P1.5 indirizzi per pagina; ordine P1 rivisto il 2026-10-25 (P1.3, P1.4, P1.5, P1.6, P1.2 ridotto)
+- Last completed step: P1.3 codici a barre e unita di misura (#40, `11cc7ab`)
 - Last update: 2026-10-26
 - Roadmap: [ROADMAP_PRODOTTO.md](docs/ROADMAP_PRODOTTO.md), fasi P0-P11 e gate G1-G7 ([ADR 0008](docs/DECISIONS/0008-product-direction-generalist-core-apparel-pilot.md)). Storico master: 32/48 step; nessuno dei due conteggi misura la prontezza alla vendita.
 - Open P0: nessuno
@@ -14,7 +14,7 @@ Stato corrente del progetto. I resoconti dettagliati fino al 2026-10-24 (step 0.
 - Open P2: F-29 (P8), F-30 (P9.2)
 - Open P3: nessuno
 - PR in attesa per scelta: Dependabot #27 Apache POI 6, da rivalutare a inizio novembre o alla 6.0.1
-- Main: `b2f9e2f` dopo #36, CI e Security verdi; 12 controlli obbligatori, job prod-like nel container Playwright
+- Main: `11cc7ab` dopo #40; 12 controlli obbligatori, job prod-like nel container Playwright
 
 ## Step
 
@@ -26,12 +26,14 @@ Stato corrente del progetto. I resoconti dettagliati fino al 2026-10-24 (step 0.
 | P0.2 Benchmark e glossario | COMPLETED | #35 | WB-007 - WB-010, glossario in `DOMAIN_MODEL.md` |
 | P0.3 Snellimento documentale | COMPLETED | #35 | Registro archiviato, stato compatto |
 | P1.1 Categorie configurabili | COMPLETED | #36 | V36, API categorie, filtri gerarchici, gestione da UI |
-| P1.3 Codici a barre e unita di misura | IN_REVIEW | da aprire | V37, verifica EAN, ricerca per codice |
-| P1.4, P1.5, P1.6, P1.2 ridotto | PENDING | - | Gate G1 |
+| P1.3 Codici a barre e unita di misura | COMPLETED | #40 | V37, verifica EAN, ricerca per codice |
+| P1.4 IVA per prodotto e per riga | IN_REVIEW | da aprire | V38, aliquote, riepilogo IVA per documento |
+| P1.5, P1.6, P1.2 ridotto | PENDING | - | Gate G1 |
 | P2 - P11 | PENDING | - | Vedere roadmap di prodotto |
 
 ## Decisioni approvate
 
+- 2026-10-26, P1.4: prezzi IVA inclusa; scorporo una volta per aliquota con arrotondamento `HALF_UP` al centesimo, provvisorio fino alla conferma del consulente in P8; sconto per riga spostato a P3.2.
 - 2026-10-24, ADR 0008: gestionale generalista per il commercio al dettaglio, segmento pilota abbigliamento e calzature, istanza dedicata per cliente, prodotto completo e non beta; obiettivo dell'utente 2-3 mesi.
 - 2026-10-24: autorizzazione permanente a commit, push di branch dedicate e PR per gli step della roadmap di prodotto; merge sempre all'utente.
 - 2026-10-24: avanzamento autonomo tra step della stessa fase; stop obbligatorio a ogni gate, su decisioni dell'utente e su fallimenti non banali.
@@ -62,7 +64,8 @@ Una riga per step o evento rilevante, dal piu recente.
 
 | Data | Step | PR / commit | Esito |
 |---|---|---|---|
-| 2026-10-26 | P1.3 Codici a barre e unita di misura | da aprire | Backend +14 test (validatore EAN, API, migrazione V37), verifica per mutazione sulla cifra di controllo; frontend 213/213 |
+| 2026-10-26 | P1.4 IVA per prodotto e per riga | da aprire | Backend 347/347 (+6: calcolo per aliquota con prova su 500 casi casuali, fattura mista 22/10/esente, snapshot IVA, API aliquote, migrazione V38 sulle fixture storiche); verifica per mutazione sull'aliquota della riga; frontend 216/216 (+3) |
+| 2026-10-26 | P1.3 Codici a barre e unita di misura | #40 | Backend +14 test (validatore EAN, API, migrazione V37), verifica per mutazione sulla cifra di controllo; frontend 213/213 |
 | 2026-10-25 | P1.1 Categorie configurabili | #36 | Backend 327/327 (+7: migrazione e controller categorie), frontend 213/213 (+4); verifica per mutazione sul controllo dei cicli; ambiente locale lento per memoria esaurita |
 | 2026-10-24 | P0.3 Snellimento documentale | #35 | Registro storico archiviato integralmente; stato compatto nel formato del master |
 | 2026-10-24 | P0.2 Benchmark e glossario | #35 | Schede WB-007 - WB-010 da Odoo 18.0 ed ERPNext; WB-008 e WB-009 in bozza |
