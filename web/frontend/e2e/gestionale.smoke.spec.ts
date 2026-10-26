@@ -59,7 +59,7 @@ test('completa catalogo, registrazione cliente e ciclo ordine', async ({ page })
   await expect(page.locator('.workspace-header h1')).toHaveText('Catalogo prodotti');
 
   const productForm = page.locator('form.product-form');
-  await productForm.getByLabel('Codice').fill(productCode);
+  await productForm.getByLabel('Codice', { exact: true }).fill(productCode);
   await productForm.getByLabel('Nome').fill(productName);
   await productForm.getByLabel('Categoria').selectOption('HARDWARE');
   await productForm.getByLabel('Brand').fill('Test Automation');
@@ -70,7 +70,7 @@ test('completa catalogo, registrazione cliente e ciclo ordine', async ({ page })
   await productForm.getByLabel('Descrizione').fill('Prodotto creato dallo smoke test browser sullo stack reale.');
   await productForm.getByRole('button', { name: 'Crea prodotto' }).click();
   await expect(page.getByRole('status').filter({ hasText: `Prodotto ${productCode} creato.` })).toBeVisible();
-  await expect(productForm.getByLabel('Codice')).toHaveValue('');
+  await expect(productForm.getByLabel('Codice', { exact: true })).toHaveValue('');
 
   await openMenuEntry(page, 'Operazioni', 'Magazzino');
   await expect(page.locator('.workspace-header h1')).toHaveText('Magazzino');

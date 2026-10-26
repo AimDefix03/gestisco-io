@@ -3,6 +3,8 @@ package it.giovannidefilippo.gestionale.product;
 import it.giovannidefilippo.gestionale.common.BusinessIdentifierCanonicalizer;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -49,6 +51,16 @@ public class Product {
 
     private String usageContext;
 
+    @Column(length = 32)
+    private String barcode;
+
+    @Column(length = 32, unique = true)
+    private String barcodeCanonical;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 16)
+    private UnitOfMeasure unitOfMeasure = UnitOfMeasure.PIECE;
+
     @Column(nullable = false)
     private int quantity;
 
@@ -91,6 +103,9 @@ public class Product {
         this.brand = clean(request.brand());
         this.productType = clean(request.productType());
         this.usageContext = optional(request.usageContext());
+        this.barcode = Barcode.normalize(request.barcode());
+        this.barcodeCanonical = barcode == null ? null : BusinessIdentifierCanonicalizer.canonical(barcode);
+        this.unitOfMeasure = request.unitOfMeasure() == null ? UnitOfMeasure.PIECE : request.unitOfMeasure();
         this.price = request.price().setScale(2, RoundingMode.HALF_UP);
         this.discount = request.discount().setScale(2, RoundingMode.HALF_UP);
     }
@@ -200,6 +215,14 @@ public class Product {
 
     public String getProductType() {
         return productType;
+    }
+
+    public String getBarcode() {
+        return barcode;
+    }
+
+    public UnitOfMeasure getUnitOfMeasure() {
+        return unitOfMeasure;
     }
 
     public String getUsageContext() {

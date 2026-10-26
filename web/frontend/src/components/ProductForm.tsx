@@ -1,5 +1,6 @@
 import { FormEvent, useMemo } from 'react';
-import { Product, ProductCategory, ProductPayload } from '../api';
+import { Product, ProductCategory, ProductPayload, UnitOfMeasure } from '../api';
+import { UNIT_OF_MEASURE_LABELS } from '../utils/units';
 import { categoryOptionLabel, useProductCategories } from '../features/catalog/ProductCategoriesContext';
 import useDraftState from '../hooks/useDraftState';
 
@@ -19,7 +20,9 @@ const initialForm = {
   productType: '',
   usageContext: '',
   price: '0',
-  discount: '0'
+  discount: '0',
+  barcode: '',
+  unitOfMeasure: 'PIECE' as UnitOfMeasure
 };
 
 export default function ProductForm({ editingProduct, busy, onSubmit, onCancel }: Props) {
@@ -33,7 +36,9 @@ export default function ProductForm({ editingProduct, busy, onSubmit, onCancel }
       productType: editingProduct.productType,
       usageContext: editingProduct.usageContext,
       price: String(editingProduct.price),
-      discount: String(editingProduct.discount)
+      discount: String(editingProduct.discount),
+      barcode: editingProduct.barcode ?? '',
+      unitOfMeasure: editingProduct.unitOfMeasure
     }) : initialForm, [editingProduct]);
   const { value: form, setValue: setForm, dirty, clear } = useDraftState({
     key: `catalog:${editingProduct?.code ?? 'new'}`,
@@ -53,7 +58,9 @@ export default function ProductForm({ editingProduct, busy, onSubmit, onCancel }
       productType: form.productType,
       usageContext: form.usageContext,
       price: Number(form.price),
-      discount: Number(form.discount)
+      discount: Number(form.discount),
+      barcode: form.barcode.trim() || null,
+      unitOfMeasure: form.unitOfMeasure
     });
     if (saved) clear();
   }
@@ -94,6 +101,16 @@ export default function ProductForm({ editingProduct, busy, onSubmit, onCancel }
             {form.category && !categories.some((category) => category.code === form.category) && (
               <option value={form.category}>{editingProduct?.categoryName ?? form.category}</option>
             )}
+          </select>
+        </label>
+        <label>
+          Codice a barre
+          <input value={form.barcode} inputMode="text" autoComplete="off" maxLength={32} placeholder="EAN o codice interno" onChange={(event) => updateField('barcode', event.target.value)} />
+        </label>
+        <label>
+          Unita di misura
+          <select value={form.unitOfMeasure} onChange={(event) => updateField('unitOfMeasure', event.target.value as UnitOfMeasure)}>
+            {(Object.keys(UNIT_OF_MEASURE_LABELS) as UnitOfMeasure[]).map((unit) => <option key={unit} value={unit}>{UNIT_OF_MEASURE_LABELS[unit]}</option>)}
           </select>
         </label>
         <label>

@@ -74,6 +74,8 @@ Accettazione: stato leggibile in una schermata; nessuna evidenza cancellata.
 
 ### P1 - Catalogo configurabile e frontend da prodotto
 
+Ordine di esecuzione rivisto con l'utente il 2026-10-25: P1.1, P1.3, P1.4, P1.5, P1.6, poi P1.2 ridotto (attributi di prodotto testuali e a elenco) prima del gate G1. I campi personalizzati su clienti e fornitori passano a P6.4.
+
 **P1.1 Categorie gerarchiche configurabili (M).** Tabelle categoria con padre, migrazione di `HARDWARE`/`SOFTWARE` come voci iniziali, gestione da UI con permessi.
 Accettazione: nessuna categoria fissa nel codice; prodotti esistenti migrati; test di migrazione su database popolato.
 

@@ -101,12 +101,13 @@ describe('client API di dominio', () => {
       name: 'Scheda video',
       description: 'Descrizione',
       category: 'HARDWARE' as const,
-      categoryName: 'Hardware',
       brand: 'Example Brand',
       productType: 'Scheda grafica',
       usageContext: 'Gaming',
       price: 899.9,
-      discount: 5
+      discount: 5,
+      barcode: null,
+      unitOfMeasure: 'PIECE' as const
     };
 
     await createProduct(payload);

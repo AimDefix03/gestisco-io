@@ -365,7 +365,8 @@ public class ProductService {
                         criteriaBuilder.like(criteriaBuilder.lower(root.get("description")), term),
                         criteriaBuilder.like(criteriaBuilder.lower(root.get("brand")), term),
                         criteriaBuilder.like(criteriaBuilder.lower(root.get("productType")), term),
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("usageContext")), term)
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("usageContext")), term),
+                        criteriaBuilder.equal(root.get("barcodeCanonical"), q.trim().toLowerCase(Locale.ROOT))
                 ));
             }
             if (categoryIds != null) {
@@ -467,6 +468,9 @@ public class ProductService {
     }
 
     private RuntimeException translateProductConstraint(DataIntegrityViolationException exception) {
+        if (DatabaseConstraintViolations.matches(exception, "uk_products_barcode")) {
+            return new ResourceConflictException("Esiste gia un prodotto con questo codice a barre.");
+        }
         if (DatabaseConstraintViolations.matches(exception, "uk_products_code", "uk_products_code_canonical")) {
             return new ResourceConflictException("Esiste gia un prodotto con questo codice prodotto.");
         }
@@ -516,6 +520,8 @@ public class ProductService {
         addChange(changes, "brand", before.brand(), after.brand());
         addChange(changes, "tipo", before.productType(), after.productType());
         addChange(changes, "utilizzo", before.usageContext(), after.usageContext());
+        addChange(changes, "codice a barre", before.barcode(), after.barcode());
+        addChange(changes, "unita", before.unitLabel(), after.unitLabel());
         addChange(changes, "prezzo", before.price(), after.price());
         addChange(changes, "sconto", before.discount(), after.discount());
         return changes.isEmpty() ? "nessuna variazione rilevante" : String.join("; ", changes);

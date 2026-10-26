@@ -219,6 +219,8 @@ Le modifiche sensibili devono registrare un riepilogo operativo chiaro senza inc
 - `POST /api/products`, `PUT /api/products/{code}`, `DELETE /api/products/{code}`, `POST /api/products/bulk-delete` e `POST /api/products/{code}/discontinue` richiedono `MANAGE_PRODUCTS`.
 - Dal 2026-10-24 (V36) `category` nelle richieste e nelle risposte prodotto e il codice di una categoria configurabile; le risposte includono `categoryName` con il percorso completo (per esempio `Abbigliamento / Pantaloni`). Un nuovo prodotto o un cambio di categoria richiede una categoria esistente e attiva (`400` altrimenti); un prodotto conserva la propria categoria anche se questa viene disattivata.
 
+- Dal 2026-10-26 (V37) prodotti in staff accettano e restituiscono `barcode` (facoltativo, massimo 32 caratteri, univoco ignorando maiuscole) e `unitOfMeasure` (`PIECE` predefinito, `PAIR`, `PACK`, `KILOGRAM`, `METER`, `LITER`); le risposte aggiungono `unitLabel`. I codici numerici di 8, 12 o 13 cifre sono validati come EAN-8, UPC-A o EAN-13 con cifra di controllo (`400` se errata); un codice duplicato restituisce `409`. Il filtro `q` trova anche il codice a barre esatto.
+
 ## Categorie di prodotto
 
 - `GET /api/product-categories` richiede `VIEW_CATALOG` e restituisce l'elenco ordinato per percorso con `code`, `name`, `path`, `parentCode`, `depth` e `active`. `includeInactive=true` include le categorie disattivate solo per chi ha `MANAGE_PRODUCTS`.
