@@ -2,7 +2,7 @@
 
 ## Preflight dopo la separazione
 
-Il nome documentale e Gestisco.IO; la root di lavoro e `/Users/aim_defix/Desktop/Gestisco.IO`. Il cambio di nome non rinomina immagini, variabili `GESTIONALE_*`, container, database o volumi. Questi identificatori restano intenzionalmente compatibili.
+Il nome documentale e Gestisco.IO; la root di lavoro e `/Users/aim_defix/Developer/Gestisco.IO`. Il cambio di nome non rinomina immagini, variabili `GESTIONALE_*`, container, database o volumi. Questi identificatori restano intenzionalmente compatibili.
 
 Prima dei comandi seguenti leggere [il layout locale](LOCAL_LAYOUT.md): scegliere esplicitamente ambiente, project Compose, porte, volumi e secret. Gli esempi di sviluppo non autorizzano l'uso dei vecchi volumi o un cutover. Non sovrascrivere una `.env.docker` esistente con il template; non rigenerare credenziali per un database gia popolato. La copia recuperata in ORG-3 e ancora separata dall'ambiente web.
 

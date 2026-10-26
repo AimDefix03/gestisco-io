@@ -22,7 +22,7 @@ Il [Product Scope](PRODUCT_SCOPE.md) resta congelato. Multi-azienda, multi-magaz
 
 | Elemento | Ruolo corrente |
 |---|---|
-| `/Users/aim_defix/Desktop/Gestisco.IO` | Fonte autorevole del prodotto web |
+| `/Users/aim_defix/Developer/Gestisco.IO` | Fonte autorevole del prodotto web (dal 2026-10-26; prima `/Users/aim_defix/Desktop/Gestisco.IO`) |
 | `web/backend/src/` | Sorgenti e test del backend attivo, da conservare |
 | `/Users/aim_defix/Desktop/GestionaleNegozioComputer` | Swing congelato; qui restano `src/` e `pom-legacy.xml` |
 | `/Users/aim_defix/Desktop/Gestionale.Negozio.Computer ` | Originale con spazio finale, conservato per rollback |

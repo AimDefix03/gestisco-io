@@ -10,7 +10,7 @@ L'addendum `docs/GESTISCO_IDENTITY_ADDENDUM.md` recepisce soltanto il nome Gesti
 
 ## Stato del progetto
 
-Gestisco.IO contiene esclusivamente la linea web in `web/`, con backend Spring Boot e frontend React. Root locale: `/Users/aim_defix/Desktop/Gestisco.IO`. Scope corrente: una sola azienda, un solo magazzino, pagamenti manuali e documenti simulati non fiscali. La direzione SaaS non autorizza multi-tenancy o ampliamenti automatici. Dal 2026-10-24 l'ordine dei lavori segue `docs/ROADMAP_PRODOTTO.md` (ADR 0008): nucleo generalista, segmento pilota abbigliamento e calzature, uno step per volta con autorizzazione.
+Gestisco.IO contiene esclusivamente la linea web in `web/`, con backend Spring Boot e frontend React. Root locale: `/Users/aim_defix/Developer/Gestisco.IO`, fuori da iCloud Drive dal 2026-10-26; la copia `/Users/aim_defix/Desktop/Gestisco.IO` e conservata come riserva e non va usata. Scope corrente: una sola azienda, un solo magazzino, pagamenti manuali e documenti simulati non fiscali. La direzione SaaS non autorizza multi-tenancy o ampliamenti automatici. Dal 2026-10-24 l'ordine dei lavori segue `docs/ROADMAP_PRODOTTO.md` (ADR 0008): nucleo generalista, segmento pilota abbigliamento e calzature, uno step per volta con autorizzazione.
 
 La parte Swing congelata e separata in `/Users/aim_defix/Desktop/GestionaleNegozioComputer`. Non ricreare qui `src/` nella root o `pom-legacy.xml`; `web/backend/src/` resta necessario. La cronologia Git contiene ancora entrambe le linee per preservarne la provenienza.
 

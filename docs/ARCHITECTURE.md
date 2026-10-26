@@ -17,7 +17,7 @@ Il repository contiene:
 
 ## Stack verificato
 
-Il checkout corrente e `/Users/aim_defix/Desktop/Gestisco.IO`. Il legacy Swing e separato: non esistono piu `src/` e `pom-legacy.xml` nella root web. La cronologia comune e conservata; la separazione non e ancora committata. Vedere [layout locale](LOCAL_LAYOUT.md) e [identita e compatibilita](GESTISCO_IDENTITY_ADDENDUM.md).
+Il checkout corrente e `/Users/aim_defix/Developer/Gestisco.IO` (dal 2026-10-26, fuori da iCloud Drive). Il legacy Swing e separato: non esistono piu `src/` e `pom-legacy.xml` nella root web. La cronologia comune e conservata; la separazione non e ancora committata. Vedere [layout locale](LOCAL_LAYOUT.md) e [identita e compatibilita](GESTISCO_IDENTITY_ADDENDUM.md).
 
 Backend web:
 

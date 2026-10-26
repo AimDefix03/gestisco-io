@@ -4,11 +4,16 @@ Separazione del 2026-10-14; identita documentale allineata il 2026-10-15. Separa
 
 | Percorso | Scopo |
 |---|---|
-| `/Users/aim_defix/Desktop/Gestisco.IO` | Sorgente web per le prossime attivita: Spring Boot, React, migrazioni, script, CI e documentazione |
+| `/Users/aim_defix/Developer/Gestisco.IO` | Sorgente web per le prossime attivita: Spring Boot, React, migrazioni, script, CI e documentazione |
+| `/Users/aim_defix/Desktop/Gestisco.IO` | Checkout web precedente, conservato come riserva dopo lo spostamento del 2026-10-26; non usare per nuove modifiche |
 | `/Users/aim_defix/Desktop/GestionaleNegozioComputer` | Swing congelato, build esplicita con pom-legacy.xml |
 | `/Users/aim_defix/Desktop/Gestionale.Negozio.Computer ` | Originale con spazio finale, conservato per rollback; non continuare qui lo sviluppo |
 | `/Users/aim_defix/Desktop/PortfolioGiovanniDeFilippo` | Portfolio indipendente, fuori perimetro |
 | `/Users/aim_defix/Desktop/codex_portfolio_sources` | Workspace storico della chat; non fonte autorevole del gestionale |
+
+## Spostamento fuori da iCloud Drive (2026-10-26)
+
+La Scrivania e sincronizzata con iCloud Drive, che creava copie duplicate dei file compilati (per esempio `GestionaleApiApplication 2.class` in `target/`) e rompeva build e test. Il checkout web e stato copiato integralmente, cartella `.git` compresa, in `/Users/aim_defix/Developer/Gestisco.IO`, fuori dalla sincronizzazione: stessi commit, branch e ref, incluse le ref `origin` storiche e il remote `gestisco`. Sono state escluse soltanto le cartelle rigenerabili `node_modules`, `target` e `dist`. La copia sulla Scrivania resta come riserva finche l'utente non decide di rimuoverla. Le cartelle legacy restano sulla Scrivania e non sono state toccate.
 
 ## Git e ripresa
 
