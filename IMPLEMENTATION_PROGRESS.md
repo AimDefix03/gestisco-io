@@ -4,9 +4,9 @@ Stato corrente del progetto. I resoconti dettagliati fino al 2026-10-24 (step 0.
 
 ## Stato generale
 
-- Current step: P1.4 IVA per prodotto e per riga (in review, sopra P1.3 #40)
+- Current step: P1.4 IVA per prodotto e per riga (in review)
 - Next eligible step: P1.5 indirizzi per pagina; ordine P1 rivisto il 2026-10-25 (P1.3, P1.4, P1.5, P1.6, P1.2 ridotto)
-- Last completed step: P1.1 categorie configurabili (#36, `b2f9e2f`)
+- Last completed step: P1.3 codici a barre e unita di misura (#40, `11cc7ab`)
 - Last update: 2026-10-26
 - Roadmap: [ROADMAP_PRODOTTO.md](docs/ROADMAP_PRODOTTO.md), fasi P0-P11 e gate G1-G7 ([ADR 0008](docs/DECISIONS/0008-product-direction-generalist-core-apparel-pilot.md)). Storico master: 32/48 step; nessuno dei due conteggi misura la prontezza alla vendita.
 - Open P0: nessuno
@@ -14,7 +14,7 @@ Stato corrente del progetto. I resoconti dettagliati fino al 2026-10-24 (step 0.
 - Open P2: F-29 (P8), F-30 (P9.2)
 - Open P3: nessuno
 - PR in attesa per scelta: Dependabot #27 Apache POI 6, da rivalutare a inizio novembre o alla 6.0.1
-- Main: `b2f9e2f` dopo #36, CI e Security verdi; 12 controlli obbligatori, job prod-like nel container Playwright
+- Main: `11cc7ab` dopo #40; 12 controlli obbligatori, job prod-like nel container Playwright
 
 ## Step
 
@@ -26,7 +26,7 @@ Stato corrente del progetto. I resoconti dettagliati fino al 2026-10-24 (step 0.
 | P0.2 Benchmark e glossario | COMPLETED | #35 | WB-007 - WB-010, glossario in `DOMAIN_MODEL.md` |
 | P0.3 Snellimento documentale | COMPLETED | #35 | Registro archiviato, stato compatto |
 | P1.1 Categorie configurabili | COMPLETED | #36 | V36, API categorie, filtri gerarchici, gestione da UI |
-| P1.3 Codici a barre e unita di misura | IN_REVIEW | #40 | V37, verifica EAN, ricerca per codice |
+| P1.3 Codici a barre e unita di misura | COMPLETED | #40 | V37, verifica EAN, ricerca per codice |
 | P1.4 IVA per prodotto e per riga | IN_REVIEW | da aprire | V38, aliquote, riepilogo IVA per documento |
 | P1.5, P1.6, P1.2 ridotto | PENDING | - | Gate G1 |
 | P2 - P11 | PENDING | - | Vedere roadmap di prodotto |
