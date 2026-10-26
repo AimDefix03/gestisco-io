@@ -33,13 +33,15 @@ public class ProductService {
     private final ProductOrderUsage productOrderUsage;
     private final ProductProcurementUsage productProcurementUsage;
     private final ProductCategoryService categoryService;
+    private final VatRateService vatRateService;
 
-    ProductService(ProductRepository repository, AuditService auditService, ProductOrderUsage productOrderUsage, ProductProcurementUsage productProcurementUsage, ProductCategoryService categoryService) {
+    ProductService(ProductRepository repository, AuditService auditService, ProductOrderUsage productOrderUsage, ProductProcurementUsage productProcurementUsage, ProductCategoryService categoryService, VatRateService vatRateService) {
         this.repository = repository;
         this.auditService = auditService;
         this.productOrderUsage = productOrderUsage;
         this.productProcurementUsage = productProcurementUsage;
         this.categoryService = categoryService;
+        this.vatRateService = vatRateService;
     }
 
     public List<ProductResponse> findAll() {
@@ -119,7 +121,7 @@ public class ProductService {
 
     @Transactional
     public ProductResponse create(ProductRequest request) {
-        Product product = saveAndFlush(new Product(request, categoryService.requireAssignable(request.category())));
+        Product product = saveAndFlush(new Product(request, categoryService.requireAssignable(request.category()), vatRateService.requireAssignable(request.vatRateCode())));
         return ProductMapper.toResponse(product);
     }
 
@@ -132,7 +134,7 @@ public class ProductService {
 
     @Transactional
     public ProductResponse create(ProductRequest request, AuthenticatedUser actor) {
-        Product product = saveAndFlush(new Product(request, categoryService.requireAssignable(request.category())));
+        Product product = saveAndFlush(new Product(request, categoryService.requireAssignable(request.category()), vatRateService.requireAssignable(request.vatRateCode())));
         ProductResponse response = ProductMapper.toResponse(product, capabilities(product, actor));
         auditService.record(actor.username(), actor.roleLabel(), "CREATE_PRODUCT", response.code(), "Creata anagrafica " + response.name() + " - brand " + response.brand() + " - tipo " + response.productType() + " - prezzo " + response.price(), AuditCategory.PRODUCT, AuditSeverity.INFO, "PRODUCT");
         return response;
@@ -142,7 +144,7 @@ public class ProductService {
     public ProductResponse update(String code, ProductRequest request) {
         Product product = requireProduct(code);
         validateCodeChangeAllowed(product, request.code());
-        product.update(request, assignableCategory(product, request.category()));
+        product.update(request, assignableCategory(product, request.category()), assignableVatRate(product, request.vatRateCode()));
         flushCanonicalCode();
         return ProductMapper.toResponse(product);
     }
@@ -152,7 +154,7 @@ public class ProductService {
         Product product = requireProduct(code);
         ProductResponse before = ProductMapper.toResponse(product);
         validateCodeChangeAllowed(product, request.code());
-        product.update(request, assignableCategory(product, request.category()));
+        product.update(request, assignableCategory(product, request.category()), assignableVatRate(product, request.vatRateCode()));
         flushCanonicalCode();
         ProductResponse response = ProductMapper.toResponse(product);
         auditService.record(actor, role, "UPDATE_PRODUCT", response.code(), "Aggiornato " + response.name() + " - modifiche: " + changeSummary(before, response), AuditCategory.PRODUCT, AuditSeverity.INFO, "PRODUCT");
@@ -164,7 +166,7 @@ public class ProductService {
         Product product = requireProduct(code);
         ProductResponse before = ProductMapper.toResponse(product);
         validateCodeChangeAllowed(product, request.code());
-        product.update(request, assignableCategory(product, request.category()));
+        product.update(request, assignableCategory(product, request.category()), assignableVatRate(product, request.vatRateCode()));
         flushCanonicalCode();
         ProductResponse response = ProductMapper.toResponse(product, capabilities(product, actor));
         auditService.record(actor.username(), actor.roleLabel(), "UPDATE_PRODUCT", response.code(), "Aggiornato " + response.name() + " - modifiche: " + changeSummary(before, response), AuditCategory.PRODUCT, AuditSeverity.INFO, "PRODUCT");
@@ -443,6 +445,14 @@ public class ProductService {
         }
     }
 
+    /** L'aliquota attuale resta valida anche se disattivata; senza codice si conserva; un cambio richiede un'aliquota attiva. */
+    private VatRate assignableVatRate(Product product, String requestedCode) {
+        if (requestedCode == null || requestedCode.isBlank() || product.getVatRate().getCode().equalsIgnoreCase(requestedCode.trim())) {
+            return product.getVatRate();
+        }
+        return vatRateService.requireAssignable(requestedCode);
+    }
+
     /** La categoria attuale resta valida anche se disattivata; un cambio richiede una categoria attiva. */
     private ProductCategory assignableCategory(Product product, String requestedCode) {
         if (product.getCategory().getCodeCanonical().equals(BusinessIdentifierCanonicalizer.canonical(requestedCode))) {
@@ -522,6 +532,7 @@ public class ProductService {
         addChange(changes, "utilizzo", before.usageContext(), after.usageContext());
         addChange(changes, "codice a barre", before.barcode(), after.barcode());
         addChange(changes, "unita", before.unitLabel(), after.unitLabel());
+        addChange(changes, "IVA", before.vatRateCode(), after.vatRateCode());
         addChange(changes, "prezzo", before.price(), after.price());
         addChange(changes, "sconto", before.discount(), after.discount());
         return changes.isEmpty() ? "nessuna variazione rilevante" : String.join("; ", changes);

@@ -221,6 +221,12 @@ Le modifiche sensibili devono registrare un riepilogo operativo chiaro senza inc
 
 - Dal 2026-10-26 (V37) prodotti in staff accettano e restituiscono `barcode` (facoltativo, massimo 32 caratteri, univoco ignorando maiuscole) e `unitOfMeasure` (`PIECE` predefinito, `PAIR`, `PACK`, `KILOGRAM`, `METER`, `LITER`); le risposte aggiungono `unitLabel`. I codici numerici di 8, 12 o 13 cifre sono validati come EAN-8, UPC-A o EAN-13 con cifra di controllo (`400` se errata); un codice duplicato restituisce `409`. Il filtro `q` trova anche il codice a barre esatto.
 
+- Dal 2026-10-26 (V38) le richieste prodotto accettano `vatRateCode` (facoltativo): alla creazione un valore vuoto usa l'aliquota predefinita, in modifica un valore vuoto conserva quella attuale; un codice inesistente o disattivato restituisce `400`. Le risposte includono `vatRateCode`, `vatRate` (frazione, per esempio `0.22`) e `vatLabel`. I prezzi restano IVA inclusa.
+
+## Aliquote IVA
+
+- `GET /api/vat-rates` richiede `MANAGE_INVENTORY` e restituisce le aliquote ordinate con `code`, `rate`, `nature` (natura di esenzione, per esempio `N4`, solo per aliquota zero), `description`, `defaultRate` e `active`. Le aliquote iniziali sono `IVA22`, `IVA10`, `IVA5`, `IVA4` ed `ESENTE`; in questo step non esistono endpoint di modifica.
+
 ## Categorie di prodotto
 
 - `GET /api/product-categories` richiede `VIEW_CATALOG` e restituisce l'elenco ordinato per percorso con `code`, `name`, `path`, `parentCode`, `depth` e `active`. `includeInactive=true` include le categorie disattivate solo per chi ha `MANAGE_PRODUCTS`.
@@ -319,6 +325,7 @@ Le modifiche sensibili devono registrare un riepilogo operativo chiaro senza inc
 - Se l'ordine non ha un cliente strutturato, lo snapshot conserva almeno il cliente testuale dell'ordine.
 - La nota credito simulata copia lo snapshot dalla fattura simulata originale, non dall'anagrafica aggiornata.
 - La nota credito copia anche snapshot emittente, aliquota e importi della fattura originale.
+- Dal 2026-10-26 (V38) ogni riga ordine e ogni riga documento espone `vatRate` e `vatNature`, copiati dal prodotto al momento della creazione dell'ordine. Ogni documento espone `vatSummaries`, un elemento per coppia aliquota e natura con `vatRate`, `vatNature`, `taxableAmount`, `vatAmount` e `totalAmount`, ordinati per aliquota decrescente. L'imponibile si scorpora una volta per aliquota dal totale lordo del gruppo, arrotondando al centesimo con `HALF_UP`; l'imposta e la differenza. `vatRate` del documento e valorizzato solo se il documento ha un'unica aliquota, altrimenti e `null`. Regola di arrotondamento provvisoria, da confermare con il consulente in P8.
 - Il campo `customer` resta valorizzato per compatibilita e corrisponde al nome cliente snapshot.
 - Il database rifiuta documenti simulati con importi negativi, aliquota IVA fuori dall'intervallo 0-1, campi operativi obbligatori vuoti e righe documento con quantita non positiva o importi negativi.
 

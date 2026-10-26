@@ -71,6 +71,7 @@ Campi principali:
 - descrizione;
 - categoria configurabile (`ProductCategory`, riferimento `category_id`, V36);
 - codice a barre facoltativo e univoco (EAN-8, UPC-A, EAN-13 con cifra di controllo, oppure codice interno) e unita di misura (pezzo, paio, confezione, chilogrammo, metro, litro), V37; con le varianti (P2) il codice a barre passera alla variante;
+- aliquota IVA (`VatRate`, riferimento `vat_rate_id`, V38): codice, aliquota, natura di esenzione per l'aliquota zero, descrizione, predefinita e attiva;
 - brand;
 - tipo prodotto;
 - utilizzo opzionale;
@@ -141,7 +142,7 @@ Rappresentano un ordine con righe prodotto, totale calcolato e un pagamento stru
 Regole attuali:
 
 - le righe ordine devono avere quantita positiva e importi non negativi;
-- ogni riga ordine conserva snapshot immutabili di codice, nome, descrizione e prezzo catalogo applicato al momento della creazione;
+- ogni riga ordine conserva snapshot immutabili di codice, nome, descrizione, prezzo catalogo, aliquota IVA e natura applicati al momento della creazione (aliquota da V38; le righe storiche hanno l'aliquota aziendale predefinita);
 - codice ordine, cliente, metodo pagamento snapshot e totale hanno vincoli database coerenti con il dominio;
 - il metodo pagamento non e piu una stringa libera: i nuovi ordini ammettono `CARD`, `BANK_TRANSFER` e `CASH`;
 - il pagamento conserva stato, importo richiesto, incassato, rimborsato, netto, residuo, valuta e timestamp;
@@ -212,7 +213,7 @@ Regole attuali:
 - il database impone l'unicita della coppia ordine collegato e tipo documento;
 - importi, aliquota IVA e righe documento sono protetti da vincoli database;
 - codice nel formato `PREFISSO-ANNO-PROGRESSIVO`, con progressivo univoco per tipo ed esercizio;
-- aliquota predefinita letta dalla configurazione aziendale al momento della fattura;
+- dal 2026-10-26 (V38) ogni riga documento copia aliquota e natura dalla riga ordine; `FiscalDocumentVatSummary` conserva imponibile, imposta e totale per ciascuna aliquota, scorporati una volta per gruppo con arrotondamento `HALF_UP` al centesimo; la somma dei riepiloghi deve coincidere con il totale del documento; l'aliquota del documento e valorizzata solo con aliquota unica; i documenti storici hanno un riepilogo con l'aliquota con cui erano stati emessi;
 - snapshot emittente: ragione sociale, identificativi fiscali, contatti e indirizzo;
 - i documenti salvano snapshot cliente: codice, nome/ragione sociale, codice fiscale, partita IVA, email, telefono, indirizzo e citta;
 - la nota credito copia dalla fattura originale snapshot emittente, snapshot cliente, aliquota e importi;

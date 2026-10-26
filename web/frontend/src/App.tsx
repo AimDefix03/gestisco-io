@@ -34,6 +34,7 @@ import usePhysicalInventoryFlow from './features/inventory/usePhysicalInventoryF
 import { SessionEntry, SessionOverlays } from './features/session/SessionExperience';
 import useSessionFlow from './features/session/useSessionFlow';
 import { ProductCategoriesProvider } from './features/catalog/ProductCategoriesContext';
+import { VatRatesProvider } from './features/catalog/VatRatesContext';
 import useCommandExecution, { type UiNotice } from './hooks/useCommandExecution';
 import useDraftState from './hooks/useDraftState';
 import useWorkspaceNavigation from './hooks/useWorkspaceNavigation';
@@ -404,6 +405,7 @@ export default function App() {
 
   return (
     <ProductCategoriesProvider enabled={hasPermission('VIEW_CATALOG')} includeInactive={canManageProducts}>
+    <VatRatesProvider enabled={hasPermission('MANAGE_INVENTORY')}>
       <WorkspaceChrome
         currentUser={currentUser!}
         sessionExpiresAt={sessionExpiresAt}
@@ -434,6 +436,7 @@ export default function App() {
           onConfirm={confirmPendingNavigation}
         />
       )}
+    </VatRatesProvider>
     </ProductCategoriesProvider>
   );
 

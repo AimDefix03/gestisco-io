@@ -1,5 +1,5 @@
 import { fetchAllPages, request, toQueryString } from './httpClient';
-import type { CustomerProduct, PageResponse, Product, ProductCategoryOption, ProductCategoryPayload, ProductLookup, ProductOperationalDetail, ProductPayload, ProductQuery } from './types';
+import type { CustomerProduct, PageResponse, Product, ProductCategoryOption, ProductCategoryPayload, ProductLookup, VatRateOption, ProductOperationalDetail, ProductPayload, ProductQuery } from './types';
 
 const baseUrl = '/api/products';
 
@@ -69,4 +69,8 @@ export function updateProductCategory(code: string, payload: ProductCategoryPayl
     method: 'PUT',
     body: JSON.stringify(payload)
   });
+}
+
+export function fetchVatRates(signal?: AbortSignal): Promise<VatRateOption[]> {
+  return request<VatRateOption[]>('/api/vat-rates', { signal });
 }

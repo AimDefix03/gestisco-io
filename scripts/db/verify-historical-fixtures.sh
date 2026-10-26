@@ -164,6 +164,15 @@ assert_snapshot() {
   if [ "$version" -ge 35 ]; then
     psql_file "$database" "$FIXTURE_DIR/assertions/v35.sql"
   fi
+  if [ "$version" -ge 36 ]; then
+    psql_file "$database" "$FIXTURE_DIR/assertions/v36.sql"
+  fi
+  if [ "$version" -ge 37 ]; then
+    psql_file "$database" "$FIXTURE_DIR/assertions/v37.sql"
+  fi
+  if [ "$version" -ge 38 ]; then
+    psql_file "$database" "$FIXTURE_DIR/assertions/v38.sql"
+  fi
   if [ "$version" -lt 29 ]; then
     psql_file "$database" "$FIXTURE_DIR/assertions/v${version}.sql"
   fi

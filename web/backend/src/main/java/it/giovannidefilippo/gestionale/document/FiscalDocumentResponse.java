@@ -40,6 +40,7 @@ public record FiscalDocumentResponse(
         String customerSnapshotCity,
         String paymentMethod,
         List<LineResponse> lines,
+        List<VatSummaryResponse> vatSummaries,
         BigDecimal taxableAmount,
         BigDecimal vatRate,
         BigDecimal vatAmount,
@@ -89,6 +90,7 @@ public record FiscalDocumentResponse(
                 document.getCustomerSnapshotCity(),
                 document.getPaymentMethod(),
                 document.getLines().stream().map(LineResponse::from).toList(),
+                document.getVatSummaries().stream().map(VatSummaryResponse::from).toList(),
                 document.getTaxableAmount(),
                 document.getVatRate(),
                 document.getVatAmount(),
@@ -101,9 +103,15 @@ public record FiscalDocumentResponse(
         );
     }
 
-    public record LineResponse(String productCode, String description, int quantity, BigDecimal unitPrice, BigDecimal lineTotal) {
+    public record VatSummaryResponse(BigDecimal vatRate, String vatNature, BigDecimal taxableAmount, BigDecimal vatAmount, BigDecimal totalAmount) {
+        static VatSummaryResponse from(FiscalDocumentVatSummary summary) {
+            return new VatSummaryResponse(summary.getVatRate(), summary.getVatNature(), summary.getTaxableAmount(), summary.getVatAmount(), summary.getTotalAmount());
+        }
+    }
+
+    public record LineResponse(String productCode, String description, int quantity, BigDecimal unitPrice, BigDecimal lineTotal, BigDecimal vatRate, String vatNature) {
         static LineResponse from(FiscalDocumentLine line) {
-            return new LineResponse(line.getProductCode(), line.getDescription(), line.getQuantity(), line.getUnitPrice(), line.getLineTotal());
+            return new LineResponse(line.getProductCode(), line.getDescription(), line.getQuantity(), line.getUnitPrice(), line.getLineTotal(), line.getVatRate(), line.getVatNature());
         }
     }
 }

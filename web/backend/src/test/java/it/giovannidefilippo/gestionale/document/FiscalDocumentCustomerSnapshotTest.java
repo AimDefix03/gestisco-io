@@ -60,7 +60,8 @@ class FiscalDocumentCustomerSnapshotTest {
     void invoiceKeepsCustomerSnapshotEvenIfRegistryChangesLater() {
         String customerCode = uniqueCode("CLI");
         createPartner(customerCode, "Cliente Originale", "CFORIG", "IT001", "originale@example.com", "Napoli");
-        OrderResponse order = createFulfilledOrder(customerCode);
+        String productCode = uniqueCode("DOC-VAT");
+        OrderResponse order = createFulfilledOrder(customerCode, productCode, "IVA10");
 
         FiscalDocumentResponse invoice = documentService.createInvoice(new FiscalDocumentRequests.CreateInvoiceRequest(order.code()), actor());
         partnerService.update(customerCode, partnerRequest(customerCode, "Cliente Modificato", "CFMOD", "IT999", "modificato@example.com", "Roma"), "admin", "Super Admin");
@@ -94,14 +95,15 @@ class FiscalDocumentCustomerSnapshotTest {
     }
 
     @Test
-    void documentsKeepIssuerAndVatSnapshotWhenCompanySettingsChange() {
+    void documentsKeepIssuerAndVatSnapshotWhenCompanySettingsAndProductVatChange() {
         CompanySettingsResponse current = companySettingsService.current();
         CompanySettingsResponse original = companySettingsService.update(companyRequest(
                 current, "Azienda Originale", "CFORIG", "IT001", new BigDecimal("0.1000")
         ), actor());
         String customerCode = uniqueCode("CLI");
         createPartner(customerCode, "Cliente Snapshot", "CFCLI", "ITCLI", "cliente@example.com", "Napoli");
-        OrderResponse order = createFulfilledOrder(customerCode);
+        String productCode = uniqueCode("DOC-VAT");
+        OrderResponse order = createFulfilledOrder(customerCode, productCode, "IVA10");
 
         FiscalDocumentResponse invoice = documentService.createInvoice(
                 new FiscalDocumentRequests.CreateInvoiceRequest(order.code()), actor()
@@ -109,6 +111,10 @@ class FiscalDocumentCustomerSnapshotTest {
         CompanySettingsResponse changed = companySettingsService.update(companyRequest(
                 original, "Azienda Modificata", "CFMOD", "IT999", new BigDecimal("0.2200")
         ), actor());
+        productService.update(productCode, new ProductRequest(
+                productCode, "Prodotto snapshot", "Prodotto creato per verificare snapshot cliente nei documenti.", "HARDWARE",
+                "TestBrand", "Scheda di test", "", new BigDecimal("120.00"), new BigDecimal("0.00"), null, null, "IVA22"
+        ));
         FiscalDocumentResponse creditNote = documentService.createCreditNote(
                 new FiscalDocumentRequests.CreateCreditNoteRequest(order.code(), "Rettifica simulata"), actor()
         );
@@ -117,9 +123,13 @@ class FiscalDocumentCustomerSnapshotTest {
         assertThat(invoice.companySnapshotTaxCode()).isEqualTo("CFORIG");
         assertThat(invoice.companySnapshotVatNumber()).isEqualTo("IT001");
         assertThat(invoice.vatRate()).isEqualByComparingTo("0.1");
+        assertThat(invoice.taxableAmount()).isEqualByComparingTo("109.09");
+        assertThat(invoice.vatAmount()).isEqualByComparingTo("10.91");
+        assertThat(invoice.vatSummaries()).singleElement().satisfies(summary -> assertThat(summary.vatRate()).isEqualByComparingTo("0.1"));
         assertThat(creditNote.companySnapshotLegalName()).isEqualTo("Azienda Originale");
         assertThat(creditNote.companySnapshotTaxCode()).isEqualTo("CFORIG");
         assertThat(creditNote.vatRate()).isEqualByComparingTo("0.1");
+        assertThat(creditNote.vatAmount()).isEqualByComparingTo("10.91");
 
         assertThatThrownBy(() -> companySettingsService.update(new CompanySettingsRequests.UpdateRequest(
                 changed.version(), changed.legalName(), changed.taxCode(), changed.vatNumber(), changed.email(), changed.phone(),
@@ -131,7 +141,10 @@ class FiscalDocumentCustomerSnapshotTest {
     }
 
     private OrderResponse createFulfilledOrder(String customerCode) {
-        String productCode = uniqueCode("DOC-PROD");
+        return createFulfilledOrder(customerCode, uniqueCode("DOC-PROD"), null);
+    }
+
+    private OrderResponse createFulfilledOrder(String customerCode, String productCode, String vatRateCode) {
         productService.create(new ProductRequest(
                 productCode,
                 "Prodotto snapshot",
@@ -141,7 +154,10 @@ class FiscalDocumentCustomerSnapshotTest {
                 "Scheda di test",
                 "",
                 new BigDecimal("120.00"),
-                new BigDecimal("0.00")
+                new BigDecimal("0.00"),
+                null,
+                null,
+                vatRateCode
         ));
         inventoryService.initialBalance(productCode, 3, "Saldo iniziale snapshot", "test", "Test");
         OrderResponse order = orderService.create(

@@ -124,8 +124,12 @@ public class FiscalDocument {
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal taxableAmount;
 
-    @Column(nullable = false, precision = 5, scale = 4)
+    @Column(precision = 5, scale = 4)
     private BigDecimal vatRate;
+
+    @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @BatchSize(size = 50)
+    private List<FiscalDocumentVatSummary> vatSummaries = new ArrayList<>();
 
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal vatAmount;
@@ -148,7 +152,7 @@ public class FiscalDocument {
     protected FiscalDocument() {
     }
 
-    FiscalDocument(DocumentNumberAllocation number, FiscalDocumentType type, String relatedOrderCode, CompanySnapshot companySnapshot, CustomerSnapshot customerSnapshot, String paymentMethod, List<FiscalDocumentLine> lines, BigDecimal taxableAmount, BigDecimal vatRate, BigDecimal vatAmount, BigDecimal totalAmount, String createdBy, String createdByRole, String reason, String disclaimer, LocalDateTime createdAt) {
+    FiscalDocument(DocumentNumberAllocation number, FiscalDocumentType type, String relatedOrderCode, CompanySnapshot companySnapshot, CustomerSnapshot customerSnapshot, String paymentMethod, List<FiscalDocumentLine> lines, List<FiscalDocumentVatSummary> vatSummaries, BigDecimal totalAmount, String createdBy, String createdByRole, String reason, String disclaimer, LocalDateTime createdAt) {
         this.code = number.code();
         this.fiscalYear = number.fiscalYear();
         this.sequenceNumber = number.sequenceNumber();
@@ -178,10 +182,17 @@ public class FiscalDocument {
         this.customerSnapshotAddress = customerSnapshot.address();
         this.customerSnapshotCity = customerSnapshot.city();
         this.paymentMethod = paymentMethod;
-        this.taxableAmount = taxableAmount;
-        this.vatRate = vatRate;
-        this.vatAmount = vatAmount;
+        this.taxableAmount = vatSummaries.stream().map(FiscalDocumentVatSummary::getTaxableAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+        this.vatAmount = vatSummaries.stream().map(FiscalDocumentVatSummary::getVatAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+        this.vatRate = vatSummaries.size() == 1 ? vatSummaries.get(0).getVatRate() : null;
         this.totalAmount = totalAmount;
+        if (this.taxableAmount.add(this.vatAmount).compareTo(totalAmount) != 0) {
+            throw new IllegalStateException("Riepilogo IVA incoerente con il totale del documento.");
+        }
+        vatSummaries.forEach(summary -> {
+            summary.assignDocument(this);
+            this.vatSummaries.add(summary);
+        });
         this.createdBy = clean(createdBy);
         this.createdByRole = clean(createdByRole);
         this.reason = reason;
@@ -225,6 +236,7 @@ public class FiscalDocument {
     public String getCustomerSnapshotCity() { return customerSnapshotCity; }
     public String getPaymentMethod() { return paymentMethod; }
     public List<FiscalDocumentLine> getLines() { return List.copyOf(lines); }
+    public List<FiscalDocumentVatSummary> getVatSummaries() { return List.copyOf(vatSummaries); }
     public BigDecimal getTaxableAmount() { return taxableAmount; }
     public BigDecimal getVatRate() { return vatRate; }
     public BigDecimal getVatAmount() { return vatAmount; }
