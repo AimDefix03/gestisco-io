@@ -3,8 +3,9 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import ProductForm from './ProductForm';
 import { renderWithDrafts } from '../test/renderWithDrafts';
-import type { ProductCategoryOption } from '../api';
+import type { ProductCategoryOption, VatRateOption } from '../api';
 import { StaticProductCategories } from '../features/catalog/ProductCategoriesContext';
+import { StaticVatRates } from '../features/catalog/VatRatesContext';
 
 const categories: ProductCategoryOption[] = [
   { code: 'HARDWARE', name: 'Hardware', path: 'Hardware', parentCode: null, depth: 1, active: true },
@@ -12,8 +13,19 @@ const categories: ProductCategoryOption[] = [
   { code: 'OLD', name: 'Fuori catalogo', path: 'Fuori catalogo', parentCode: null, depth: 1, active: false }
 ];
 
+const vatRates: VatRateOption[] = [
+  { code: 'IVA22', rate: 0.22, nature: null, description: 'IVA 22% ordinaria', defaultRate: true, active: true },
+  { code: 'IVA10', rate: 0.1, nature: null, description: 'IVA 10% ridotta', defaultRate: false, active: true },
+  { code: 'ESENTE', rate: 0, nature: 'N4', description: 'Esente', defaultRate: false, active: true },
+  { code: 'IVA5', rate: 0.05, nature: null, description: 'IVA 5% ridotta', defaultRate: false, active: false }
+];
+
 function renderForm(ui: Parameters<typeof renderWithDrafts>[0]) {
-  return renderWithDrafts(<StaticProductCategories categories={categories}>{ui}</StaticProductCategories>);
+  return renderWithDrafts(
+    <StaticProductCategories categories={categories}>
+      <StaticVatRates vatRates={vatRates}>{ui}</StaticVatRates>
+    </StaticProductCategories>
+  );
 }
 
 describe('ProductForm', () => {
@@ -50,7 +62,8 @@ describe('ProductForm', () => {
       price: 899.9,
       discount: 5,
       barcode: '8001234567897',
-      unitOfMeasure: 'PAIR'
+      unitOfMeasure: 'PAIR',
+      vatRateCode: null
     });
     expect(screen.getByLabelText('Codice')).toHaveValue('');
   });
@@ -70,6 +83,9 @@ describe('ProductForm', () => {
           barcode: null,
           unitOfMeasure: 'PIECE',
           unitLabel: 'Pezzo',
+          vatRateCode: 'IVA22',
+          vatRate: 0.22,
+          vatLabel: 'IVA 22% ordinaria',
           brand: 'Example Brand',
           productType: 'CPU',
           usageContext: '',
@@ -113,6 +129,9 @@ describe('ProductForm', () => {
           barcode: null,
           unitOfMeasure: 'PIECE',
           unitLabel: 'Pezzo',
+          vatRateCode: 'IVA22',
+          vatRate: 0.22,
+          vatLabel: 'IVA 22% ordinaria',
           brand: 'Example Brand',
           productType: 'CPU',
           usageContext: '',
@@ -133,6 +152,8 @@ describe('ProductForm', () => {
     );
 
     expect(screen.getByLabelText('Codice')).toHaveValue('CPU-001');
+    expect(screen.getByLabelText('Aliquota IVA')).toHaveValue('IVA22');
+    expect(screen.queryByRole('option', { name: /Predefinita/ })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Salva modifiche' })).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Annulla' }));
     expect(onCancel).toHaveBeenCalledOnce();
@@ -149,5 +170,29 @@ describe('ProductForm', () => {
     expect(screen.getByRole('option', { name: /Schede video/ })).toHaveValue('GPU');
     await user.click(screen.getByRole('button', { name: 'Crea prodotto' }));
     expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('usa l aliquota predefinita salvo scelta esplicita di un aliquota attiva', async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn().mockResolvedValue(true);
+    renderForm(<ProductForm editingProduct={null} busy={false} onSubmit={onSubmit} onCancel={vi.fn()} />);
+
+    const select = screen.getByLabelText('Aliquota IVA');
+    expect(select).toHaveValue('');
+    expect(screen.getByRole('option', { name: 'Predefinita (22%)' })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Esente · Esente (N4)' })).toHaveValue('ESENTE');
+    expect(screen.queryByRole('option', { name: /IVA 5%/ })).not.toBeInTheDocument();
+
+    await user.type(screen.getByLabelText('Codice'), 'TSH-001');
+    await user.type(screen.getByLabelText('Nome'), 'T-shirt');
+    await user.selectOptions(screen.getByLabelText('Categoria'), 'HARDWARE');
+    await user.selectOptions(select, 'IVA10');
+    await user.type(screen.getByLabelText('Brand'), 'Example Brand');
+    await user.type(screen.getByLabelText('Tipo prodotto'), 'Maglia');
+    await user.type(screen.getByLabelText('Descrizione'), 'Prodotto di test con IVA ridotta.');
+    await user.click(screen.getByRole('button', { name: 'Crea prodotto' }));
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledOnce());
+    expect(onSubmit.mock.calls[0][0]).toMatchObject({ code: 'TSH-001', vatRateCode: 'IVA10' });
   });
 });

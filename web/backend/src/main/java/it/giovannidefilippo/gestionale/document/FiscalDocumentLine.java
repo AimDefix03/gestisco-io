@@ -38,10 +38,18 @@ public class FiscalDocumentLine {
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal lineTotal;
 
+    @Column(nullable = false, precision = 5, scale = 4)
+    private BigDecimal vatRate;
+
+    @Column(length = 8)
+    private String vatNature;
+
     protected FiscalDocumentLine() {
     }
 
-    FiscalDocumentLine(String productCode, String description, int quantity, BigDecimal unitPrice, BigDecimal lineTotal) {
+    FiscalDocumentLine(String productCode, String description, int quantity, BigDecimal unitPrice, BigDecimal lineTotal, BigDecimal vatRate, String vatNature) {
+        this.vatRate = vatRate;
+        this.vatNature = vatNature;
         this.productCode = productCode;
         this.description = description;
         this.quantity = quantity;
@@ -58,4 +66,6 @@ public class FiscalDocumentLine {
     public int getQuantity() { return quantity; }
     public BigDecimal getUnitPrice() { return unitPrice; }
     public BigDecimal getLineTotal() { return lineTotal; }
+    public BigDecimal getVatRate() { return vatRate; }
+    public String getVatNature() { return vatNature; }
 }

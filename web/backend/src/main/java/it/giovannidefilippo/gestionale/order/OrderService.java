@@ -431,7 +431,7 @@ public class OrderService {
         if (product.getAvailableQuantity() < quantity) {
             throw new IllegalArgumentException("Scorte insufficienti per il prodotto " + product.getCode() + ".");
         }
-        return new OrderItem(product.getCode(), product.getName(), product.getDescription(), quantity, product.getDiscountedPrice());
+        return new OrderItem(product.getCode(), product.getName(), product.getDescription(), quantity, product.getDiscountedPrice(), product.getVatRate().getRate(), product.getVatRate().getNature());
     }
 
     private OrderReturnItem toReturnItem(CustomerOrder order, String productCode, int quantity) {

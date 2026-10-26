@@ -107,7 +107,8 @@ describe('client API di dominio', () => {
       price: 899.9,
       discount: 5,
       barcode: null,
-      unitOfMeasure: 'PIECE' as const
+      unitOfMeasure: 'PIECE' as const,
+      vatRateCode: null
     };
 
     await createProduct(payload);

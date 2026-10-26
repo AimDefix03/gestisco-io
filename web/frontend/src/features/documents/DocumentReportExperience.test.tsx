@@ -58,6 +58,7 @@ const document: FiscalDocument = {
   vatRate: 0.22,
   vatAmount: 22,
   totalAmount: 122,
+  vatSummaries: [{ vatRate: 0.22, vatNature: null, taxableAmount: 100, vatAmount: 22, totalAmount: 122 }],
   createdBy: 'admin',
   createdByRole: 'ADMIN',
   reason: '',

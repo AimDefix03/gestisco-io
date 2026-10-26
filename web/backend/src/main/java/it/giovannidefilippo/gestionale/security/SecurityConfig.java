@@ -58,6 +58,8 @@ class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/accounts/me/password").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/customer/catalog/**").hasAuthority("VIEW_CATALOG")
                         .requestMatchers(HttpMethod.GET, "/api/customer/dashboard").hasAuthority("VIEW_ORDERS")
+                        .requestMatchers(HttpMethod.GET, "/api/vat-rates").hasAuthority("MANAGE_INVENTORY")
+                        .requestMatchers("/api/vat-rates/**").denyAll()
                         .requestMatchers(HttpMethod.GET, "/api/product-categories").hasAuthority("VIEW_CATALOG")
                         .requestMatchers(HttpMethod.POST, "/api/product-categories").hasAuthority("MANAGE_PRODUCTS")
                         .requestMatchers(HttpMethod.PUT, "/api/product-categories/*").hasAuthority("MANAGE_PRODUCTS")

@@ -22,8 +22,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -34,7 +32,6 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 public class FiscalDocumentService {
-    private static final BigDecimal ONE = BigDecimal.ONE;
     private static final String DISCLAIMER = "DOCUMENTO SIMULATO - NON VALIDO AI FINI FISCALI";
     private final FiscalDocumentRepository repository;
     private final OrderService orderService;
@@ -148,9 +145,7 @@ public class FiscalDocumentService {
     }
 
     private FiscalDocument buildInvoice(CustomerOrder order, CustomerSnapshot customerSnapshot, String actor, String role, String reason, DocumentNumberService.NumberedCompanySettings numberedSettings) {
-        BigDecimal vatRate = numberedSettings.companySettings().defaultVatRate();
-        BigDecimal taxableAmount = order.getTotal().divide(ONE.add(vatRate), 2, RoundingMode.HALF_UP);
-        BigDecimal vatAmount = order.getTotal().subtract(taxableAmount).setScale(2, RoundingMode.HALF_UP);
+        List<FiscalDocumentLine> lines = order.getItems().stream().map(this::lineFromOrder).toList();
         return new FiscalDocument(
                 numberedSettings.number(),
                 FiscalDocumentType.SIMULATED_INVOICE,
@@ -158,10 +153,8 @@ public class FiscalDocumentService {
                 CompanySnapshot.from(numberedSettings.companySettings()),
                 customerSnapshot,
                 order.getPayment().getMethod().getLabel(),
-                order.getItems().stream().map(this::lineFromOrder).toList(),
-                taxableAmount,
-                vatRate,
-                vatAmount,
+                lines,
+                VatSummaryCalculator.summarize(lines),
                 order.getTotal(),
                 actor,
                 role,
@@ -180,9 +173,7 @@ public class FiscalDocumentService {
                 snapshotFromDocument(invoice),
                 order.getPayment().getMethod().getLabel(),
                 order.getItems().stream().map(this::lineFromOrder).toList(),
-                invoice.getTaxableAmount(),
-                invoice.getVatRate(),
-                invoice.getVatAmount(),
+                invoice.getVatSummaries().stream().map(FiscalDocumentVatSummary::copy).toList(),
                 invoice.getTotalAmount(),
                 actor,
                 role,
@@ -230,7 +221,7 @@ public class FiscalDocumentService {
     }
 
     private FiscalDocumentLine lineFromOrder(OrderItem item) {
-        return new FiscalDocumentLine(item.getProductCode(), item.getProductName(), item.getQuantity(), item.getUnitPrice(), item.getLineTotal());
+        return new FiscalDocumentLine(item.getProductCode(), item.getProductName(), item.getQuantity(), item.getUnitPrice(), item.getLineTotal(), item.getVatRate(), item.getVatNature());
     }
 
     private Specification<FiscalDocument> specification(String q, FiscalDocumentType type) {

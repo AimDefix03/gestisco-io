@@ -2,6 +2,7 @@ import { DocumentQuery, FiscalDocument, PageResponse } from '../api';
 import PaginationControls from '../components/PaginationControls';
 import DataList from '../components/common/DataList';
 import { dateTime, money } from '../utils/formatters';
+import { documentVatLabel } from '../utils/vat';
 
 type Props = {
   page: PageResponse<FiscalDocument>;
@@ -21,7 +22,7 @@ export default function DocumentsPage({ page, query, creditReason, busy, pageSiz
       columns={['Codice', 'Documento', 'Ordine', 'Cliente', 'Importi', 'Data']}
       rows={page.content.map((document) => [
         document.code,
-        <div className="product-cell"><strong>{document.typeLabel}</strong><span>{document.companySnapshotLegalName || 'Emittente non configurato'} · IVA {(document.vatRate * 100).toLocaleString('it-IT')}%</span></div>,
+        <div className="product-cell"><strong>{document.typeLabel}</strong><span>{document.companySnapshotLegalName || 'Emittente non configurato'} · {documentVatLabel(document)}</span></div>,
         document.relatedOrderCode,
         <div className="product-cell"><strong>{document.customerSnapshotName || document.customer}</strong><span>{[document.customerSnapshotCode, document.customerSnapshotVatNumber || document.customerSnapshotTaxCode, document.customerSnapshotCity].filter(Boolean).join(' · ') || 'Dati minimi ordine'}</span></div>,
         <div className="product-cell"><strong>{money.format(document.totalAmount)}</strong><span>Imponibile {money.format(document.taxableAmount)}</span></div>,

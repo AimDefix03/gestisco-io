@@ -1,6 +1,8 @@
 import { FormEvent, useMemo } from 'react';
 import { Product, ProductCategory, ProductPayload, UnitOfMeasure } from '../api';
 import { UNIT_OF_MEASURE_LABELS } from '../utils/units';
+import { vatRateLabel } from '../utils/vat';
+import { useVatRates } from '../features/catalog/VatRatesContext';
 import { categoryOptionLabel, useProductCategories } from '../features/catalog/ProductCategoriesContext';
 import useDraftState from '../hooks/useDraftState';
 
@@ -22,11 +24,14 @@ const initialForm = {
   price: '0',
   discount: '0',
   barcode: '',
-  unitOfMeasure: 'PIECE' as UnitOfMeasure
+  unitOfMeasure: 'PIECE' as UnitOfMeasure,
+  vatRateCode: ''
 };
 
 export default function ProductForm({ editingProduct, busy, onSubmit, onCancel }: Props) {
   const { categories } = useProductCategories();
+  const vatRates = useVatRates();
+  const defaultVatRate = vatRates.find((rate) => rate.defaultRate);
   const initialValue = useMemo(() => editingProduct ? ({
       code: editingProduct.code,
       name: editingProduct.name,
@@ -38,7 +43,8 @@ export default function ProductForm({ editingProduct, busy, onSubmit, onCancel }
       price: String(editingProduct.price),
       discount: String(editingProduct.discount),
       barcode: editingProduct.barcode ?? '',
-      unitOfMeasure: editingProduct.unitOfMeasure
+      unitOfMeasure: editingProduct.unitOfMeasure,
+      vatRateCode: editingProduct.vatRateCode
     }) : initialForm, [editingProduct]);
   const { value: form, setValue: setForm, dirty, clear } = useDraftState({
     key: `catalog:${editingProduct?.code ?? 'new'}`,
@@ -60,7 +66,8 @@ export default function ProductForm({ editingProduct, busy, onSubmit, onCancel }
       price: Number(form.price),
       discount: Number(form.discount),
       barcode: form.barcode.trim() || null,
-      unitOfMeasure: form.unitOfMeasure
+      unitOfMeasure: form.unitOfMeasure,
+      vatRateCode: form.vatRateCode || null
     });
     if (saved) clear();
   }
@@ -111,6 +118,18 @@ export default function ProductForm({ editingProduct, busy, onSubmit, onCancel }
           Unita di misura
           <select value={form.unitOfMeasure} onChange={(event) => updateField('unitOfMeasure', event.target.value as UnitOfMeasure)}>
             {(Object.keys(UNIT_OF_MEASURE_LABELS) as UnitOfMeasure[]).map((unit) => <option key={unit} value={unit}>{UNIT_OF_MEASURE_LABELS[unit]}</option>)}
+          </select>
+        </label>
+        <label>
+          Aliquota IVA
+          <select value={form.vatRateCode} onChange={(event) => updateField('vatRateCode', event.target.value)}>
+            {!editingProduct && <option value="">Predefinita{defaultVatRate ? ` (${vatRateLabel(defaultVatRate.rate, defaultVatRate.nature)})` : ''}</option>}
+            {vatRates
+              .filter((rate) => rate.active || rate.code === form.vatRateCode)
+              .map((rate) => <option key={rate.code} value={rate.code}>{rate.description} · {vatRateLabel(rate.rate, rate.nature)}</option>)}
+            {form.vatRateCode && !vatRates.some((rate) => rate.code === form.vatRateCode) && (
+              <option value={form.vatRateCode}>{editingProduct?.vatLabel ?? form.vatRateCode}</option>
+            )}
           </select>
         </label>
         <label>

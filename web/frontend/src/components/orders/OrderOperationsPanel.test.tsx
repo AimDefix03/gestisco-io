@@ -26,7 +26,7 @@ const baseOrder: Order = {
   canceledAt: null,
   canceledBy: null,
   canceledByRole: null,
-  items: [{ productCode: 'GPU-01', productName: 'Scheda video', productDescription: 'Scheda video per test.', quantity: 1, returnedOrReservedQuantity: 0, returnableQuantity: 1, unitPrice: 100, lineTotal: 100 }],
+  items: [{ productCode: 'GPU-01', productName: 'Scheda video', productDescription: 'Scheda video per test.', quantity: 1, returnedOrReservedQuantity: 0, returnableQuantity: 1, unitPrice: 100, lineTotal: 100, vatRate: 0.22, vatNature: null }],
   returns: [],
   payment: {
     id: 1,
@@ -75,7 +75,7 @@ test('registra incasso e richiesta reso multi-riga dalla scheda ordine', async (
     ...baseOrder,
     items: [
       { ...baseOrder.items[0], quantity: 2, returnedOrReservedQuantity: 1, returnableQuantity: 1 },
-      { productCode: 'CPU-01', productName: 'Processore', productDescription: 'Processore per test.', quantity: 3, returnedOrReservedQuantity: 0, returnableQuantity: 3, unitPrice: 80, lineTotal: 240 }
+      { productCode: 'CPU-01', productName: 'Processore', productDescription: 'Processore per test.', quantity: 3, returnedOrReservedQuantity: 0, returnableQuantity: 3, unitPrice: 80, lineTotal: 240, vatRate: 0.22, vatNature: null }
     ]
   };
   render(<OrderOperationsPanel order={order} capabilities={order.capabilities} documents={null} loading={false} error={null} busy={false} {...actions} />);
