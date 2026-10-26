@@ -4,7 +4,7 @@
 
 La precedente applicazione desktop Java Swing e congelata come riferimento funzionale e dimostrazione didattica. Non riceve nuove funzionalita commerciali e non fa parte della build produttiva predefinita.
 
-Da ORG-3 il codice si trova in `src/` nella cartella separata `/Users/aim_defix/Desktop/GestionaleNegozioComputer`, non nella root web `/Users/aim_defix/Desktop/Gestisco.IO`. Le build sotto si eseguono nella cartella legacy. La cronologia completa e l'originale sono conservati: questa separazione dei sorgenti non certifica migrazione dei dati o parita di tutti i workflow.
+Da ORG-3 il codice si trova in `src/` nella cartella separata `/Users/aim_defix/Desktop/GestionaleNegozioComputer`, non nella root web `/Users/aim_defix/Developer/Gestisco.IO`. Le build sotto si eseguono nella cartella legacy. La cronologia completa e l'originale sono conservati: questa separazione dei sorgenti non certifica migrazione dei dati o parita di tutti i workflow.
 
 ## Build dedicata
 
