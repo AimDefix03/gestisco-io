@@ -466,6 +466,7 @@ Backend web:
 - vertical slice documenti/report verificata su query cancellabili, latest-request-wins, caricamento lazy e cache report, emissione fattura/nota credito, conservazione causale, protezione export duplicati, errori e composizione delle pagine.
 - esecuzione automatica dei test frontend nella pipeline CI prima della build Vite.
 - smoke test Playwright su login negativo, login super admin, navigazione a schede, creazione prodotto, report magazzino con download CSV, verifica responsive senza overflow a 1024x768, registrazione cliente, carrello, creazione ordine e conferma ordine contro lo stack Docker reale.
+- indirizzi per pagina (P1.5, `e2e/navigation.spec.ts`): indirizzo di ogni sezione, dettaglio ordine da link diretto, tasti indietro e avanti, ricarica con nuovo accesso sulla stessa pagina, indirizzo sconosciuto, ritorno alla radice al logout e conferma delle bozze sul tasto indietro.
 - acquisizione automatica di report HTML, trace, screenshot e video Playwright in caso di errore CI.
 
 ## Gap principali
