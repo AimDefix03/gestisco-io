@@ -4,6 +4,8 @@ import it.giovannidefilippo.gestionale.common.ApiErrorCode;
 import it.giovannidefilippo.gestionale.common.UnauthorizedException;
 import it.giovannidefilippo.gestionale.user.AuthSessionService;
 import it.giovannidefilippo.gestionale.user.AuthenticatedUser;
+import it.giovannidefilippo.gestionale.user.SessionCookies;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,26 +20,28 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @Component
 class SessionAuthenticationFilter extends OncePerRequestFilter {
-    private static final String SESSION_HEADER = "X-Session-Token";
-
     private final AuthSessionService authSessionService;
+    private final SessionCookies sessionCookies;
     private final SecurityErrorWriter errorWriter;
 
-    SessionAuthenticationFilter(AuthSessionService authSessionService, SecurityErrorWriter errorWriter) {
+    SessionAuthenticationFilter(AuthSessionService authSessionService, SessionCookies sessionCookies, SecurityErrorWriter errorWriter) {
         this.authSessionService = authSessionService;
+        this.sessionCookies = sessionCookies;
         this.errorWriter = errorWriter;
     }
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path = request.getServletPath();
+        String path = request.getRequestURI().substring(request.getContextPath().length());
         String method = request.getMethod();
         return path.equals("/api/accounts/login")
                 || path.equals("/api/accounts/register")
                 || path.equals("/api/accounts/password-strength")
+                || (path.equals("/api/accounts/session") && HttpMethod.GET.matches(method))
                 || path.equals("/actuator/health/liveness")
                 || path.equals("/actuator/health/readiness")
                 || path.equals("/actuator/prometheus")
@@ -46,7 +50,7 @@ class SessionAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String token = request.getHeader(SESSION_HEADER);
+        String token = sessionToken(request);
         if (token == null || token.isBlank()) {
             filterChain.doFilter(request, response);
             return;
@@ -63,7 +67,18 @@ class SessionAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (UnauthorizedException exception) {
             SecurityContextHolder.clearContext();
+            sessionCookies.close(request, response);
             errorWriter.write(request, response, HttpStatus.UNAUTHORIZED, ApiErrorCode.AUTH_UNAUTHORIZED, exception.getMessage());
         }
+    }
+
+    private static String sessionToken(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) return null;
+        return Arrays.stream(cookies)
+                .filter(cookie -> SessionCookies.SESSION_COOKIE.equals(cookie.getName()))
+                .map(Cookie::getValue)
+                .findFirst()
+                .orElse(null);
     }
 }

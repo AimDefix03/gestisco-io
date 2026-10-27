@@ -12,6 +12,8 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.UUID;
 
+import static it.giovannidefilippo.gestionale.support.SessionRequests.session;
+import static it.giovannidefilippo.gestionale.support.SessionRequests.sessionToken;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -43,7 +45,7 @@ class OrderOwnershipControllerTest {
         long originalAccountId = order.path("customerAccountId").asLong();
 
         mockMvc.perform(delete("/api/accounts/{username}", username)
-                        .header("X-Session-Token", adminToken)
+                        .with(session(adminToken))
                         .header("X-Reauth-Password", SUPER_ADMIN_PASSWORD))
                 .andExpect(status().isNoContent());
 
@@ -59,7 +61,7 @@ class OrderOwnershipControllerTest {
                 .andExpect(jsonPath("$.code").value("RESOURCE_CONFLICT"));
 
         mockMvc.perform(get("/api/products")
-                        .header("X-Session-Token", originalToken))
+                        .with(session(originalToken)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value("AUTH_UNAUTHORIZED"));
 
@@ -82,12 +84,12 @@ class OrderOwnershipControllerTest {
         JsonNode order = createOrder(ownerToken, productCode);
 
         mockMvc.perform(get("/api/orders/customer/{customer}", owner)
-                        .header("X-Session-Token", strangerToken))
+                        .with(session(strangerToken)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(0));
 
         mockMvc.perform(get("/api/orders/customer/{customer}", stranger)
-                        .header("X-Session-Token", ownerToken))
+                        .with(session(ownerToken)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(1))
                 .andExpect(jsonPath("$.content[0].code").value(order.path("code").asText()));
@@ -103,7 +105,7 @@ class OrderOwnershipControllerTest {
         createProduct(adminToken, productCode, 2);
 
         mockMvc.perform(post("/api/orders")
-                        .header("X-Session-Token", customerToken)
+                        .with(session(customerToken))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -132,7 +134,7 @@ class OrderOwnershipControllerTest {
     }
 
     private String login(String username, String password, String role) throws Exception {
-        String response = mockMvc.perform(post("/api/accounts/login")
+        MvcResult response = mockMvc.perform(post("/api/accounts/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -142,15 +144,13 @@ class OrderOwnershipControllerTest {
                                 }
                                 """.formatted(username, password, role)))
                 .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        return objectMapper.readTree(response).path("token").asText();
+                .andReturn();
+        return sessionToken(response);
     }
 
     private void createProduct(String token, String code, int quantity) throws Exception {
         mockMvc.perform(post("/api/products")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -172,7 +172,7 @@ class OrderOwnershipControllerTest {
 
     private void initializeStock(String token, String code, int quantity) throws Exception {
         mockMvc.perform(post("/api/inventory/initial-balance")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -186,7 +186,7 @@ class OrderOwnershipControllerTest {
 
     private JsonNode createOrder(String token, String productCode) throws Exception {
         MvcResult result = mockMvc.perform(post("/api/orders")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -205,7 +205,7 @@ class OrderOwnershipControllerTest {
 
     private JsonNode accountByUsername(String token, String username) throws Exception {
         String response = mockMvc.perform(get("/api/accounts")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .param("q", username)
                         .param("size", "10"))
                 .andExpect(status().isOk())

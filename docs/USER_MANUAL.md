@@ -48,11 +48,11 @@ Quando la sessione non e piu valida:
 4. premere `Rinnova sessione`;
 5. verificare l'esito dell'operazione prima di ripeterla.
 
-Il rinnovo sostituisce il token della sessione: quello precedente non e piu utilizzabile. Se la sessione e gia scaduta, il gestionale verifica nuovamente le credenziali e apre una nuova sessione mantenendo la schermata corrente.
+Il rinnovo sostituisce la sessione: quella precedente non e piu utilizzabile. Se la sessione e gia scaduta, il gestionale verifica nuovamente le credenziali e apre una nuova sessione mantenendo la schermata corrente.
 
 Se era in corso un'operazione sensibile, il backend non la completa con una sessione scaduta. Dopo il rinnovo controllare lo stato dei dati e inviare nuovamente l'operazione solo se non risulta gia registrata.
 
-Usare `Logout` al termine del lavoro, soprattutto su dispositivi condivisi.
+Usare `Logout` al termine del lavoro, soprattutto su dispositivi condivisi. Ricaricare la pagina, aprire un link o una nuova scheda mantiene la sessione; chiudere il browser la termina, e la sessione scade comunque dopo 45 minuti o 30 di inattivita.
 
 ## Navigazione del workspace
 
@@ -65,7 +65,7 @@ La barra superiore e organizzata in menu orizzontali:
 
 Ogni voce aperta crea una scheda nel workspace. E possibile passare da una scheda all'altra o chiuderla senza uscire dalla sessione. Il comando `Aggiorna dati` ricarica le informazioni operative dal server.
 
-Ogni sezione ha un proprio indirizzo nella barra del browser, per esempio `/catalogo`, `/magazzino` o `/amministrazione/audit`; ordini cliente, ordini fornitore e inventari fisici aperti hanno un indirizzo di dettaglio (`/ordini/<codice>`, `/acquisti/<codice>`, `/magazzino/inventari/<numero>`). I tasti indietro e avanti del browser ripercorrono sezioni e dettagli aperti e un indirizzo puo essere salvato nei preferiti o condiviso con un collega autorizzato. Finche la sessione persistente (P1.6) non e attiva, ricaricare la pagina o aprire un link richiede un nuovo accesso, dopo il quale il gestionale riapre l'indirizzo richiesto. Un indirizzo sconosciuto mostra `Pagina non trovata`; una sezione non consentita al profilo mostra `Sezione non disponibile`, e il server rifiuta comunque i dati non autorizzati. All'uscita il gestionale torna all'indirizzo iniziale, cosi l'utente successivo non riapre la pagina del precedente.
+Ogni sezione ha un proprio indirizzo nella barra del browser, per esempio `/catalogo`, `/magazzino` o `/amministrazione/audit`; ordini cliente, ordini fornitore e inventari fisici aperti hanno un indirizzo di dettaglio (`/ordini/<codice>`, `/acquisti/<codice>`, `/magazzino/inventari/<numero>`). I tasti indietro e avanti del browser ripercorrono sezioni e dettagli aperti e un indirizzo puo essere salvato nei preferiti o condiviso con un collega autorizzato. Ricaricare la pagina o aprire un link riapre direttamente l'indirizzo richiesto finche la sessione e valida; se e scaduta, dopo l'accesso il gestionale riapre l'indirizzo richiesto. Un indirizzo sconosciuto mostra `Pagina non trovata`; una sezione non consentita al profilo mostra `Sezione non disponibile`, e il server rifiuta comunque i dati non autorizzati. All'uscita il gestionale torna all'indirizzo iniziale, cosi l'utente successivo non riapre la pagina del precedente.
 
 Le schede possono essere percorse da tastiera con `Freccia sinistra`, `Freccia destra`, `Home` ed `End`. I menu si aprono con `Invio` o `Spazio` e si chiudono con `Escape`; dopo la chiusura il focus torna al controllo di origine. I dialog mantengono il focus al proprio interno fino alla conferma o all'annullamento.
 

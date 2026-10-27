@@ -1,6 +1,5 @@
 package it.giovannidefilippo.gestionale.reporting;
 
-import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -12,6 +11,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
+import static it.giovannidefilippo.gestionale.support.SessionRequests.session;
+import static it.giovannidefilippo.gestionale.support.SessionRequests.sessionToken;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -26,9 +27,6 @@ class ReportingControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Test
     void reportEndpointsRequireAnAuthenticatedSession() throws Exception {
@@ -45,12 +43,12 @@ class ReportingControllerTest {
         registerCustomer(username);
         String token = login(username, "CustomerStrong123!", "CUSTOMER");
 
-        mockMvc.perform(get("/api/reports/sales").header("X-Session-Token", token))
+        mockMvc.perform(get("/api/reports/sales").with(session(token)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("AUTH_FORBIDDEN"));
         mockMvc.perform(get("/api/reports/inventory/export")
                         .param("format", "PDF")
-                        .header("X-Session-Token", token))
+                        .with(session(token)))
                 .andExpect(status().isForbidden());
     }
 
@@ -60,13 +58,13 @@ class ReportingControllerTest {
 
         mockMvc.perform(get("/api/reports/sales")
                         .param("status", "FULFILLED")
-                        .header("X-Session-Token", token))
+                        .with(session(token)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.orderCount").isNumber())
                 .andExpect(jsonPath("$.netCollectedAmount").isNumber())
                 .andExpect(jsonPath("$.topProducts").isArray());
 
-        mockMvc.perform(get("/api/reports/inventory").header("X-Session-Token", token))
+        mockMvc.perform(get("/api/reports/inventory").with(session(token)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.productCount").isNumber())
                 .andExpect(jsonPath("$.potentialRetailStockValue").isNumber())
@@ -88,7 +86,7 @@ class ReportingControllerTest {
 
         mockMvc.perform(get("/api/audit")
                         .param("q", "EXPORT_SALES_REPORT")
-                        .header("X-Session-Token", token))
+                        .with(session(token)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].action").value("EXPORT_SALES_REPORT"))
                 .andExpect(jsonPath("$.content[0].category").value("REPORT"))
@@ -98,7 +96,7 @@ class ReportingControllerTest {
     private MvcResult export(String token, String endpoint, String format, String contentType) throws Exception {
         return mockMvc.perform(get(endpoint)
                         .param("format", format)
-                        .header("X-Session-Token", token))
+                        .with(session(token)))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Type", org.hamcrest.Matchers.startsWith(contentType)))
                 .andExpect(header().string("Content-Disposition", org.hamcrest.Matchers.containsString("attachment")))
@@ -131,6 +129,6 @@ class ReportingControllerTest {
                                 """.formatted(username, password, role)))
                 .andExpect(status().isOk())
                 .andReturn();
-        return objectMapper.readTree(result.getResponse().getContentAsString()).path("token").asText();
+        return sessionToken(result);
     }
 }

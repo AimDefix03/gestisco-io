@@ -1,7 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   ApiRequestError,
-  clearSessionToken,
+  CSRF_COOKIE,
+  CSRF_HEADER,
+  markSessionActive,
+  markSessionEnded,
   fetchAllPages,
   parseDownloadFilename,
   request,
@@ -10,7 +13,6 @@ import {
   sanitizeFilename,
   saveDownloadedFile,
   SessionExpiredError,
-  setSessionToken,
   subscribeToSessionExpiration,
   toQueryString
 } from './httpClient';
@@ -26,21 +28,37 @@ function jsonResponse(payload: unknown, status = 200, headers: Record<string, st
 }
 
 afterEach(() => {
-  clearSessionToken();
+  markSessionEnded();
   vi.unstubAllGlobals();
 });
 
 describe('httpClient', () => {
-  it('propaga token di sessione e request id', async () => {
+  it('affida la sessione al cookie e non espone token di sessione negli header', async () => {
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ value: 'ok' }, 200, { 'X-Request-Id': 'response-id' }));
     vi.stubGlobal('fetch', fetchMock);
-    setSessionToken('session-token');
+    markSessionActive();
 
     await expect(request<{ value: string }>('/api/test')).resolves.toEqual({ value: 'ok' });
 
-    const headers = new Headers(fetchMock.mock.calls[0][1]?.headers);
-    expect(headers.get('X-Session-Token')).toBe('session-token');
+    const init = fetchMock.mock.calls[0][1];
+    const headers = new Headers(init?.headers);
+    expect(init?.credentials).toBe('same-origin');
+    expect(headers.has('X-Session-Token')).toBe(false);
     expect(headers.get('X-Request-Id')).toBeTruthy();
+  });
+
+  it('invia il token CSRF del cookie solo sui comandi che modificano dati', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ value: 'ok' }));
+    vi.stubGlobal('fetch', fetchMock);
+    vi.spyOn(document, 'cookie', 'get').mockReturnValue(`altro=1; ${CSRF_COOKIE}=csrf-123`);
+
+    await request('/api/products');
+    await request('/api/products', { method: 'POST', body: '{}' });
+    await request('/api/products/NB-1', { method: 'delete' });
+
+    expect(new Headers(fetchMock.mock.calls[0][1]?.headers).has(CSRF_HEADER)).toBe(false);
+    expect(new Headers(fetchMock.mock.calls[1][1]?.headers).get(CSRF_HEADER)).toBe('csrf-123');
+    expect(new Headers(fetchMock.mock.calls[2][1]?.headers).get(CSRF_HEADER)).toBe('csrf-123');
   });
 
   it('traduce un 401 in sessione scaduta conservando i dettagli', async () => {
@@ -66,7 +84,7 @@ describe('httpClient', () => {
     await request('/api/accounts/login', { method: 'POST' }).catch(() => undefined);
     expect(listener).not.toHaveBeenCalled();
 
-    setSessionToken('active-session');
+    markSessionActive();
     await request('/api/protected').catch(() => undefined);
     expect(listener).toHaveBeenCalledOnce();
     expect(listener.mock.calls[0][0]).toBeInstanceOf(SessionExpiredError);
@@ -168,13 +186,12 @@ describe('httpClient', () => {
     Object.assign(response, { blob: vi.fn().mockResolvedValue(blob) });
     const fetchMock = vi.fn().mockResolvedValue(response);
     vi.stubGlobal('fetch', fetchMock);
-    setSessionToken('report-token');
+    markSessionActive();
 
     await expect(requestBlob('/api/reports/sales/export?format=XLSX')).resolves.toEqual({ blob, filename: 'report-vendite.xlsx' });
 
-    const headers = new Headers(fetchMock.mock.calls[0][1]?.headers);
-    expect(headers.get('X-Session-Token')).toBe('report-token');
-    expect(headers.get('X-Request-Id')).toBeTruthy();
+    expect(fetchMock.mock.calls[0][1]?.credentials).toBe('same-origin');
+    expect(new Headers(fetchMock.mock.calls[0][1]?.headers).get('X-Request-Id')).toBeTruthy();
   });
 
   it('interpreta filename RFC 5987, quoted e fallback malformati senza accettare path', () => {

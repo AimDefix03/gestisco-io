@@ -10,7 +10,10 @@ type ApiError = {
   requestId?: string;
 };
 
-let sessionToken = '';
+export const CSRF_COOKIE = '__Host-gestionale_xsrf';
+export const CSRF_HEADER = 'X-XSRF-TOKEN';
+const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
+let sessionActive = false;
 const sessionExpiredListeners = new Set<(error: SessionExpiredError) => void>();
 const pendingIdempotencyIntents = new Map<string, IdempotencyIntent>();
 const idempotencyIntentTtlMs = 24 * 60 * 60 * 1000;
@@ -50,12 +53,13 @@ export class ApiRequestError extends Error {
   }
 }
 
-export function setSessionToken(token: string) {
-  sessionToken = token;
+/** Il token di sessione vive solo nel cookie HttpOnly: qui resta soltanto lo stato, per distinguere un 401 di sessione da uno pubblico. */
+export function markSessionActive() {
+  sessionActive = true;
 }
 
-export function clearSessionToken() {
-  sessionToken = '';
+export function markSessionEnded() {
+  sessionActive = false;
   clearPendingIdempotencyIntents();
 }
 
@@ -65,8 +69,8 @@ export function subscribeToSessionExpiration(listener: (error: SessionExpiredErr
 }
 
 export async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
-  const headers = requestHeaders(options.headers);
-  const response = await fetch(url, { ...options, headers });
+  const headers = requestHeaders(options);
+  const response = await fetch(url, { ...options, headers, credentials: 'same-origin' });
   await requireSuccess(response, headers);
 
   if (response.status === 204) return undefined as T;
@@ -74,8 +78,8 @@ export async function request<T>(url: string, options: RequestInit = {}): Promis
 }
 
 export async function requestBlob(url: string, options: RequestInit = {}): Promise<DownloadedFile> {
-  const headers = requestHeaders(options.headers);
-  const response = await fetch(url, { ...options, headers });
+  const headers = requestHeaders(options);
+  const response = await fetch(url, { ...options, headers, credentials: 'same-origin' });
   await requireSuccess(response, headers);
   return {
     blob: await response.blob(),
@@ -250,12 +254,19 @@ function canonicalize(value: unknown): unknown {
   );
 }
 
-function requestHeaders(initial?: HeadersInit): Headers {
-  const headers = new Headers(initial);
+function requestHeaders(options: RequestInit): Headers {
+  const headers = new Headers(options.headers);
   headers.set('Content-Type', 'application/json');
   headers.set('X-Request-Id', headers.get('X-Request-Id') ?? createRequestId());
-  if (sessionToken) headers.set('X-Session-Token', sessionToken);
+  const csrfToken = SAFE_METHODS.has((options.method ?? 'GET').toUpperCase()) ? null : readCookie(CSRF_COOKIE);
+  if (csrfToken) headers.set(CSRF_HEADER, csrfToken);
   return headers;
+}
+
+function readCookie(name: string): string | null {
+  const prefix = `${name}=`;
+  const entry = document.cookie.split('; ').find((cookie) => cookie.startsWith(prefix));
+  return entry ? decodeURIComponent(entry.slice(prefix.length)) : null;
 }
 
 async function requireSuccess(response: Response, requestHeaders: Headers): Promise<void> {
@@ -270,7 +281,7 @@ async function requireSuccess(response: Response, requestHeaders: Headers): Prom
     sessionError.code = error?.code ?? 'AUTH_UNAUTHORIZED';
     sessionError.details = details;
     sessionError.requestId = requestId;
-    if (sessionToken) {
+    if (sessionActive) {
       sessionExpiredListeners.forEach((listener) => listener(sessionError));
     }
     throw sessionError;

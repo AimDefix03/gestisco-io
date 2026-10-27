@@ -10,6 +10,7 @@ vi.mock('../../api', async (importOriginal) => {
   return {
     ...actual,
     changeOwnPassword: vi.fn(),
+    fetchCurrentSession: vi.fn().mockResolvedValue(null),
     login: vi.fn(),
     logoutSession: vi.fn(),
     register: vi.fn(),
@@ -28,7 +29,7 @@ const account = {
   disabledBy: null,
   disabledReason: null
 };
-const session = { user: account, token: 'session-token', expiresAt: new Date(Date.now() + 3600000).toISOString() };
+const session = { user: account, expiresAt: new Date(Date.now() + 3600000).toISOString() };
 const loginMock = vi.mocked(login);
 const registerMock = vi.mocked(register);
 const renewSessionMock = vi.mocked(renewSession);
@@ -95,7 +96,7 @@ describe('useSessionFlow', () => {
     act(() => result.current.setAuthForm({ username: 'superadmin', password: 'Secret123!' }));
     await act(async () => result.current.submitAuthentication(submitEvent()));
     renewSessionMock.mockRejectedValue(new SessionExpiredError('Token scaduto.'));
-    loginMock.mockResolvedValue({ ...session, token: 'rotated-token' });
+    loginMock.mockResolvedValue({ ...session, expiresAt: new Date(Date.now() + 7200000).toISOString() });
 
     act(() => result.current.setSessionPassword('Secret123!'));
     await act(async () => result.current.submitRenewal(submitEvent()));

@@ -19,6 +19,37 @@ const account = {
 afterEach(() => vi.unstubAllGlobals());
 
 describe('SessionProvider', () => {
+  it('ripristina la sessione del cookie dopo una ricarica senza chiedere il login', async () => {
+    const expiresAt = new Date(Date.now() + 3600000).toISOString();
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: new Headers(),
+      json: vi.fn().mockResolvedValue({ user: account, expiresAt })
+    } as unknown as Response);
+    vi.stubGlobal('fetch', fetchMock);
+    render(<SessionProvider><Harness /></SessionProvider>);
+
+    expect(screen.getByText('Ripristino in corso')).toBeInTheDocument();
+    expect(await screen.findByText('Utente superadmin')).toBeInTheDocument();
+    expect(fetchMock.mock.calls[0][0]).toBe('/api/accounts/session');
+    expect(screen.queryByText('Ripristino in corso')).not.toBeInTheDocument();
+  });
+
+  it('mostra l accesso quando il cookie manca o e scaduto, senza aprire il rinnovo', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      status: 204,
+      headers: new Headers(),
+      json: vi.fn().mockRejectedValue(new SyntaxError('Unexpected end of JSON input'))
+    } as unknown as Response));
+    render(<SessionProvider><Harness /></SessionProvider>);
+
+    await waitFor(() => expect(screen.queryByText('Ripristino in corso')).not.toBeInTheDocument());
+    expect(screen.queryByText(/^Utente /)).not.toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
   it('apre una sola gestione centralizzata della sessione sui 401 autenticati', async () => {
     const user = userEvent.setup();
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
@@ -63,9 +94,11 @@ function Harness({ expiresAt = new Date(Date.now() + 3600000).toISOString() }: {
   const session = useSession();
   return (
     <div>
-      <button onClick={() => session.startSession({ user: account, token: 'token', expiresAt })}>Avvia sessione</button>
+      <button onClick={() => session.startSession({ user: account, expiresAt })}>Avvia sessione</button>
       <button onClick={() => void request('/api/protected').catch(() => undefined)}>Richiesta protetta</button>
       {session.renewalMessage && <div role="alert">{session.renewalMessage}</div>}
+      {session.restoring && <p>Ripristino in corso</p>}
+      {session.currentUser && <p>Utente {session.currentUser.username}</p>}
     </div>
   );
 }

@@ -338,7 +338,6 @@ export type UserAccount = {
 
 export type AuthSession = {
   user: UserAccount;
-  token: string;
   expiresAt: string;
 };
 

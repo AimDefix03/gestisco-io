@@ -4,8 +4,8 @@ Stato corrente del progetto. I resoconti dettagliati fino al 2026-10-24 (step 0.
 
 ## Stato generale
 
-- Current step: P1.5 indirizzi per pagina (in review)
-- Next eligible step: P1.6 sessione persistente sicura, dopo la decisione dell'utente sulla nuova ADR; poi P1.2 ridotto e gate G1
+- Current step: P1.5 indirizzi per pagina (#44) e P1.6 sessione persistente sicura (#45), in review
+- Next eligible step: P1.2 ridotto (attributi di prodotto testuali e a elenco), poi gate G1
 - Last completed step: P1.4 IVA per prodotto e per riga (#41, `78f7c0f`)
 - Last update: 2026-10-27
 - Roadmap: [ROADMAP_PRODOTTO.md](docs/ROADMAP_PRODOTTO.md), fasi P0-P11 e gate G1-G7 ([ADR 0008](docs/DECISIONS/0008-product-direction-generalist-core-apparel-pilot.md)). Storico master: 32/48 step; nessuno dei due conteggi misura la prontezza alla vendita.
@@ -30,11 +30,13 @@ Stato corrente del progetto. I resoconti dettagliati fino al 2026-10-24 (step 0.
 | P1.3 Codici a barre e unita di misura | COMPLETED | #40 | V37, verifica EAN, ricerca per codice |
 | P1.4 IVA per prodotto e per riga | COMPLETED | #41 | V38, aliquote, riepilogo IVA per documento |
 | P1.5 Indirizzi per pagina | IN REVIEW | #44 | Router su History API, dettagli ordini, acquisti e inventari |
-| P1.6, P1.2 ridotto | PENDING | - | Gate G1 |
+| P1.6 Sessione persistente sicura | IN REVIEW | #45 | ADR 0009, cookie `HttpOnly` e CSRF double-submit, stack di verifica in HTTPS |
+| P1.2 ridotto | PENDING | - | Gate G1 |
 | P2 - P11 | PENDING | - | Vedere roadmap di prodotto |
 
 ## Decisioni approvate
 
+- 2026-10-27, P1.6 (ADR 0009): CSRF double-submit di Spring Security, cookie di sessione fino alla chiusura del browser, header `X-Session-Token` rimosso del tutto; stack E2E e prod-like serviti in HTTPS con certificato autofirmato per runner, perche WebKit rifiuta i cookie `Secure` su HTTP.
 - 2026-10-26, P1.4: prezzi IVA inclusa; scorporo una volta per aliquota con arrotondamento `HALF_UP` al centesimo, provvisorio fino alla conferma del consulente in P8; sconto per riga spostato a P3.2.
 - 2026-10-24, ADR 0008: gestionale generalista per il commercio al dettaglio, segmento pilota abbigliamento e calzature, istanza dedicata per cliente, prodotto completo e non beta; obiettivo dell'utente 2-3 mesi.
 - 2026-10-24: autorizzazione permanente a commit, push di branch dedicate e PR per gli step della roadmap di prodotto; merge sempre all'utente.
@@ -66,6 +68,7 @@ Una riga per step o evento rilevante, dal piu recente.
 
 | Data | Step | PR / commit | Esito |
 |---|---|---|---|
+| 2026-10-27 | P1.6 Sessione persistente sicura | #45 | Backend 355/355 (+8 `BrowserSessionCookieSecurityTest`), frontend 237/237 (+3), E2E locale 21/21 in HTTPS su Chromium, Firefox e WebKit; verifiche per mutazione su CSRF e rotazione del token; R-024 mitigato |
 | 2026-10-27 | P1.5 Indirizzi per pagina | #44 | Frontend 234/234 (+18: indirizzi, cronologia, controllo bozze sul tasto indietro, sincronizzazione dei dettagli), verifica per mutazione sul controllo bozze; E2E locale 21/21 sullo stack isolato con il nuovo `navigation.spec.ts` |
 | 2026-10-27 | Patch Maven (Dependabot #37, #38, #39) | #43 | Spring Boot 4.1.2, surefire 3.6.1, Modulith 2.1.2; backend 347/347 |
 | 2026-10-26 | Checkout fuori da iCloud Drive | #42 | Copia integrale con `.git` in `/Users/aim_defix/Developer/Gestisco.IO` (64 ref identiche, fsck pulito); build locale dalla nuova cartella: frontend 213/213, backend 341/341; copia sulla Scrivania conservata come riserva |

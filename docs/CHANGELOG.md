@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-27 - Sessione persistente sicura (P1.6)
+
+- La sessione del browser passa in un cookie `HttpOnly`, `Secure`, `SameSite=Strict` con prefisso `__Host-`, che dura fino alla chiusura del browser: ricaricare la pagina o aprire un link non richiede piu il login e il token non e piu leggibile da JavaScript. Protezione CSRF double-submit su ogni richiesta che modifica dati, nuovo endpoint `GET /api/accounts/session`, header `X-Session-Token` rimosso. ADR 0009 sostituisce l'ADR 0004; R-024 mitigato.
+
 ## 2026-10-27 - Indirizzi per pagina (P1.5)
 
 - Ogni sezione del workspace ha un indirizzo proprio e i dettagli di ordini cliente, ordini fornitore e inventari fisici hanno un indirizzo di dettaglio; tasti indietro e avanti, preferiti e link diretti funzionano, e dopo una ricarica il login riapre la pagina richiesta. Il tasto indietro chiede conferma come il cambio di scheda quando ci sono bozze; indirizzi sconosciuti o non consentiti mostrano uno stato dedicato.

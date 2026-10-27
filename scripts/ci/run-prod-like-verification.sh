@@ -6,9 +6,11 @@ COMPOSE_FILE="$ROOT_DIR/docker-compose.prod-like.yml"
 SECRETS_COMPOSE_FILE="$ROOT_DIR/docker-compose.secrets.yml"
 BOOTSTRAP_SECRET_COMPOSE_FILE="$ROOT_DIR/docker-compose.bootstrap-secret.yml"
 RUN_LABELS_COMPOSE_FILE="$ROOT_DIR/docker-compose.run-labels.yml"
+TLS_COMPOSE_FILE="$ROOT_DIR/docker-compose.e2e-tls.yml"
 PROJECT_PREFIX=gestionale-prodlike-
 
 . "$ROOT_DIR/scripts/ci/docker-run-safety.sh"
+. "$ROOT_DIR/scripts/ci/frontend-tls.sh"
 
 for command in docker openssl curl npm; do
   command -v "$command" >/dev/null 2>&1 || {
@@ -44,6 +46,7 @@ printf '%s' "$DATABASE_RUNTIME_PASSWORD" >"$SECRET_DIR/database-runtime-password
 printf '%s' "$DATABASE_BACKUP_PASSWORD" >"$SECRET_DIR/database-backup-password"
 printf '%s' "$DATABASE_RESTORE_PASSWORD" >"$SECRET_DIR/database-restore-password"
 printf '%s' "$BOOTSTRAP_PASSWORD" >"$SECRET_DIR/bootstrap-password"
+frontend_tls_prepare "$SECRET_DIR"
 chmod 0444 "$SECRET_DIR"/*
 
 if [ -n "${GITHUB_ACTIONS:-}" ]; then
@@ -97,7 +100,7 @@ export BACKUP_VERIFY_POSTGRES_PORT=${PRODLIKE_BACKUP_VERIFY_POSTGRES_PORT:-55433
 export RESTORE_DRILL_POSTGRES_PORT=${PRODLIKE_RESTORE_DRILL_POSTGRES_PORT:-55435}
 export E2E_USERNAME=$GESTIONALE_BOOTSTRAP_SUPER_ADMIN_USERNAME
 export E2E_PASSWORD=$BOOTSTRAP_PASSWORD
-export PLAYWRIGHT_BASE_URL="http://127.0.0.1:$GESTIONALE_FRONTEND_PORT"
+export PLAYWRIGHT_BASE_URL="https://127.0.0.1:$GESTIONALE_FRONTEND_PORT"
 
 compose() {
   docker compose \
@@ -106,6 +109,7 @@ compose() {
     -f "$SECRETS_COMPOSE_FILE" \
     -f "$BOOTSTRAP_SECRET_COMPOSE_FILE" \
     -f "$RUN_LABELS_COMPOSE_FILE" \
+    -f "$TLS_COMPOSE_FILE" \
     --profile observability \
     "$@"
 }

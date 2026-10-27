@@ -4,9 +4,11 @@ import it.giovannidefilippo.gestionale.common.PageResponse;
 import it.giovannidefilippo.gestionale.idempotency.IdempotencyService;
 import it.giovannidefilippo.gestionale.user.AuthSessionService;
 import it.giovannidefilippo.gestionale.user.AuthenticatedUser;
+import it.giovannidefilippo.gestionale.user.SessionCookies;
 import it.giovannidefilippo.gestionale.user.UserPermission;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,7 +34,7 @@ class SupplierOrderController {
 
     @GetMapping
     PageResponse<SupplierOrderSummaryResponse> search(
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "25") int size,
             @RequestParam(required = false) String q,
@@ -44,7 +46,7 @@ class SupplierOrderController {
     }
 
     @GetMapping("/{code}")
-    SupplierOrderResponse findByCode(@PathVariable String code, @RequestHeader(value = "X-Session-Token", required = false) String token) {
+    SupplierOrderResponse findByCode(@PathVariable String code, @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.VIEW_PURCHASE_ORDERS);
         return service.findByCode(code, actor);
     }
@@ -53,7 +55,7 @@ class SupplierOrderController {
     @ResponseStatus(HttpStatus.CREATED)
     SupplierOrderResponse create(
             @Valid @RequestBody SupplierOrderRequests.CreateRequest request,
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestHeader(value = IdempotencyService.HEADER_NAME, required = false) String idempotencyKey
     ) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.MANAGE_PURCHASE_ORDERS);
@@ -63,7 +65,7 @@ class SupplierOrderController {
     @PostMapping("/{code}/send")
     SupplierOrderResponse send(
             @PathVariable String code,
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestHeader(value = IdempotencyService.HEADER_NAME, required = false) String idempotencyKey
     ) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.MANAGE_PURCHASE_ORDERS);
@@ -74,7 +76,7 @@ class SupplierOrderController {
     SupplierOrderResponse receive(
             @PathVariable String code,
             @Valid @RequestBody SupplierOrderRequests.ReceiveRequest request,
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestHeader(value = IdempotencyService.HEADER_NAME, required = false) String idempotencyKey
     ) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.MANAGE_PURCHASE_ORDERS);
@@ -85,7 +87,7 @@ class SupplierOrderController {
     SupplierOrderResponse cancel(
             @PathVariable String code,
             @Valid @RequestBody SupplierOrderRequests.CancelRequest request,
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestHeader(value = IdempotencyService.HEADER_NAME, required = false) String idempotencyKey
     ) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.MANAGE_PURCHASE_ORDERS);

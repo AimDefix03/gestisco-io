@@ -1,6 +1,5 @@
 package it.giovannidefilippo.gestionale.inventory;
 
-import tools.jackson.databind.ObjectMapper;
 import it.giovannidefilippo.gestionale.common.PostgreSqlIntegrationTestSupport;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -9,9 +8,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.UUID;
 
+import static it.giovannidefilippo.gestionale.support.SessionRequests.session;
+import static it.giovannidefilippo.gestionale.support.SessionRequests.sessionToken;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -26,12 +28,10 @@ class InventoryLedgerControllerTest extends PostgreSqlIntegrationTestSupport {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     @Test
     void ledgerCommandsRequireAnAuthenticatedInventoryOperator() throws Exception {
         mockMvc.perform(post("/api/inventory/initial-balance")
+                        .with(session(null))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"productCode":"UNAUTHORIZED","quantity":1,"reason":"Non autorizzato"}
@@ -48,14 +48,14 @@ class InventoryLedgerControllerTest extends PostgreSqlIntegrationTestSupport {
         String code = "API-LED-" + UUID.randomUUID().toString().substring(0, 8);
 
         mockMvc.perform(post("/api/products")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(productJson(code, "Prodotto ledger", 99)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.quantity").value(0));
 
         mockMvc.perform(post("/api/inventory/adjustments")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"productCode":"%s","delta":1,"reason":"Rettifica prematura"}
@@ -63,7 +63,7 @@ class InventoryLedgerControllerTest extends PostgreSqlIntegrationTestSupport {
                 .andExpect(status().isConflict());
 
         mockMvc.perform(post("/api/inventory/initial-balance")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"productCode":"%s","quantity":5,"reason":"Inventario iniziale"}
@@ -74,7 +74,7 @@ class InventoryLedgerControllerTest extends PostgreSqlIntegrationTestSupport {
                 .andExpect(jsonPath("$.newQuantity").value(5));
 
         mockMvc.perform(post("/api/inventory/adjustments")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"productCode":"%s","delta":-2,"reason":"Rettifica inventario"}
@@ -83,7 +83,7 @@ class InventoryLedgerControllerTest extends PostgreSqlIntegrationTestSupport {
                 .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("sessione di conteggio approvata")));
 
         mockMvc.perform(put("/api/products/{code}", code)
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(productJson(code, "Prodotto rinominato", 500)))
                 .andExpect(status().isOk())
@@ -91,13 +91,13 @@ class InventoryLedgerControllerTest extends PostgreSqlIntegrationTestSupport {
                 .andExpect(jsonPath("$.quantity").value(5));
 
         mockMvc.perform(get("/api/inventory/reconciliation")
-                        .header("X-Session-Token", token))
+                        .with(session(token)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.items[?(@.productCode == '%s')].status".formatted(code)).value(hasItem("BALANCED")));
     }
 
     private String login() throws Exception {
-        String response = mockMvc.perform(post("/api/accounts/login")
+        MvcResult response = mockMvc.perform(post("/api/accounts/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -107,10 +107,8 @@ class InventoryLedgerControllerTest extends PostgreSqlIntegrationTestSupport {
                                 }
                                 """))
                 .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        return objectMapper.readTree(response).path("token").asText();
+                .andReturn();
+        return sessionToken(response);
     }
 
     private String productJson(String code, String name, int ignoredQuantity) {

@@ -100,6 +100,17 @@ public class AuthSessionService {
 
     @Transactional(noRollbackFor = UnauthorizedException.class)
     public AuthenticatedUser require(String token) {
+        UserAccount account = requireActiveSession(token).getAccount();
+        return new AuthenticatedUser(account.getId(), account.getUsername(), account.getRole());
+    }
+
+    @Transactional(noRollbackFor = UnauthorizedException.class)
+    public SessionResponse current(String token) {
+        AuthSession session = requireActiveSession(token);
+        return new SessionResponse(UserResponse.from(session.getAccount()), session.getExpiresAt());
+    }
+
+    private AuthSession requireActiveSession(String token) {
         String normalizedToken = normalizeToken(token);
         AuthSession session = sessionRepository.findByTokenHashForUpdate(tokenHash(normalizedToken))
                 .orElse(null);
@@ -107,11 +118,11 @@ public class AuthSessionService {
             throw new UnauthorizedException("Sessione non valida. Effettua di nuovo il login.");
         }
         Instant now = timeProvider.instant();
-        UserAccount account = validate(session, now);
+        validate(session, now);
         if (!session.getLastUsedAt().plus(touchInterval).isAfter(now)) {
             session.touch(now);
         }
-        return new AuthenticatedUser(account.getId(), account.getUsername(), account.getRole());
+        return session;
     }
 
     public AuthenticatedUser requireManageOperations(String token) {

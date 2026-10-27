@@ -8,6 +8,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.UUID;
 
+import static it.giovannidefilippo.gestionale.support.SessionRequests.session;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -45,21 +46,21 @@ class AccountSecurityReviewControllerTest {
         String adminToken = token(admin, "AdminSecure123!", UserRole.ADMIN);
 
         mockMvc.perform(get("/api/accounts/security-review")
-                        .header("X-Session-Token", adminToken))
+                        .with(session(adminToken)))
                 .andExpect(status().isForbidden());
 
         mockMvc.perform(get("/api/accounts/security-review")
-                        .header("X-Session-Token", rootToken))
+                        .with(session(rootToken)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accounts[?(@.username == '" + employee + "')].classification")
                         .value("SUSPICIOUS_OPERATIONAL"));
 
         mockMvc.perform(post("/api/accounts/security-review/{username}/verify", employee)
-                        .header("X-Session-Token", rootToken))
+                        .with(session(rootToken)))
                 .andExpect(status().isBadRequest());
 
         mockMvc.perform(post("/api/accounts/security-review/{username}/verify", employee)
-                        .header("X-Session-Token", rootToken)
+                        .with(session(rootToken))
                         .header("X-Reauth-Password", rootPassword))
                 .andExpect(status().isNoContent());
     }

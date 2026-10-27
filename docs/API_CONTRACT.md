@@ -62,24 +62,26 @@ Regole:
 ## Sessioni
 
 - `POST /api/accounts/login` accetta soltanto `username` e `password`; ruolo e permessi sono derivati dall'account autorevole lato server.
-- Il login restituisce un token da inviare con header `X-Session-Token`.
+- Il login imposta il cookie di sessione `__Host-gestionale_session` (`HttpOnly`, `Secure`, `SameSite=Strict`, `Path=/`, senza scadenza lato browser) e il cookie CSRF `__Host-gestionale_xsrf`; il corpo contiene `user` ed `expiresAt`, mai il token ([ADR 0009](DECISIONS/0009-browser-session-cookie-and-csrf.md)).
+- L'header `X-Session-Token` non e piu accettato: una richiesta che lo usa al posto del cookie riceve `AUTH_UNAUTHORIZED`.
+- `GET /api/accounts/session` restituisce `user` ed `expiresAt` della sessione del cookie, con `no-store`, ed emette il cookie CSRF se manca: il frontend lo usa per ripristinare la sessione dopo una ricarica.
+- Ogni richiesta diversa da `GET`, `HEAD` e `OPTIONS` deve inviare nell'header `X-XSRF-TOKEN` il valore del cookie `__Host-gestionale_xsrf`; altrimenti risponde `403 AUTH_CSRF_INVALID`, anche prima del controllo di sessione. Sono esenti solo login, registrazione e verifica della password, che precedono la sessione e accettano solo JSON. Il token CSRF ruota a login e rinnovo, non a ogni richiesta.
 - Il backend conserva solo l'hash del token nella tabella `auth_sessions`.
 - Ogni sessione identifica l'account tramite il suo ID database stabile; lo username e conservato soltanto come snapshot diagnostico e non viene usato come subject autorizzativo.
 - La sessione conserva la versione delle credenziali dell'account. Cambio password o ruolo incrementano tale versione e revocano tutte le sessioni emesse in precedenza.
 - Disabilitare un account incrementa la versione credenziali e revoca tutte le sessioni; lo username resta riservato e non puo essere riutilizzato.
 - Logout, rinnovo e aggiornamento dell'ultima attivita serializzano l'accesso alla riga di sessione: una revoca concorrente prevale sempre sul touch.
 - La durata assoluta standard della sessione e 45 minuti e il timeout di inattivita standard e 30 minuti.
-- `POST /api/accounts/session/renew` richiede sessione valida e password dell'account autenticato; la risposta ha lo stesso formato del login.
+- `POST /api/accounts/session/renew` richiede sessione valida e password dell'account autenticato; la risposta ha lo stesso formato del login e imposta nuovi cookie di sessione e CSRF.
 - Il rinnovo ruota il token: il token precedente viene revocato nella stessa transazione e non puo essere riutilizzato.
 - Se il token e gia scaduto o inattivo, il rinnovo autenticato viene rifiutato e il client deve eseguire un nuovo login.
 - Login e rinnovo restituiscono `Cache-Control: no-store` e `Pragma: no-cache`.
-- Il logout revoca la sessione salvando `revoked_at`.
+- Il logout revoca la sessione salvando `revoked_at` e scade entrambi i cookie (`Max-Age=0`); lo stesso avviene dopo il cambio della propria password e quando il server rifiuta un cookie di sessione non valido.
 - Se l'account e disabilitato, non esiste oppure la sessione e scaduta/revocata, gli endpoint protetti restituiscono `AUTH_UNAUTHORIZED` senza rivelare lo stato dell'account.
 - Dopo disabilitazione, modifica password, reset amministrativo o cambio ruolo, tutti i token precedenti restituiscono `AUTH_UNAUTHORIZED`; e necessario un nuovo login dopo l'eventuale riabilitazione.
 - Se un account operativo storico e in attesa di revisione, ogni sua sessione viene revocata e gli endpoint protetti restituiscono `AUTH_UNAUTHORIZED`; la revoca viene confermata anche quando la richiesta termina con `401`.
 - Il token non deve comparire in log, errori o dettagli diagnostici.
-- Il frontend conserva il token solo in memoria e non usa cookie di autenticazione, `localStorage` o `sessionStorage`.
-- CSRF resta disabilitato per questo contratto basato su header non ambientale; un passaggio a cookie HttpOnly richiede una migrazione atomica con protezione CSRF.
+- Il frontend non vede il token: non lo riceve nel corpo, non puo leggere il cookie `HttpOnly` e non usa `localStorage` o `sessionStorage` per la sessione.
 - I tentativi login falliti vengono persistiti in `login_attempts`.
 - Dopo 5 tentativi falliti per la stessa identita canonica, il login viene bloccato temporaneamente per 5 minuti; il lockout non disabilita permanentemente l'account.
 - Un job programmato elimina sessioni obsolete, lock scaduti e tentativi falliti non piu rilevanti.

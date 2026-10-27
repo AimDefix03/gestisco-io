@@ -12,6 +12,8 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.UUID;
 
+import static it.giovannidefilippo.gestionale.support.SessionRequests.session;
+import static it.giovannidefilippo.gestionale.support.SessionRequests.sessionToken;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -46,12 +48,12 @@ class ProductCategoryControllerTest {
                 .andExpect(jsonPath("$.parentCode").value(root))
                 .andExpect(jsonPath("$.depth").value(2));
 
-        mockMvc.perform(get("/api/product-categories").header("X-Session-Token", employee))
+        mockMvc.perform(get("/api/product-categories").with(session(employee)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[*].code", hasItem(child)))
                 .andExpect(jsonPath("$[*].code", hasItem("HARDWARE")));
 
-        mockMvc.perform(get("/api/audit").header("X-Session-Token", login("test_super_admin", SUPER_ADMIN_PASSWORD, "SUPER_ADMIN")).param("q", child))
+        mockMvc.perform(get("/api/audit").with(session(login("test_super_admin", SUPER_ADMIN_PASSWORD, "SUPER_ADMIN"))).param("q", child))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].action").value("CREATE_PRODUCT_CATEGORY"));
     }
@@ -103,7 +105,7 @@ class ProductCategoryControllerTest {
         updateCategory(employee, level2, level2, "Livello " + level2, other, null)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.path").value("Altra radice " + other + " / Livello " + level2));
-        mockMvc.perform(get("/api/product-categories").header("X-Session-Token", employee))
+        mockMvc.perform(get("/api/product-categories").with(session(employee)))
                 .andExpect(jsonPath("$[?(@.code == '" + level3 + "')].path").value(hasItem("Altra radice " + other + " / Livello " + level2 + " / Livello " + level3)));
     }
 
@@ -134,17 +136,17 @@ class ProductCategoryControllerTest {
         createProduct(superAdmin, unique("PRD-MISSING"), unique("NESSUNA"))
                 .andExpect(status().isBadRequest());
         mockMvc.perform(put("/api/products/" + existingProduct)
-                        .header("X-Session-Token", superAdmin)
+                        .with(session(superAdmin))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(productJson(existingProduct, child, "Costume rinominato")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.category").value(child));
 
-        mockMvc.perform(get("/api/product-categories").header("X-Session-Token", employee).param("includeInactive", "true"))
+        mockMvc.perform(get("/api/product-categories").with(session(employee)).param("includeInactive", "true"))
                 .andExpect(jsonPath("$[*].code", hasItem(child)));
-        mockMvc.perform(get("/api/product-categories").header("X-Session-Token", employee))
+        mockMvc.perform(get("/api/product-categories").with(session(employee)))
                 .andExpect(jsonPath("$[*].code", not(hasItem(child))));
-        mockMvc.perform(get("/api/product-categories").header("X-Session-Token", customer).param("includeInactive", "true"))
+        mockMvc.perform(get("/api/product-categories").with(session(customer)).param("includeInactive", "true"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[*].code", not(hasItem(child))));
     }
@@ -164,14 +166,14 @@ class ProductCategoryControllerTest {
                 .andExpect(jsonPath("$.categoryName").value("Donna " + parent + " / Gonne"));
         createProduct(superAdmin, inSibling, sibling).andExpect(status().isCreated());
 
-        mockMvc.perform(get("/api/products").header("X-Session-Token", superAdmin).param("category", parent).param("size", "100"))
+        mockMvc.perform(get("/api/products").with(session(superAdmin)).param("category", parent).param("size", "100"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[*].code", hasItem(inChild)))
                 .andExpect(jsonPath("$.content[*].code", not(hasItem(inSibling))));
-        mockMvc.perform(get("/api/products").header("X-Session-Token", superAdmin).param("category", unique("INESISTENTE")))
+        mockMvc.perform(get("/api/products").with(session(superAdmin)).param("category", unique("INESISTENTE")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isEmpty());
-        mockMvc.perform(get("/api/reports/inventory").header("X-Session-Token", superAdmin).param("category", parent))
+        mockMvc.perform(get("/api/reports/inventory").with(session(superAdmin)).param("category", parent))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.products[0].code").value(inChild))
                 .andExpect(jsonPath("$.products[0].categoryLabel").value("Donna " + parent + " / Gonne"));
@@ -182,21 +184,21 @@ class ProductCategoryControllerTest {
         String customer = registerAndLoginCustomer();
 
         mockMvc.perform(get("/api/product-categories")).andExpect(status().isUnauthorized());
-        mockMvc.perform(get("/api/product-categories").header("X-Session-Token", customer)).andExpect(status().isOk());
+        mockMvc.perform(get("/api/product-categories").with(session(customer))).andExpect(status().isOk());
         saveCategory(customer, unique("CLIENTE"), "Non consentita", null, null).andExpect(status().isForbidden());
         updateCategory(customer, "HARDWARE", "HARDWARE", "Hardware", null, false).andExpect(status().isForbidden());
     }
 
     private ResultActions saveCategory(String token, String code, String name, String parentCode, Boolean active) throws Exception {
         return mockMvc.perform(post("/api/product-categories")
-                .header("X-Session-Token", token)
+                .with(session(token))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(categoryJson(code, name, parentCode, active)));
     }
 
     private ResultActions updateCategory(String token, String path, String code, String name, String parentCode, Boolean active) throws Exception {
         return mockMvc.perform(put("/api/product-categories/" + path)
-                .header("X-Session-Token", token)
+                .with(session(token))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(categoryJson(code, name, parentCode, active)));
     }
@@ -212,7 +214,7 @@ class ProductCategoryControllerTest {
 
     private ResultActions createProduct(String token, String code, String category) throws Exception {
         return mockMvc.perform(post("/api/products")
-                .header("X-Session-Token", token)
+                .with(session(token))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(productJson(code, category, "Prodotto categoria")));
     }
@@ -256,7 +258,7 @@ class ProductCategoryControllerTest {
         String username = role.toLowerCase() + "_category_" + UUID.randomUUID().toString().replace("-", "").substring(0, 10);
         String password = "StaffStrong123!";
         mockMvc.perform(post("/api/accounts")
-                        .header("X-Session-Token", superAdminToken)
+                        .with(session(superAdminToken))
                         .header("X-Reauth-Password", SUPER_ADMIN_PASSWORD)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -282,6 +284,6 @@ class ProductCategoryControllerTest {
                                 """.formatted(username, password, role)))
                 .andExpect(status().isOk())
                 .andReturn();
-        return objectMapper.readTree(result.getResponse().getContentAsString()).path("token").asText();
+        return sessionToken(result);
     }
 }

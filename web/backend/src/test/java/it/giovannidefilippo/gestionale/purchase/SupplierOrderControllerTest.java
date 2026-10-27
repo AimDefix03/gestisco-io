@@ -16,6 +16,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import static it.giovannidefilippo.gestionale.support.SessionRequests.session;
+import static it.giovannidefilippo.gestionale.support.SessionRequests.sessionToken;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -57,7 +59,7 @@ class SupplierOrderControllerTest {
                                 """.formatted(customerUsername, customerPassword)))
                 .andExpect(status().isCreated());
         String customerToken = login(customerUsername, customerPassword, "CUSTOMER");
-        mockMvc.perform(get("/api/purchase-orders").header("X-Session-Token", customerToken))
+        mockMvc.perform(get("/api/purchase-orders").with(session(customerToken)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("AUTH_FORBIDDEN"));
     }
@@ -77,7 +79,7 @@ class SupplierOrderControllerTest {
         String code = created.path("code").asText();
 
         MvcResult sentResult = mockMvc.perform(post("/api/purchase-orders/" + code + "/send")
-                        .header("X-Session-Token", employeeToken)
+                        .with(session(employeeToken))
                         .header("Idempotency-Key", "send-" + suffix))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("SENT"))
@@ -103,7 +105,7 @@ class SupplierOrderControllerTest {
 
     private JsonNode createPurchase(String token, String key, String payload) throws Exception {
         MvcResult result = mockMvc.perform(post("/api/purchase-orders")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .header("Idempotency-Key", key)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
@@ -114,7 +116,7 @@ class SupplierOrderControllerTest {
 
     private JsonNode receive(String token, String code, String key, String payload) throws Exception {
         MvcResult result = mockMvc.perform(post("/api/purchase-orders/" + code + "/receipts")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .header("Idempotency-Key", key)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
@@ -125,7 +127,7 @@ class SupplierOrderControllerTest {
 
     private long createSupplier(String token, String code) throws Exception {
         MvcResult result = mockMvc.perform(post("/api/partners")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"code":"%s","type":"SUPPLIER","displayName":"Fornitore %s","taxCode":"","vatNumber":"IT12345678901","email":"supplier@example.com","phone":"","address":"Via Test 1","city":"Napoli","notes":""}
@@ -137,7 +139,7 @@ class SupplierOrderControllerTest {
 
     private void createProduct(String token, String code) throws Exception {
         mockMvc.perform(post("/api/products")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"code":"%s","name":"Prodotto acquisto","description":"Prodotto per test API ordini fornitore.","category":"HARDWARE","brand":"Test","productType":"Componente","usageContext":"","price":100.00,"discount":0.00}
@@ -159,6 +161,6 @@ class SupplierOrderControllerTest {
                                 """.formatted(username, password, role)))
                 .andExpect(status().isOk())
                 .andReturn();
-        return objectMapper.readTree(result.getResponse().getContentAsString()).path("token").asText();
+        return sessionToken(result);
     }
 }

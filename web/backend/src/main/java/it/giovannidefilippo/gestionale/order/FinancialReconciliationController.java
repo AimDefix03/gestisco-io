@@ -1,9 +1,10 @@
 package it.giovannidefilippo.gestionale.order;
 
 import it.giovannidefilippo.gestionale.user.AuthSessionService;
+import it.giovannidefilippo.gestionale.user.SessionCookies;
 import it.giovannidefilippo.gestionale.user.UserPermission;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,7 +21,7 @@ class FinancialReconciliationController {
 
     @GetMapping
     FinancialReconciliationResponse reconcile(
-            @RequestHeader(value = "X-Session-Token", required = false) String token
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token
     ) {
         authSessionService.requirePermission(token, UserPermission.VIEW_REPORTS);
         return service.reconcile();

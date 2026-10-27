@@ -3,9 +3,11 @@ package it.giovannidefilippo.gestionale.product;
 import it.giovannidefilippo.gestionale.common.PageResponse;
 import it.giovannidefilippo.gestionale.user.AuthSessionService;
 import it.giovannidefilippo.gestionale.user.AuthenticatedUser;
+import it.giovannidefilippo.gestionale.user.SessionCookies;
 import it.giovannidefilippo.gestionale.user.UserPermission;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,7 +16,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,7 +34,7 @@ class ProductController {
 
     @GetMapping
     PageResponse<ProductResponse> findAll(
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "25") int size,
             @RequestParam(required = false) String q,
@@ -48,46 +49,46 @@ class ProductController {
     }
 
     @GetMapping("/lookup")
-    List<ProductLookupResponse> lookup(@RequestHeader(value = "X-Session-Token", required = false) String token) {
+    List<ProductLookupResponse> lookup(@CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token) {
         authSessionService.requirePermission(token, UserPermission.MANAGE_INVENTORY);
         return service.lookup();
     }
 
     @GetMapping("/{code}")
-    ProductResponse findByCode(@PathVariable String code, @RequestHeader(value = "X-Session-Token", required = false) String token) {
+    ProductResponse findByCode(@PathVariable String code, @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.MANAGE_INVENTORY);
         return service.findByCode(code, actor);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    ProductResponse create(@Valid @RequestBody ProductRequest request, @RequestHeader(value = "X-Session-Token", required = false) String token) {
+    ProductResponse create(@Valid @RequestBody ProductRequest request, @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.MANAGE_PRODUCTS);
         return service.create(request, actor);
     }
 
     @PutMapping("/{code}")
-    ProductResponse update(@PathVariable String code, @Valid @RequestBody ProductRequest request, @RequestHeader(value = "X-Session-Token", required = false) String token) {
+    ProductResponse update(@PathVariable String code, @Valid @RequestBody ProductRequest request, @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.MANAGE_PRODUCTS);
         return service.update(code, request, actor);
     }
 
     @DeleteMapping("/{code}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    void delete(@PathVariable String code, @RequestHeader(value = "X-Session-Token", required = false) String token) {
+    void delete(@PathVariable String code, @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.MANAGE_PRODUCTS);
         service.delete(code, actor.username(), actor.roleLabel());
     }
 
     @PostMapping("/{code}/discontinue")
-    ProductResponse discontinue(@PathVariable String code, @RequestHeader(value = "X-Session-Token", required = false) String token) {
+    ProductResponse discontinue(@PathVariable String code, @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.MANAGE_PRODUCTS);
         return service.discontinue(code, actor);
     }
 
     @PostMapping("/bulk-delete")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    void deleteMany(@Valid @RequestBody DeleteProductsRequest request, @RequestHeader(value = "X-Session-Token", required = false) String token) {
+    void deleteMany(@Valid @RequestBody DeleteProductsRequest request, @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.MANAGE_PRODUCTS);
         service.deleteMany(request.codes(), actor.username(), actor.roleLabel());
     }

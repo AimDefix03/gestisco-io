@@ -1,10 +1,9 @@
 import { randomUUID } from 'node:crypto';
-import { APIResponse, expect, Page, Response, test } from '@playwright/test';
+import { APIRequestContext, APIResponse, BrowserContext, expect, Page, request, Response, test } from '@playwright/test';
 
 type UserRole = 'SUPER_ADMIN' | 'ADMIN' | 'EMPLOYEE' | 'CUSTOMER';
 
 type AuthSession = {
-  token: string;
   expiresAt: string;
   user: {
     username: string;
@@ -76,8 +75,9 @@ const firstProductName = `Componente E2E A ${suffix}`;
 const secondProductCode = `E2E-B-${suffix}`;
 const secondProductName = `Componente E2E B ${suffix}`;
 
-let adminToken = '';
-let employeeToken = '';
+type StorageState = Awaited<ReturnType<BrowserContext['storageState']>>;
+
+let adminState: StorageState;
 let fulfilledOrder: Order;
 let canceledOrder: Order;
 
@@ -93,7 +93,7 @@ test('super admin crea dipendente', async ({ page }) => {
   const runtimeErrors = collectRuntimeErrors(page);
   await page.goto('/');
   const adminSession = await login(page, adminUsername!, adminPassword!);
-  adminToken = adminSession.token;
+  adminState = await page.context().storageState();
   expect(adminSession.user.role).toBe('SUPER_ADMIN');
 
   await openMenuEntry(page, 'Amministrazione', 'Account');
@@ -116,7 +116,6 @@ test('dipendente crea cliente e vendita, poi completa carico inventario fisico r
   const runtimeErrors = collectRuntimeErrors(page);
   await page.goto('/');
   const session = await login(page, employeeUsername, employeePassword);
-  employeeToken = session.token;
   expect(session.user.role).toBe('EMPLOYEE');
 
   await createPartner(page);
@@ -129,7 +128,7 @@ test('dipendente crea cliente e vendita, poi completa carico inventario fisico r
   await recordInventoryMovement(page, secondProductCode, 'INITIAL_BALANCE', '6', 'Saldo iniziale seconda riga gate MVP');
   await applyPhysicalInventoryCount(page, firstProductCode, 10);
 
-  const preparedProduct = await apiGet<Product>(page, employeeToken, `/api/products/${encodeURIComponent(firstProductCode)}`);
+  const preparedProduct = await apiGet<Product>(page, `/api/products/${encodeURIComponent(firstProductCode)}`);
   expect(preparedProduct).toMatchObject({ quantity: 10, reservedQuantity: 0, availableQuantity: 10 });
 
   fulfilledOrder = await createAssistedOrder(page, 2, true);
@@ -140,7 +139,7 @@ test('dipendente crea cliente e vendita, poi completa carico inventario fisico r
   const confirmedOrder = await readJson<Order>(await confirmationPromise);
   expect(confirmedOrder.status).toBe('CONFIRMED');
 
-  const reservedProduct = await apiGet<Product>(page, employeeToken, `/api/products/${encodeURIComponent(firstProductCode)}`);
+  const reservedProduct = await apiGet<Product>(page, `/api/products/${encodeURIComponent(firstProductCode)}`);
   expect(reservedProduct).toMatchObject({ quantity: 10, reservedQuantity: 2, availableQuantity: 8 });
 
   const fulfillmentPromise = waitForApiResponse(page, 'POST', new RegExp(`^/api/orders/${fulfilledOrder.code}/fulfill$`));
@@ -148,8 +147,8 @@ test('dipendente crea cliente e vendita, poi completa carico inventario fisico r
   fulfilledOrder = await readJson<Order>(await fulfillmentPromise);
   expect(fulfilledOrder.status).toBe('FULFILLED');
 
-  const fulfilledFirstProduct = await apiGet<Product>(page, employeeToken, `/api/products/${encodeURIComponent(firstProductCode)}`);
-  const fulfilledSecondProduct = await apiGet<Product>(page, employeeToken, `/api/products/${encodeURIComponent(secondProductCode)}`);
+  const fulfilledFirstProduct = await apiGet<Product>(page, `/api/products/${encodeURIComponent(firstProductCode)}`);
+  const fulfilledSecondProduct = await apiGet<Product>(page, `/api/products/${encodeURIComponent(secondProductCode)}`);
   expect(fulfilledFirstProduct).toMatchObject({ quantity: 8, reservedQuantity: 0, availableQuantity: 8 });
   expect(fulfilledSecondProduct).toMatchObject({ quantity: 5, reservedQuantity: 0, availableQuantity: 5 });
   expect(runtimeErrors).toEqual([]);
@@ -158,7 +157,7 @@ test('dipendente crea cliente e vendita, poi completa carico inventario fisico r
 test('acconto, annullo e storno restano atomici', async ({ page }) => {
   const runtimeErrors = collectRuntimeErrors(page);
   await page.goto('/');
-  const session = await login(page, employeeUsername, employeePassword);
+  await login(page, employeeUsername, employeePassword);
   const order = await createAssistedOrder(page, 1, false);
   const orderRow = page.getByRole('row').filter({ hasText: order.code });
 
@@ -189,7 +188,7 @@ test('acconto, annullo e storno restano atomici', async ({ page }) => {
     expect.objectContaining({ type: 'RECEIPT', amount: 25 }),
     expect.objectContaining({ type: 'REVERSAL', amount: 25 })
   ]));
-  const product = await apiGet<Product>(page, session.token, `/api/products/${encodeURIComponent(firstProductCode)}`);
+  const product = await apiGet<Product>(page, `/api/products/${encodeURIComponent(firstProductCode)}`);
   expect(product.reservedQuantity).toBe(0);
   expect(runtimeErrors).toEqual([]);
 });
@@ -197,7 +196,7 @@ test('acconto, annullo e storno restano atomici', async ({ page }) => {
 test('reso multi-riga, ricezione e rimborso aggiornano ledger e giacenze', async ({ page }) => {
   const runtimeErrors = collectRuntimeErrors(page);
   await page.goto('/');
-  const session = await login(page, employeeUsername, employeePassword);
+  await login(page, employeeUsername, employeePassword);
   await openOrderOperations(page, fulfilledOrder.code);
 
   const receiptForm = page.locator('form').filter({ has: page.getByRole('button', { name: 'Registra incasso' }) });
@@ -230,8 +229,8 @@ test('reso multi-riga, ricezione e rimborso aggiornano ledger e giacenze', async
   const receivedOrder = await readJson<Order>(await receiptReturnPromise);
   expect(receivedOrder.returns.find((item) => item.code === requestedReturn!.code)?.status).toBe('RECEIVED');
 
-  const returnedFirstProduct = await apiGet<Product>(page, session.token, `/api/products/${encodeURIComponent(firstProductCode)}`);
-  const returnedSecondProduct = await apiGet<Product>(page, session.token, `/api/products/${encodeURIComponent(secondProductCode)}`);
+  const returnedFirstProduct = await apiGet<Product>(page, `/api/products/${encodeURIComponent(firstProductCode)}`);
+  const returnedSecondProduct = await apiGet<Product>(page, `/api/products/${encodeURIComponent(secondProductCode)}`);
   expect(returnedFirstProduct.quantity).toBe(9);
   expect(returnedSecondProduct.quantity).toBe(6);
 
@@ -308,18 +307,14 @@ test('autorizzazione cliente negativa impedisce accesso a dati e ordini altrui',
   await expect(mainMenu.getByRole('button', { name: /^Anagrafiche/ })).toHaveCount(0);
   await page.keyboard.press('Escape');
 
-  const productResponse = await page.request.get('/api/products?page=0&size=1', {
-    headers: sessionHeaders(customerSession.token)
-  });
+  const productResponse = await page.request.get('/api/products?page=0&size=1', { headers: requestHeaders() });
   expect(productResponse.status()).toBe(403);
 
-  const foreignOrderResponse = await page.request.get(`/api/orders/${encodeURIComponent(fulfilledOrder.code)}`, {
-    headers: sessionHeaders(customerSession.token)
-  });
+  const foreignOrderResponse = await page.request.get(`/api/orders/${encodeURIComponent(fulfilledOrder.code)}`, { headers: requestHeaders() });
   expect(foreignOrderResponse.status()).toBe(403);
   expect((await foreignOrderResponse.json() as { message: string }).message).toContain('Puoi operare solo sui tuoi ordini.');
 
-  const ownOrders = await apiGet<PageResponse<Order>>(page, customerSession.token, '/api/orders?page=0&size=25');
+  const ownOrders = await apiGet<PageResponse<Order>>(page, '/api/orders?page=0&size=25');
   expect(ownOrders.content.map((order) => order.code)).not.toContain(fulfilledOrder.code);
   expect(ownOrders.content.map((order) => order.code)).not.toContain(canceledOrder.code);
   expect(runtimeErrors).toEqual([]);
@@ -401,14 +396,16 @@ async function applyPhysicalInventoryCount(page: Page, code: string, countedQuan
   await page.getByRole('button', { name: 'Invia per approvazione' }).click();
   expect((await readJson<PhysicalInventorySession>(await submitPromise)).status).toBe('SUBMITTED');
 
-  const approvalResponse = await page.request.post(`/api/inventory/counts/${session.id}/approve`, {
+  const approver = await adminApi();
+  const approvalResponse = await approver.post(`/api/inventory/counts/${session.id}/approve`, {
     headers: {
-      ...sessionHeaders(adminToken),
+      ...requestHeaders(csrfToken(adminState)),
       'Idempotency-Key': `physical-inventory-approve-${randomUUID()}`
     },
     data: { reason: 'Differenza verificata dal super admin E2E' }
   });
   expect((await readJson<PhysicalInventorySession>(approvalResponse)).status).toBe('APPROVED');
+  await approver.dispose();
 }
 
 async function createAssistedOrder(page: Page, firstProductQuantity: number, includeSecondProduct: boolean): Promise<Order> {
@@ -487,8 +484,8 @@ async function registerCustomer(page: Page, username: string, password: string):
   return session;
 }
 
-async function apiGet<T>(page: Page, token: string, path: string): Promise<T> {
-  const response = await page.request.get(path, { headers: sessionHeaders(token) });
+async function apiGet<T>(page: Page, path: string): Promise<T> {
+  const response = await page.request.get(path, { headers: requestHeaders() });
   return readJson<T>(response);
 }
 
@@ -509,12 +506,27 @@ async function readJson<T = unknown>(response: Response | APIResponse): Promise<
   return body ? JSON.parse(body) as T : undefined as T;
 }
 
-function sessionHeaders(token: string) {
+function requestHeaders(csrf?: string): Record<string, string> {
   return {
     'Content-Type': 'application/json',
-    'X-Session-Token': token,
-    'X-Request-Id': `e2e-${randomUUID()}`
+    'X-Request-Id': `e2e-${randomUUID()}`,
+    ...(csrf ? { 'X-XSRF-TOKEN': csrf } : {})
   };
+}
+
+/** Il super admin approva dal proprio browser: stessa sessione in cookie salvata nel primo test, distinta da quella del dipendente. */
+function adminApi(): Promise<APIRequestContext> {
+  return request.newContext({
+    baseURL: process.env.PLAYWRIGHT_BASE_URL ?? 'https://127.0.0.1:18081',
+    ignoreHTTPSErrors: process.env.PLAYWRIGHT_TLS_SELF_SIGNED === 'true',
+    storageState: adminState
+  });
+}
+
+function csrfToken(state: StorageState): string {
+  const cookie = state.cookies.find((candidate) => candidate.name === '__Host-gestionale_xsrf');
+  if (!cookie) throw new Error('Cookie CSRF del super admin assente.');
+  return cookie.value;
 }
 
 async function openMenuEntry(page: Page, menu: string, entry: string) {

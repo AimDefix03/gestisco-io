@@ -5,11 +5,13 @@ import it.giovannidefilippo.gestionale.common.PageResponse;
 import it.giovannidefilippo.gestionale.idempotency.IdempotencyService;
 import it.giovannidefilippo.gestionale.user.AuthSessionService;
 import it.giovannidefilippo.gestionale.user.AuthenticatedUser;
+import it.giovannidefilippo.gestionale.user.SessionCookies;
 import it.giovannidefilippo.gestionale.user.UserPermission;
 import it.giovannidefilippo.gestionale.user.UserRole;
 import it.giovannidefilippo.gestionale.user.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,7 +41,7 @@ class OrderController {
 
     @GetMapping
     PageResponse<OrderResponse> findAll(
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "25") int size,
             @RequestParam(required = false) String q,
@@ -55,7 +57,7 @@ class OrderController {
     @GetMapping("/customer/{customer}")
     PageResponse<OrderResponse> findByCustomer(
             @PathVariable String customer,
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "25") int size,
             @RequestParam(required = false) String q
@@ -70,7 +72,7 @@ class OrderController {
     @GetMapping("/{code}")
     OrderResponse findByCode(
             @PathVariable String code,
-            @RequestHeader(value = "X-Session-Token", required = false) String token
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token
     ) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.VIEW_ORDERS);
         return service.findByCode(code, actor);
@@ -80,7 +82,7 @@ class OrderController {
     @ResponseStatus(HttpStatus.CREATED)
     OrderResponse create(
             @Valid @RequestBody OrderRequests.CreateOrderRequest request,
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestHeader(value = IdempotencyService.HEADER_NAME, required = false) String idempotencyKey
     ) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.CREATE_ORDERS);
@@ -92,7 +94,7 @@ class OrderController {
     @PostMapping("/{code}/confirm")
     OrderResponse confirm(
             @PathVariable String code,
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestHeader(value = IdempotencyService.HEADER_NAME, required = false) String idempotencyKey
     ) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.CONFIRM_ORDERS);
@@ -102,7 +104,7 @@ class OrderController {
     @PostMapping("/{code}/fulfill")
     OrderResponse fulfill(
             @PathVariable String code,
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestHeader(value = IdempotencyService.HEADER_NAME, required = false) String idempotencyKey
     ) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.FULFILL_ORDERS);
@@ -113,7 +115,7 @@ class OrderController {
     OrderResponse cancel(
             @PathVariable String code,
             @Valid @RequestBody OrderOperationRequests.CancellationRequest request,
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestHeader(value = IdempotencyService.HEADER_NAME, required = false) String idempotencyKey
     ) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.CANCEL_ORDERS);
@@ -124,7 +126,7 @@ class OrderController {
     OrderResponse recordReceipt(
             @PathVariable String code,
             @Valid @RequestBody OrderOperationRequests.ReceiptRequest request,
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestHeader(value = IdempotencyService.HEADER_NAME, required = false) String idempotencyKey
     ) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.RECORD_PAYMENTS);
@@ -135,7 +137,7 @@ class OrderController {
     OrderResponse reconcilePayment(
             @PathVariable String code,
             @Valid @RequestBody OrderOperationRequests.PaymentReconciliationRequest request,
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestHeader(value = "X-Reauth-Password", required = false) String reauthPassword,
             @RequestHeader(value = IdempotencyService.HEADER_NAME, required = false) String idempotencyKey
     ) {
@@ -149,7 +151,7 @@ class OrderController {
     OrderResponse requestReturn(
             @PathVariable String code,
             @Valid @RequestBody OrderOperationRequests.ReturnRequest request,
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestHeader(value = IdempotencyService.HEADER_NAME, required = false) String idempotencyKey
     ) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.REQUEST_RETURNS);
@@ -161,7 +163,7 @@ class OrderController {
             @PathVariable String code,
             @PathVariable String returnCode,
             @Valid @RequestBody OrderOperationRequests.ReturnReviewRequest request,
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestHeader(value = IdempotencyService.HEADER_NAME, required = false) String idempotencyKey
     ) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.MANAGE_RETURNS);
@@ -173,7 +175,7 @@ class OrderController {
             @PathVariable String code,
             @PathVariable String returnCode,
             @Valid @RequestBody OrderOperationRequests.ReturnRejectionRequest request,
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestHeader(value = IdempotencyService.HEADER_NAME, required = false) String idempotencyKey
     ) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.MANAGE_RETURNS);
@@ -184,7 +186,7 @@ class OrderController {
     OrderResponse receiveReturn(
             @PathVariable String code,
             @PathVariable String returnCode,
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestHeader(value = IdempotencyService.HEADER_NAME, required = false) String idempotencyKey
     ) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.MANAGE_RETURNS);
@@ -197,7 +199,7 @@ class OrderController {
             @PathVariable String code,
             @PathVariable String returnCode,
             @Valid @RequestBody OrderOperationRequests.ReturnRefundRequest request,
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestHeader(value = IdempotencyService.HEADER_NAME, required = false) String idempotencyKey
     ) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.REFUND_PAYMENTS);

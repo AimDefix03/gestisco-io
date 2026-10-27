@@ -1,9 +1,10 @@
 package it.giovannidefilippo.gestionale.product;
 
 import it.giovannidefilippo.gestionale.user.AuthSessionService;
+import it.giovannidefilippo.gestionale.user.SessionCookies;
 import it.giovannidefilippo.gestionale.user.UserPermission;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,7 +22,7 @@ class VatRateController {
     }
 
     @GetMapping
-    List<VatRateResponse> findAll(@RequestHeader(value = "X-Session-Token", required = false) String token) {
+    List<VatRateResponse> findAll(@CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token) {
         authSessionService.requirePermission(token, UserPermission.MANAGE_INVENTORY);
         return service.list();
     }

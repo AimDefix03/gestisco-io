@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+import static it.giovannidefilippo.gestionale.support.SessionRequests.session;
+import static it.giovannidefilippo.gestionale.support.SessionRequests.sessionToken;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -92,7 +94,7 @@ class PublicRegistrationSecurityTest {
         String username = uniqueUsername("staff_employee");
 
         mockMvc.perform(post("/api/accounts")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .header("X-Reauth-Password", SUPER_ADMIN_PASSWORD)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -118,10 +120,7 @@ class PublicRegistrationSecurityTest {
                                 """.formatted(SUPER_ADMIN_PASSWORD)))
                 .andExpect(status().isOk())
                 .andReturn();
-        return new tools.jackson.databind.ObjectMapper()
-                .readTree(result.getResponse().getContentAsString())
-                .path("token")
-                .asText();
+        return sessionToken(result);
     }
 
     private static String uniqueUsername(String prefix) {

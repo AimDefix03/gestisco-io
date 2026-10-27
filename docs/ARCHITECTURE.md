@@ -49,7 +49,7 @@ Frontend web:
 ## Moduli backend web
 
 - `common`: errori API, eccezioni, correlation ID, clock applicativo UTC e seed configurabile del super admin.
-- `security`: filtro token sessione e configurazione Spring Security.
+- `security`: filtro della sessione in cookie, CSRF double-submit e configurazione Spring Security.
 - `user`: account, ruoli, permessi, sessioni, password.
 - `product`: anagrafica di catalogo e proiezione transazionale delle disponibilita, senza comandi pubblici di variazione stock.
 - `partner`: anagrafiche clienti e fornitori.
@@ -109,7 +109,7 @@ Motivazione:
 - Correlation ID propagato tra client, risposta API e log backend.
 - Timestamp generati dal backend tramite `TimeProvider` basato su `Clock.systemUTC()`, sovrascrivibile nei test con clock fisso.
 - Client frontend separati per dominio sotto `src/api`, con un unico `httpClient` responsabile di sessione, errori, request id e chiavi idempotenti legate all'intento.
-- `SessionProvider` centralizza identita autenticata, token in memoria, scadenza, rinnovo e invalidazione su `401`; le richieste pubbliche prive di sessione non attivano il flusso di rinnovo.
+- `SessionProvider` centralizza identita autenticata, ripristino della sessione del cookie al caricamento (`GET /api/accounts/session`), scadenza, rinnovo e invalidazione su `401`; le richieste pubbliche prive di sessione non attivano il flusso di rinnovo. `httpClient` invia i cookie same-origin e aggiunge `X-XSRF-TOKEN` letto dal cookie CSRF alle sole richieste che modificano dati.
 - Le risorse paginate delle slice Catalogo, Ordini, Partner, Documenti e Amministrazione usano `usePaginatedResource`: espone `loading`, `refreshing`, `error` e `data`, annulla richieste obsolete con `AbortController` e applica una sequenza latest-request-wins.
 - I filtri remoti del pilot sono sottoposti a debounce; le mutazioni restano separate dalle query e non vengono ritentate automaticamente quando l'esito potrebbe essere ambiguo.
 - La prima vertical slice sotto `src/features/session` possiede form e comandi per login, registrazione, rinnovo, logout e cambio password; `App.tsx` riceve soltanto il controller della sessione e callback esplicite di ingresso/uscita.
@@ -119,7 +119,7 @@ Motivazione:
 - La vertical slice `src/features/purchases` possiede lista paginata, filtri, bozza multi-riga, dettaglio, residui e comandi create/send/receive/cancel. Le azioni derivano dalle capability backend e gli errori non cancellano la bozza.
 - La vertical slice `src/features/documents` possiede query documenti, report vendite e inventario, stato pagina, causale nota credito, emissione documenti ed export. Le query propagano `AbortSignal`, i report vengono attivati in modo lazy e le mutazioni conservano la pipeline comandi condivisa.
 - La vertical slice `src/features/administration` possiede pagine account e audit, form e conferme account, configurazione aziendale, monitoraggio e relativi comandi. Le query sono permission-aware, cancellabili e latest-request-wins; monitoraggio e stato sistema sono lazy e restano in cache tra le viste, mentre le dipendenze con Partner sono espresse tramite callback esplicite.
-- Token browser conservato solo in memoria e inviato tramite header custom; la scelta e le condizioni per una futura migrazione cookie/CSRF sono registrate nell'ADR 0004.
+- Sessione browser in cookie `HttpOnly` con CSRF double-submit (ADR 0009, che sostituisce l'ADR 0004): il token non e accessibile a JavaScript e la sessione regge ricariche e link diretti fino alla chiusura del browser.
 - Nginx applica una CSP same-origin in enforcement senza direttive permissive, uniforma gli header browser e separa la cache della shell da quella degli asset versionati.
 - Indirizzi per pagina (P1.5): `src/navigation/routes.ts` mappa ogni vista e i dettagli di ordini, ordini fornitore e inventari fisici su percorsi stabili tramite History API, senza dipendenze aggiuntive; `useWorkspaceNavigation` tiene allineati indirizzo, schede aperte e ultimo dettaglio di ogni scheda, `useDetailRouteSync` allinea la selezione dei flussi all'indirizzo. Il tasto indietro passa dallo stesso controllo delle bozze delle schede; nginx e il server di sviluppo Vite servono `index.html` per ogni percorso non statico. Filtri e paginazione restano nello stato della vista.
 - Layout frontend fluido: shell senza `min-width` globale, griglie responsive progressive e overflow orizzontale confinato alle tabelle operative.

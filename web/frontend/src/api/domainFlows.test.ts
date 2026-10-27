@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { changeAccountRole, changeOwnPassword, disableAccount, enableAccount, fetchAccountPage, fetchAccounts, login, register, renewSession, resetAccountPassword, revokeAccountSessions } from './accountClient';
 import { fetchAuditEventPage } from './auditClient';
 import { fetchCompanySettings } from './companyClient';
-import { ApiRequestError, clearSessionToken, setSessionToken } from './httpClient';
+import { ApiRequestError, CSRF_COOKIE, CSRF_HEADER, markSessionActive, markSessionEnded } from './httpClient';
 import { confirmOrder, createOrder, fetchFinancialReconciliation, fetchOrderPage } from './orderClient';
 import { fetchPartnerPage, linkPartnerAccount, unlinkPartnerAccount } from './partnerClient';
 import { createProduct, deleteProduct } from './productClient';
@@ -23,7 +23,7 @@ function jsonResponse(payload: unknown, status = 200): Response {
 }
 
 afterEach(() => {
-  clearSessionToken();
+  markSessionEnded();
   vi.unstubAllGlobals();
 });
 
@@ -47,7 +47,7 @@ describe('client API di dominio', () => {
   it('usa comandi account espliciti senza cancellazione fisica', async () => {
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ username: 'mario', enabled: false }));
     vi.stubGlobal('fetch', fetchMock);
-    setSessionToken('session-token');
+    markSessionActive();
 
     await disableAccount('mario', 'Fine rapporto', 'AdminPassword123!');
     await enableAccount('mario', 'Rientro autorizzato', 'AdminPassword123!');
@@ -81,16 +81,17 @@ describe('client API di dominio', () => {
   });
 
   it('rinnova la sessione autenticata senza ripetere username e ruolo', async () => {
-    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ token: 'rotated-token', expiresAt: '2026-07-13T12:45:00Z', user: {} }));
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ expiresAt: '2026-07-13T12:45:00Z', user: {} }));
     vi.stubGlobal('fetch', fetchMock);
-    setSessionToken('current-token');
+    markSessionActive();
+    vi.spyOn(document, 'cookie', 'get').mockReturnValue(`${CSRF_COOKIE}=csrf-renew`);
 
     await renewSession('SecurePassword123!');
 
     expect(fetchMock.mock.calls[0][0]).toBe('/api/accounts/session/renew');
     expect(fetchMock.mock.calls[0][1]).toMatchObject({ method: 'POST' });
     expect(JSON.parse(String(fetchMock.mock.calls[0][1]?.body))).toEqual({ password: 'SecurePassword123!' });
-    expect(new Headers(fetchMock.mock.calls[0][1]?.headers).get('X-Session-Token')).toBe('current-token');
+    expect(new Headers(fetchMock.mock.calls[0][1]?.headers).get(CSRF_HEADER)).toBe('csrf-renew');
   });
 
   it('crea un prodotto con payload strutturato', async () => {

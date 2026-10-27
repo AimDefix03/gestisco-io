@@ -1,6 +1,5 @@
 package it.giovannidefilippo.gestionale.product;
 
-import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -12,6 +11,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.util.List;
 import java.util.UUID;
 
+import static it.giovannidefilippo.gestionale.support.SessionRequests.session;
+import static it.giovannidefilippo.gestionale.support.SessionRequests.sessionToken;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -25,9 +26,6 @@ class CustomerCatalogControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Test
     void customerCatalogRequiresSession() throws Exception {
@@ -44,7 +42,7 @@ class CustomerCatalogControllerTest {
         createProduct(adminToken, productCode, 2);
 
         mockMvc.perform(get("/api/customer/catalog")
-                        .header("X-Session-Token", customerToken)
+                        .with(session(customerToken))
                         .param("q", productCode))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].code").value(productCode))
@@ -75,15 +73,15 @@ class CustomerCatalogControllerTest {
         createProduct(adminToken, discontinuedCode, 2);
         discontinueProduct(adminToken, discontinuedCode);
 
-        mockMvc.perform(get("/api/customer/catalog").header("X-Session-Token", customerToken).param("q", availableCode))
+        mockMvc.perform(get("/api/customer/catalog").with(session(customerToken)).param("q", availableCode))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].availability").value("AVAILABLE"));
 
-        mockMvc.perform(get("/api/customer/catalog").header("X-Session-Token", customerToken).param("q", unavailableCode))
+        mockMvc.perform(get("/api/customer/catalog").with(session(customerToken)).param("q", unavailableCode))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].availability").value("UNAVAILABLE"));
 
-        mockMvc.perform(get("/api/customer/catalog").header("X-Session-Token", customerToken).param("q", discontinuedCode))
+        mockMvc.perform(get("/api/customer/catalog").with(session(customerToken)).param("q", discontinuedCode))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isEmpty());
     }
@@ -97,29 +95,29 @@ class CustomerCatalogControllerTest {
         String productCode = uniqueCode("CUSTOMER-ROLES");
         createProduct(superAdminToken, productCode, 4);
 
-        mockMvc.perform(get("/api/products").header("X-Session-Token", customerToken))
+        mockMvc.perform(get("/api/products").with(session(customerToken)))
                 .andExpect(status().isForbidden());
 
-        mockMvc.perform(get("/api/dashboard").header("X-Session-Token", customerToken))
+        mockMvc.perform(get("/api/dashboard").with(session(customerToken)))
                 .andExpect(status().isForbidden());
 
-        mockMvc.perform(get("/api/customer/catalog").header("X-Session-Token", customerToken).param("q", productCode))
+        mockMvc.perform(get("/api/customer/catalog").with(session(customerToken)).param("q", productCode))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].availability").value("AVAILABLE"))
                 .andExpect(jsonPath("$.content[0].quantity").doesNotExist());
 
-        mockMvc.perform(get("/api/customer/dashboard").header("X-Session-Token", customerToken))
+        mockMvc.perform(get("/api/customer/dashboard").with(session(customerToken)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.potentialRetailStockValue").doesNotExist());
 
         for (String staffToken : List.of(superAdminToken, adminToken, employeeToken)) {
-            mockMvc.perform(get("/api/customer/catalog").header("X-Session-Token", staffToken))
+            mockMvc.perform(get("/api/customer/catalog").with(session(staffToken)))
                     .andExpect(status().isForbidden());
 
-            mockMvc.perform(get("/api/customer/dashboard").header("X-Session-Token", staffToken))
+            mockMvc.perform(get("/api/customer/dashboard").with(session(staffToken)))
                     .andExpect(status().isForbidden());
 
-            mockMvc.perform(get("/api/products").header("X-Session-Token", staffToken).param("q", productCode))
+            mockMvc.perform(get("/api/products").with(session(staffToken)).param("q", productCode))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content[0].quantity").value(4))
                     .andExpect(jsonPath("$.content[0].reservedQuantity").value(0))
@@ -134,7 +132,7 @@ class CustomerCatalogControllerTest {
         String customerToken = registerAndLoginCustomer();
 
         mockMvc.perform(get("/api/customer/catalog")
-                        .header("X-Session-Token", customerToken)
+                        .with(session(customerToken))
                         .param("sort", "QTY_DESC"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("REQUEST_INVALID"));
@@ -158,7 +156,7 @@ class CustomerCatalogControllerTest {
         String username = role.toLowerCase() + "_catalog_" + UUID.randomUUID().toString().replace("-", "").substring(0, 10);
         String password = "StaffStrong123!";
         mockMvc.perform(post("/api/accounts")
-                        .header("X-Session-Token", superAdminToken)
+                        .with(session(superAdminToken))
                         .header("X-Reauth-Password", SUPER_ADMIN_PASSWORD)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -184,12 +182,12 @@ class CustomerCatalogControllerTest {
                                 """.formatted(username, password, role)))
                 .andExpect(status().isOk())
                 .andReturn();
-        return objectMapper.readTree(result.getResponse().getContentAsString()).path("token").asText();
+        return sessionToken(result);
     }
 
     private void createProduct(String token, String code, int quantity) throws Exception {
         mockMvc.perform(post("/api/products")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -207,7 +205,7 @@ class CustomerCatalogControllerTest {
                 .andExpect(status().isCreated());
         if (quantity > 0) {
             mockMvc.perform(post("/api/inventory/initial-balance")
-                            .header("X-Session-Token", token)
+                            .with(session(token))
                             .contentType(MediaType.APPLICATION_JSON)
                             .content("""
                                     {
@@ -222,7 +220,7 @@ class CustomerCatalogControllerTest {
 
     private void discontinueProduct(String token, String code) throws Exception {
         mockMvc.perform(post("/api/products/{code}/discontinue", code)
-                        .header("X-Session-Token", token))
+                        .with(session(token)))
                 .andExpect(status().isOk());
     }
 

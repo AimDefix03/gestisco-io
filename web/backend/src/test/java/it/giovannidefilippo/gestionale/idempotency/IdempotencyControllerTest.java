@@ -28,6 +28,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static it.giovannidefilippo.gestionale.support.SessionRequests.session;
+import static it.giovannidefilippo.gestionale.support.SessionRequests.sessionToken;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -206,7 +208,7 @@ class IdempotencyControllerTest extends PostgreSqlIntegrationTestSupport {
         createProduct(token, productCode);
 
         mockMvc.perform(post("/api/orders")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(orderPayload("Cliente pagamento", productCode).replace("Carta", "Criptovaluta")))
                 .andExpect(status().isBadRequest())
@@ -225,7 +227,7 @@ class IdempotencyControllerTest extends PostgreSqlIntegrationTestSupport {
         postOrder(token, idempotencyKey, orderPayload("Cliente idempotenza", firstProduct));
 
         mockMvc.perform(post("/api/orders")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .header("Idempotency-Key", idempotencyKey)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(orderPayload("Cliente idempotenza", secondProduct)))
@@ -268,13 +270,13 @@ class IdempotencyControllerTest extends PostgreSqlIntegrationTestSupport {
                 """.formatted(orderCode);
 
         mockMvc.perform(post("/api/documents/invoice")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isCreated());
 
         mockMvc.perform(post("/api/documents/invoice")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isConflict())
@@ -289,7 +291,7 @@ class IdempotencyControllerTest extends PostgreSqlIntegrationTestSupport {
         createProduct(token, productCode);
         JsonNode draft = postOrder(token, uniqueCode("idem-payment-order"), orderPayload("Cliente incasso", productCode));
         String orderCode = draft.path("code").asText();
-        mockMvc.perform(post("/api/orders/" + orderCode + "/confirm").header("X-Session-Token", token)).andExpect(status().isOk());
+        mockMvc.perform(post("/api/orders/" + orderCode + "/confirm").with(session(token))).andExpect(status().isOk());
         String key = uniqueCode("idem-receipt");
         String payload = """
                 {
@@ -314,7 +316,7 @@ class IdempotencyControllerTest extends PostgreSqlIntegrationTestSupport {
         createProduct(token, productCode);
         JsonNode draft = postOrder(token, uniqueCode("idem-cancel-order"), orderPayload("Cliente annullamento", productCode));
         String orderCode = draft.path("code").asText();
-        mockMvc.perform(post("/api/orders/" + orderCode + "/confirm").header("X-Session-Token", token)).andExpect(status().isOk());
+        mockMvc.perform(post("/api/orders/" + orderCode + "/confirm").with(session(token))).andExpect(status().isOk());
         postReceipt(token, orderCode, uniqueCode("idem-cancel-receipt"), """
                 {
                   "amount": 100.00,
@@ -346,7 +348,7 @@ class IdempotencyControllerTest extends PostgreSqlIntegrationTestSupport {
 
     private JsonNode postOrder(String token, String idempotencyKey, String payload) throws Exception {
         MvcResult result = mockMvc.perform(post("/api/orders")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .header("Idempotency-Key", idempotencyKey)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
@@ -371,7 +373,7 @@ class IdempotencyControllerTest extends PostgreSqlIntegrationTestSupport {
 
     private JsonNode postInvoice(String token, String idempotencyKey, String payload) throws Exception {
         MvcResult result = mockMvc.perform(post("/api/documents/invoice")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .header("Idempotency-Key", idempotencyKey)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
@@ -382,7 +384,7 @@ class IdempotencyControllerTest extends PostgreSqlIntegrationTestSupport {
 
     private JsonNode postReceipt(String token, String orderCode, String idempotencyKey, String payload) throws Exception {
         MvcResult result = mockMvc.perform(post("/api/orders/" + orderCode + "/payments/receipts")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .header("Idempotency-Key", idempotencyKey)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
@@ -393,7 +395,7 @@ class IdempotencyControllerTest extends PostgreSqlIntegrationTestSupport {
 
     private JsonNode postCancellation(String token, String orderCode, String idempotencyKey, String payload) throws Exception {
         MvcResult result = mockMvc.perform(post("/api/orders/" + orderCode + "/cancel")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .header("Idempotency-Key", idempotencyKey)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
@@ -406,23 +408,23 @@ class IdempotencyControllerTest extends PostgreSqlIntegrationTestSupport {
         JsonNode order = postOrder(token, uniqueCode("idem-draft"), orderPayload("Cliente documento", productCode));
         String orderCode = order.path("code").asText();
         mockMvc.perform(post("/api/orders/" + orderCode + "/confirm")
-                        .header("X-Session-Token", token))
+                        .with(session(token)))
                 .andExpect(status().isOk());
         mockMvc.perform(post("/api/orders/" + orderCode + "/fulfill")
-                        .header("X-Session-Token", token))
+                        .with(session(token)))
                 .andExpect(status().isOk());
         return orderCode;
     }
 
     private void createProduct(String token, String code) throws Exception {
         mockMvc.perform(post("/api/products")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(productPayload(code)))
                 .andExpect(status().isCreated());
 
         mockMvc.perform(post("/api/inventory/initial-balance")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -435,7 +437,7 @@ class IdempotencyControllerTest extends PostgreSqlIntegrationTestSupport {
     }
 
     private String loginSuperAdmin() throws Exception {
-        String response = mockMvc.perform(post("/api/accounts/login")
+        MvcResult response = mockMvc.perform(post("/api/accounts/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -445,10 +447,8 @@ class IdempotencyControllerTest extends PostgreSqlIntegrationTestSupport {
                                 }
                                 """.formatted(SUPER_ADMIN_PASSWORD)))
                 .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        return objectMapper.readTree(response).path("token").asText();
+                .andReturn();
+        return sessionToken(response);
     }
 
     private String orderPayload(String customer, String productCode) {

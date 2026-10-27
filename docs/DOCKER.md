@@ -90,6 +90,8 @@ La gestione completa dei segreti e descritta in `docs/SECRET_ROTATION.md`.
 ## URL locali
 
 - Frontend: `http://localhost:8081`
+
+I cookie di sessione sono `Secure` (ADR 0009): Chromium e Firefox li accettano su `http://localhost`, Safari e WebKit no. Per usare lo stack con Safari, o su un host diverso da `localhost`, servire il frontend in HTTPS: aggiungere `-f docker-compose.e2e-tls.yml`, impostare `GESTIONALE_FRONTEND_CONTAINER_PORT=8443` e indicare certificato e chiave in `GESTIONALE_FRONTEND_TLS_CERTIFICATE_FILE` e `GESTIONALE_FRONTEND_TLS_KEY_FILE`. Nginx apre allora il listener `8443 ssl`, mentre la porta interna 8080 resta per l'healthcheck e non viene pubblicata.
 - Backend API locale: `http://127.0.0.1:8080`
 - PostgreSQL host locale: `127.0.0.1:5433`
 

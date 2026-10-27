@@ -9,10 +9,11 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import tools.jackson.databind.ObjectMapper;
 
 import java.util.UUID;
 
+import static it.giovannidefilippo.gestionale.support.SessionRequests.session;
+import static it.giovannidefilippo.gestionale.support.SessionRequests.sessionToken;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -27,9 +28,6 @@ class AccountLifecycleControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Autowired
     private UserAccountRepository accountRepository;
@@ -68,7 +66,7 @@ class AccountLifecycleControllerTest {
         String customerToken = login(username, CUSTOMER_PASSWORD);
 
         mockMvc.perform(post("/api/accounts/{username}/disable", username)
-                        .header("X-Session-Token", adminToken)
+                        .with(session(adminToken))
                         .header("X-Reauth-Password", SUPER_ADMIN_PASSWORD)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -79,7 +77,7 @@ class AccountLifecycleControllerTest {
                 .andExpect(jsonPath("$.disabledBy").value("test_super_admin"))
                 .andExpect(jsonPath("$.disabledReason").value("Uscita dal servizio"));
 
-        mockMvc.perform(get("/api/customer/dashboard").header("X-Session-Token", customerToken))
+        mockMvc.perform(get("/api/customer/dashboard").with(session(customerToken)))
                 .andExpect(status().isUnauthorized());
         mockMvc.perform(post("/api/accounts/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -93,7 +91,7 @@ class AccountLifecycleControllerTest {
                 .anySatisfy(event -> assertThat(event.action()).isEqualTo("DISABLE_ACCOUNT"));
 
         mockMvc.perform(post("/api/accounts/{username}/enable", username)
-                        .header("X-Session-Token", adminToken)
+                        .with(session(adminToken))
                         .header("X-Reauth-Password", SUPER_ADMIN_PASSWORD)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -104,7 +102,7 @@ class AccountLifecycleControllerTest {
                 .andExpect(jsonPath("$.disabledAt").doesNotExist());
 
         login(username, CUSTOMER_PASSWORD);
-        mockMvc.perform(get("/api/customer/dashboard").header("X-Session-Token", customerToken))
+        mockMvc.perform(get("/api/customer/dashboard").with(session(customerToken)))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -115,7 +113,7 @@ class AccountLifecycleControllerTest {
         String secondToken = login(username, CUSTOMER_PASSWORD);
 
         mockMvc.perform(post("/api/accounts/me/password")
-                        .header("X-Session-Token", firstToken)
+                        .with(session(firstToken))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -126,7 +124,7 @@ class AccountLifecycleControllerTest {
                 .andExpect(status().isBadRequest());
 
         mockMvc.perform(post("/api/accounts/me/password")
-                        .header("X-Session-Token", firstToken)
+                        .with(session(firstToken))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -136,9 +134,9 @@ class AccountLifecycleControllerTest {
                                 """.formatted(CUSTOMER_PASSWORD)))
                 .andExpect(status().isNoContent());
 
-        mockMvc.perform(get("/api/customer/dashboard").header("X-Session-Token", firstToken))
+        mockMvc.perform(get("/api/customer/dashboard").with(session(firstToken)))
                 .andExpect(status().isUnauthorized());
-        mockMvc.perform(get("/api/customer/dashboard").header("X-Session-Token", secondToken))
+        mockMvc.perform(get("/api/customer/dashboard").with(session(secondToken)))
                 .andExpect(status().isUnauthorized());
         mockMvc.perform(post("/api/accounts/login").contentType(MediaType.APPLICATION_JSON).content(loginBody(username, CUSTOMER_PASSWORD)))
                 .andExpect(status().isBadRequest());
@@ -153,7 +151,7 @@ class AccountLifecycleControllerTest {
         String secondToken = login(username, CUSTOMER_PASSWORD);
 
         mockMvc.perform(post("/api/accounts/{username}/sessions/revoke", username)
-                        .header("X-Session-Token", adminToken)
+                        .with(session(adminToken))
                         .header("X-Reauth-Password", SUPER_ADMIN_PASSWORD)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -161,12 +159,12 @@ class AccountLifecycleControllerTest {
                                 """))
                 .andExpect(status().isNoContent());
 
-        mockMvc.perform(get("/api/customer/dashboard").header("X-Session-Token", firstToken)).andExpect(status().isUnauthorized());
-        mockMvc.perform(get("/api/customer/dashboard").header("X-Session-Token", secondToken)).andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/api/customer/dashboard").with(session(firstToken))).andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/api/customer/dashboard").with(session(secondToken))).andExpect(status().isUnauthorized());
 
         String freshToken = login(username, CUSTOMER_PASSWORD);
         mockMvc.perform(post("/api/accounts/{username}/password-reset", username)
-                        .header("X-Session-Token", adminToken)
+                        .with(session(adminToken))
                         .header("X-Reauth-Password", SUPER_ADMIN_PASSWORD)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -177,7 +175,7 @@ class AccountLifecycleControllerTest {
                                 """))
                 .andExpect(status().isNoContent());
 
-        mockMvc.perform(get("/api/customer/dashboard").header("X-Session-Token", freshToken)).andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/api/customer/dashboard").with(session(freshToken))).andExpect(status().isUnauthorized());
         mockMvc.perform(post("/api/accounts/login").contentType(MediaType.APPLICATION_JSON).content(loginBody(username, CUSTOMER_PASSWORD)))
                 .andExpect(status().isBadRequest());
         login(username, "Administrative-Reset-123!");
@@ -203,7 +201,7 @@ class AccountLifecycleControllerTest {
                         .content(loginBody(username, password)))
                 .andExpect(status().isOk())
                 .andReturn();
-        return objectMapper.readTree(response.getResponse().getContentAsString()).path("token").asText();
+        return sessionToken(response);
     }
 
     private String loginBody(String username, String password) {
