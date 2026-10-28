@@ -4,9 +4,9 @@ Stato corrente del progetto. I resoconti dettagliati fino al 2026-10-24 (step 0.
 
 ## Stato generale
 
-- Current step: P1.7 unita di misura configurabili, in review; ultimo requisito del gate G1
-- Next eligible step: chiusura del gate G1 dopo l'integrazione di P1.7, poi P2.1 griglie e attributi di variante, con la validazione V1 in parallelo
-- Last completed step: P1.2 ridotto Attributi di prodotto (#46, `8159791`)
+- Current step: nessuno; fase P1 chiusa con il gate G1 il 2026-10-28
+- Next eligible step: P2.1 griglie e attributi di variante, solo dopo il via libera esplicito dell'utente; validazione V1 in parallelo, da considerare prima di P2.2
+- Last completed step: gate G1 Catalogo generalista (main `7303bce`)
 - Last update: 2026-10-28
 - Roadmap: [ROADMAP_PRODOTTO.md](docs/ROADMAP_PRODOTTO.md), fasi P0-P11 e gate G1-G7 ([ADR 0008](docs/DECISIONS/0008-product-direction-generalist-core-apparel-pilot.md)). Storico master: 32/48 step; nessuno dei due conteggi misura la prontezza alla vendita.
 - Open P0: nessuno
@@ -14,7 +14,7 @@ Stato corrente del progetto. I resoconti dettagliati fino al 2026-10-24 (step 0.
 - Open P2: F-29 (P8), F-30 (P9.2)
 - Open P3: nessuno
 - PR in attesa per scelta: Dependabot #27 Apache POI 6, da rivalutare a inizio novembre o alla 6.0.1
-- Main: `8159791` dopo #46; 12 controlli obbligatori verdi dopo il merge, job prod-like nel container Playwright
+- Main: `7303bce` dopo #48; 12 controlli obbligatori verdi dopo il merge, job prod-like nel container Playwright
 - Dependabot 2026-10-27: patch Maven #37, #38, #39 raggruppate in #43
 
 ## Step
@@ -32,10 +32,10 @@ Stato corrente del progetto. I resoconti dettagliati fino al 2026-10-24 (step 0.
 | P1.5 Indirizzi per pagina | COMPLETED | #44 | Router su History API, dettagli ordini, acquisti e inventari |
 | P1.6 Sessione persistente sicura | COMPLETED | #45 | ADR 0009, cookie `HttpOnly` e CSRF double-submit, stack di verifica in HTTPS |
 | P1.2 ridotto Attributi di prodotto | COMPLETED | #46 | V39, attributi testuali e a elenco con ambito di categoria, filtri ed export; campi su clienti e fornitori in P6.4 |
-| P1.7 Unita di misura configurabili | IN REVIEW | #47 | V40, unita in tabella gestite da UI, pezzo come unita base |
-| Nome Gestisco.IO nell'interfaccia | IN REVIEW | - | Solo testi visibili, decisione del gate G1 |
-| Gate G1 | IN REVIEW | - | Criteri verificati il 2026-10-28 su `8159791`; resta P1.7 |
-| P2 - P11 | PENDING | - | Vedere roadmap di prodotto |
+| P1.7 Unita di misura configurabili | COMPLETED | #47 | V40, unita in tabella gestite da UI, pezzo come unita base |
+| Nome Gestisco.IO nell'interfaccia | COMPLETED | #48 | Solo testi visibili, decisione del gate G1 |
+| Gate G1 | COMPLETED | - | Raggiunto il 2026-10-28 su `7303bce`: catalogo senza valori fissi, IVA per riga, indirizzi e sessione persistenti, CI verde |
+| P2 - P11 | PENDING | - | Vedere roadmap di prodotto; P2 parte solo su via libera dell'utente |
 
 ## Decisioni approvate
 
@@ -72,7 +72,8 @@ Una riga per step o evento rilevante, dal piu recente.
 
 | Data | Step | PR / commit | Esito |
 |---|---|---|---|
-| 2026-10-28 | Nome Gestisco.IO nell'interfaccia | PR rinomina | Solo testi visibili (titolo, accesso, workspace, autore PDF); frontend 249/249 (+1), backend 364/364 |
+| 2026-10-28 | Gate G1 chiuso | `7303bce` | #47 e #48 integrate, CI su main verde (12 controlli obbligatori, Dependency review solo sulle PR). Fase P1 in 4 giorni di calendario (25-28 ottobre) contro la stima di 3-5 settimane |
+| 2026-10-28 | Nome Gestisco.IO nell'interfaccia | #48 | Solo testi visibili (titolo, accesso, workspace, autore PDF); frontend 249/249 (+1), backend 364/364 |
 | 2026-10-28 | P1.7 Unita di misura configurabili | #47 | Backend 364/364 (+4: API unita, migrazione V40), verifica per mutazione sul rifiuto delle unita disattivate; frontend 248/248 (+5); E2E locale 23/23 in HTTPS con il nuovo `units-of-measure.spec.ts` |
 | 2026-10-28 | Revisione gate G1 | `8159791` | #43-#46 integrate, CI su main verde (12 controlli); criteri soddisfatti tranne le unita di misura fisse, da cui P1.7 |
 | 2026-10-28 | P1.2 ridotto Attributi di prodotto | #46 | Backend 360/360 (+5: API e validazione attributi, filtri, colonne di export in CSV/Excel/PDF), verifica per mutazione sulla validazione degli elenchi; frontend 243/243 (+6); E2E locale 22/22 in HTTPS con il nuovo `product-attributes.spec.ts` |
