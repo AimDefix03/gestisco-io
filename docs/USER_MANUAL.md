@@ -2,7 +2,7 @@
 
 ## Scopo
 
-Questo manuale descrive l'uso della web app Gestionale Negozio Computer per super admin, admin, dipendenti e clienti.
+Questo manuale descrive l'uso della web app Gestisco.IO per super admin, admin, dipendenti e clienti.
 
 Le procedure fanno riferimento alle funzionalita effettivamente disponibili nella versione corrente. La precedente applicazione Java Swing non fa parte del flusso operativo descritto.
 
