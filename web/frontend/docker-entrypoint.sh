@@ -46,4 +46,39 @@ envsubst '${NGINX_LOGIN_RATE} ${NGINX_LOGIN_BURST} ${NGINX_LOGIN_RETRY_AFTER_SEC
   < /etc/nginx/templates/default.conf.template \
   > /tmp/default.conf
 
+# HTTPS opzionale sulla porta 8443 (ADR 0009: i cookie Secure richiedono TLS). La porta 8080 resta per
+# l'healthcheck interno; in modalita TLS il compose pubblica soltanto la 8443.
+NGINX_TLS_CERTIFICATE_FILE=${NGINX_TLS_CERTIFICATE_FILE:-}
+NGINX_TLS_CERTIFICATE_KEY_FILE=${NGINX_TLS_CERTIFICATE_KEY_FILE:-}
+if [ -n "$NGINX_TLS_CERTIFICATE_FILE" ] || [ -n "$NGINX_TLS_CERTIFICATE_KEY_FILE" ]; then
+  for file in "$NGINX_TLS_CERTIFICATE_FILE" "$NGINX_TLS_CERTIFICATE_KEY_FILE"; do
+    case "$file" in
+      /*) ;;
+      *)
+        printf 'Certificato e chiave TLS richiedono entrambi un percorso assoluto.\n' >&2
+        exit 78
+        ;;
+    esac
+    if [ ! -r "$file" ]; then
+      printf 'File TLS non leggibile: %s\n' "$file" >&2
+      exit 78
+    fi
+  done
+  awk -v certificate="$NGINX_TLS_CERTIFICATE_FILE" -v key="$NGINX_TLS_CERTIFICATE_KEY_FILE" '
+    { print }
+    $0 ~ /^    listen 8080;$/ {
+      print "    listen 8443 ssl;"
+      print "    ssl_certificate " certificate ";"
+      print "    ssl_certificate_key " key ";"
+      print "    ssl_protocols TLSv1.2 TLSv1.3;"
+      print "    ssl_session_cache off;"
+    }
+  ' /tmp/default.conf > /tmp/default-tls.conf
+  if ! grep -q '^    listen 8443 ssl;$' /tmp/default-tls.conf; then
+    printf 'Listener TLS non applicato alla configurazione Nginx.\n' >&2
+    exit 78
+  fi
+  mv /tmp/default-tls.conf /tmp/default.conf
+fi
+
 exec nginx -c /etc/nginx/nginx.conf -g 'daemon off;'

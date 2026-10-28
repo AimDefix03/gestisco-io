@@ -44,6 +44,7 @@ exec docker run --rm --init --ipc=host --network host \
   --env HOME=/tmp \
   --env CI \
   --env PLAYWRIGHT_BASE_URL \
+  --env PLAYWRIGHT_TLS_SELF_SIGNED \
   --env E2E_USERNAME \
   --env E2E_PASSWORD \
   --env GESTIONALE_BOOTSTRAP_SUPER_ADMIN_USERNAME \

@@ -12,6 +12,8 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.UUID;
 
+import static it.giovannidefilippo.gestionale.support.SessionRequests.session;
+import static it.giovannidefilippo.gestionale.support.SessionRequests.sessionToken;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -41,7 +43,7 @@ class ProductBarcodeControllerTest {
                 .andExpect(jsonPath("$.unitOfMeasure").value("PAIR"))
                 .andExpect(jsonPath("$.unitLabel").value("Paio"));
 
-        mockMvc.perform(get("/api/products").header("X-Session-Token", token).param("q", barcode.toLowerCase()))
+        mockMvc.perform(get("/api/products").with(session(token)).param("q", barcode.toLowerCase()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(1))
                 .andExpect(jsonPath("$.content[0].code").value(code));
@@ -93,8 +95,8 @@ class ProductBarcodeControllerTest {
         body.put("unitOfMeasure", unit);
         String json = objectMapper.writeValueAsString(body);
         return existingCode == null
-                ? mockMvc.perform(post("/api/products").header("X-Session-Token", token).contentType(MediaType.APPLICATION_JSON).content(json))
-                : mockMvc.perform(put("/api/products/" + existingCode).header("X-Session-Token", token).contentType(MediaType.APPLICATION_JSON).content(json));
+                ? mockMvc.perform(post("/api/products").with(session(token)).contentType(MediaType.APPLICATION_JSON).content(json))
+                : mockMvc.perform(put("/api/products/" + existingCode).with(session(token)).contentType(MediaType.APPLICATION_JSON).content(json));
     }
 
     private static String unique(String prefix) {
@@ -117,6 +119,6 @@ class ProductBarcodeControllerTest {
                                 """.formatted(SUPER_ADMIN_PASSWORD)))
                 .andExpect(status().isOk())
                 .andReturn();
-        return objectMapper.readTree(result.getResponse().getContentAsString()).path("token").asText();
+        return sessionToken(result);
     }
 }

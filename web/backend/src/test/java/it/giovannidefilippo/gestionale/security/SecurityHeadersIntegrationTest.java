@@ -1,6 +1,5 @@
 package it.giovannidefilippo.gestionale.security;
 
-import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -10,7 +9,10 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
+import static it.giovannidefilippo.gestionale.support.SessionRequests.session;
+import static it.giovannidefilippo.gestionale.support.SessionRequests.sessionToken;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -26,9 +28,6 @@ class SecurityHeadersIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Test
     void securityHeadersAreWrittenForSuccessfulResponses() throws Exception {
@@ -47,7 +46,7 @@ class SecurityHeadersIntegrationTest {
         String token = login();
 
         assertSecurityHeaders(mockMvc.perform(get("/test/security/internal-error")
-                        .header("X-Session-Token", token)))
+                        .with(session(token))))
                 .andExpect(status().isInternalServerError());
     }
 
@@ -62,7 +61,7 @@ class SecurityHeadersIntegrationTest {
     }
 
     private String login() throws Exception {
-        String response = mockMvc.perform(post("/api/accounts/login")
+        MvcResult response = mockMvc.perform(post("/api/accounts/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -72,10 +71,8 @@ class SecurityHeadersIntegrationTest {
                                 }
                                 """.formatted(SUPER_ADMIN_USERNAME, SUPER_ADMIN_PASSWORD)))
                 .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        return objectMapper.readTree(response).path("token").asText();
+                .andReturn();
+        return sessionToken(response);
     }
 
     @RestController

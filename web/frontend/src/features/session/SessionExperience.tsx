@@ -4,6 +4,15 @@ import AuthPage from '../../pages/AuthPage';
 import type { SessionFlowController } from './useSessionFlow';
 
 export function SessionEntry({ flow }: { flow: SessionFlowController }) {
+  if (flow.restoring) {
+    return (
+      <main className="auth-shell">
+        <section className="auth-card" aria-busy="true">
+          <p className="empty-state" role="status">Verifica della sessione in corso.</p>
+        </section>
+      </main>
+    );
+  }
   return (
     <AuthPage
       mode={flow.authMode}

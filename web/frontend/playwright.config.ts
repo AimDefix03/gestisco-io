@@ -15,7 +15,9 @@ export default defineConfig({
     ? [['line'], ['html', { open: 'never' }]]
     : [['list'], ['html', { open: 'never' }]],
   use: {
-    baseURL: process.env.PLAYWRIGHT_BASE_URL ?? 'http://127.0.0.1:18081',
+    baseURL: process.env.PLAYWRIGHT_BASE_URL ?? 'https://127.0.0.1:18081',
+    // Gli stack di verifica servono HTTPS con un certificato autofirmato generato a ogni run (ADR 0009).
+    ignoreHTTPSErrors: process.env.PLAYWRIGHT_TLS_SELF_SIGNED === 'true',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure'

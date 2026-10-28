@@ -4,9 +4,11 @@ import it.giovannidefilippo.gestionale.common.PageResponse;
 import it.giovannidefilippo.gestionale.idempotency.IdempotencyService;
 import it.giovannidefilippo.gestionale.user.AuthSessionService;
 import it.giovannidefilippo.gestionale.user.AuthenticatedUser;
+import it.giovannidefilippo.gestionale.user.SessionCookies;
 import it.giovannidefilippo.gestionale.user.UserPermission;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,7 +35,7 @@ class PhysicalInventoryController {
 
     @GetMapping
     PageResponse<PhysicalInventorySessionResponse> search(
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestParam(required = false) PhysicalInventoryStatus status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
@@ -45,7 +47,7 @@ class PhysicalInventoryController {
     @GetMapping("/{id}")
     PhysicalInventorySessionResponse find(
             @PathVariable Long id,
-            @RequestHeader(value = "X-Session-Token", required = false) String token
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token
     ) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.MANAGE_INVENTORY);
         return service.find(id, actor);
@@ -55,7 +57,7 @@ class PhysicalInventoryController {
     @ResponseStatus(HttpStatus.CREATED)
     PhysicalInventorySessionResponse create(
             @Valid @RequestBody PhysicalInventoryRequests.Create request,
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestHeader(value = IdempotencyService.HEADER_NAME, required = false) String idempotencyKey
     ) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.MANAGE_INVENTORY);
@@ -68,7 +70,7 @@ class PhysicalInventoryController {
             @PathVariable Long sessionId,
             @PathVariable Long itemId,
             @Valid @RequestBody PhysicalInventoryRequests.Count request,
-            @RequestHeader(value = "X-Session-Token", required = false) String token
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token
     ) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.MANAGE_INVENTORY);
         return service.recordCount(sessionId, itemId, request, actor);
@@ -77,7 +79,7 @@ class PhysicalInventoryController {
     @PostMapping("/{id}/submit")
     PhysicalInventorySessionResponse submit(
             @PathVariable Long id,
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestHeader(value = IdempotencyService.HEADER_NAME, required = false) String idempotencyKey
     ) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.MANAGE_INVENTORY);
@@ -89,7 +91,7 @@ class PhysicalInventoryController {
     PhysicalInventorySessionResponse approve(
             @PathVariable Long id,
             @Valid @RequestBody PhysicalInventoryRequests.Decision request,
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestHeader(value = IdempotencyService.HEADER_NAME, required = false) String idempotencyKey
     ) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.APPROVE_INVENTORY_COUNTS);
@@ -101,7 +103,7 @@ class PhysicalInventoryController {
     PhysicalInventorySessionResponse cancel(
             @PathVariable Long id,
             @Valid @RequestBody PhysicalInventoryRequests.Decision request,
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestHeader(value = IdempotencyService.HEADER_NAME, required = false) String idempotencyKey
     ) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.MANAGE_INVENTORY);

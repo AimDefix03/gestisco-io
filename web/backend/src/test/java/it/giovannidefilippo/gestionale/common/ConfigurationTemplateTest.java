@@ -74,7 +74,7 @@ class ConfigurationTemplateTest {
         assertThat(prodLikeCompose)
                 .contains("/var/run/postgresql:rw,noexec,nosuid,nodev")
                 .contains("127.0.0.1:${GESTIONALE_POSTGRES_PORT:-5433}:5432")
-                .contains("${GESTIONALE_FRONTEND_PORT:-8081}:8080")
+                .contains("${GESTIONALE_FRONTEND_PORT:-8081}:${GESTIONALE_FRONTEND_CONTAINER_PORT:-8080}")
                 .contains("prom/prometheus:v3.13.1")
                 .contains("127.0.0.1:${GESTIONALE_PROMETHEUS_PORT:-9091}:9090");
 

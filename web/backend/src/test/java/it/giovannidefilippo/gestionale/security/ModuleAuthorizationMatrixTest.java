@@ -20,6 +20,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.util.List;
 import java.util.UUID;
 
+import static it.giovannidefilippo.gestionale.support.SessionRequests.session;
+import static it.giovannidefilippo.gestionale.support.SessionRequests.sessionToken;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -73,41 +75,41 @@ class ModuleAuthorizationMatrixTest extends PostgreSqlIntegrationTestSupport {
     void customerCanBrowseCatalogAndOrdersButCannotManageOperationalModules() throws Exception {
         Account customer = createAccount("customer", "CUSTOMER");
 
-        mockMvc.perform(get("/api/products").header("X-Session-Token", customer.token()))
+        mockMvc.perform(get("/api/products").with(session(customer.token())))
                 .andExpect(status().isForbidden());
 
-        mockMvc.perform(get("/api/customer/catalog").header("X-Session-Token", customer.token()))
+        mockMvc.perform(get("/api/customer/catalog").with(session(customer.token())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray());
 
-        mockMvc.perform(get("/api/orders").header("X-Session-Token", customer.token()))
+        mockMvc.perform(get("/api/orders").with(session(customer.token())))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(get("/api/partners").header("X-Session-Token", customer.token()))
+        mockMvc.perform(get("/api/partners").with(session(customer.token())))
                 .andExpect(status().isForbidden());
 
-        mockMvc.perform(get("/api/purchase-orders").header("X-Session-Token", customer.token()))
+        mockMvc.perform(get("/api/purchase-orders").with(session(customer.token())))
                 .andExpect(status().isForbidden());
 
         mockMvc.perform(post("/api/products")
-                        .header("X-Session-Token", customer.token())
+                        .with(session(customer.token()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(productPayload(uniqueCode("CUST-PROD"))))
                 .andExpect(status().isForbidden());
 
-        mockMvc.perform(get("/api/inventory/movements").header("X-Session-Token", customer.token()))
+        mockMvc.perform(get("/api/inventory/movements").with(session(customer.token())))
                 .andExpect(status().isForbidden());
 
-        mockMvc.perform(get("/api/documents").header("X-Session-Token", customer.token()))
+        mockMvc.perform(get("/api/documents").with(session(customer.token())))
                 .andExpect(status().isForbidden());
 
-        mockMvc.perform(get("/api/reports/sales").header("X-Session-Token", customer.token()))
+        mockMvc.perform(get("/api/reports/sales").with(session(customer.token())))
                 .andExpect(status().isForbidden());
 
-        mockMvc.perform(get("/api/accounts").header("X-Session-Token", customer.token()))
+        mockMvc.perform(get("/api/accounts").with(session(customer.token())))
                 .andExpect(status().isForbidden());
 
-        mockMvc.perform(get("/api/audit").header("X-Session-Token", customer.token()))
+        mockMvc.perform(get("/api/audit").with(session(customer.token())))
                 .andExpect(status().isForbidden());
     }
 
@@ -119,7 +121,7 @@ class ModuleAuthorizationMatrixTest extends PostgreSqlIntegrationTestSupport {
         createProduct(employee.token(), productCode);
 
         mockMvc.perform(post("/api/inventory/movements")
-                        .header("X-Session-Token", employee.token())
+                        .with(session(employee.token()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -132,24 +134,24 @@ class ModuleAuthorizationMatrixTest extends PostgreSqlIntegrationTestSupport {
                 .andExpect(status().isCreated());
 
         mockMvc.perform(post("/api/partners")
-                        .header("X-Session-Token", employee.token())
+                        .with(session(employee.token()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(partnerPayload(uniqueCode("EMP-CLI"), "CUSTOMER", "Cliente permessi")))
                 .andExpect(status().isCreated());
 
-        mockMvc.perform(get("/api/documents").header("X-Session-Token", employee.token()))
+        mockMvc.perform(get("/api/documents").with(session(employee.token())))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(get("/api/reports/inventory").header("X-Session-Token", employee.token()))
+        mockMvc.perform(get("/api/reports/inventory").with(session(employee.token())))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(get("/api/purchase-orders").header("X-Session-Token", employee.token()))
+        mockMvc.perform(get("/api/purchase-orders").with(session(employee.token())))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(get("/api/accounts").header("X-Session-Token", employee.token()))
+        mockMvc.perform(get("/api/accounts").with(session(employee.token())))
                 .andExpect(status().isForbidden());
 
-        mockMvc.perform(get("/api/audit").header("X-Session-Token", employee.token()))
+        mockMvc.perform(get("/api/audit").with(session(employee.token())))
                 .andExpect(status().isForbidden());
     }
 
@@ -161,7 +163,7 @@ class ModuleAuthorizationMatrixTest extends PostgreSqlIntegrationTestSupport {
         createProduct(employee.token(), productCode);
 
         MvcResult created = mockMvc.perform(post("/api/inventory/counts")
-                        .header("X-Session-Token", employee.token())
+                        .with(session(employee.token()))
                         .header("Idempotency-Key", UUID.randomUUID().toString())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -175,7 +177,7 @@ class ModuleAuthorizationMatrixTest extends PostgreSqlIntegrationTestSupport {
         long itemId = session.path("items").get(0).path("id").asLong();
 
         mockMvc.perform(put("/api/inventory/counts/{sessionId}/items/{itemId}", sessionId, itemId)
-                        .header("X-Session-Token", employee.token())
+                        .with(session(employee.token()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"countedQuantity":4,"note":"Conteggio reparto"}
@@ -184,13 +186,13 @@ class ModuleAuthorizationMatrixTest extends PostgreSqlIntegrationTestSupport {
                 .andExpect(jsonPath("$.items[0].differenceQuantity").value(-1));
 
         mockMvc.perform(post("/api/inventory/counts/{id}/submit", sessionId)
-                        .header("X-Session-Token", employee.token())
+                        .with(session(employee.token()))
                         .header("Idempotency-Key", UUID.randomUUID().toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("SUBMITTED"));
 
         mockMvc.perform(post("/api/inventory/counts/{id}/approve", sessionId)
-                        .header("X-Session-Token", employee.token())
+                        .with(session(employee.token()))
                         .header("Idempotency-Key", UUID.randomUUID().toString())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"reason\":\"Approvazione non consentita\"}"))
@@ -198,7 +200,7 @@ class ModuleAuthorizationMatrixTest extends PostgreSqlIntegrationTestSupport {
                 .andExpect(jsonPath("$.code").value("AUTH_FORBIDDEN"));
 
         mockMvc.perform(post("/api/inventory/counts/{id}/approve", sessionId)
-                        .header("X-Session-Token", admin.token())
+                        .with(session(admin.token()))
                         .header("Idempotency-Key", UUID.randomUUID().toString())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"reason\":\"Differenza verificata dal responsabile\"}"))
@@ -219,7 +221,7 @@ class ModuleAuthorizationMatrixTest extends PostgreSqlIntegrationTestSupport {
                 """;
 
         mockMvc.perform(post("/api/orders/ORD-NOT-REACHED/payments/reconciliation")
-                        .header("X-Session-Token", employee.token())
+                        .with(session(employee.token()))
                         .header("Idempotency-Key", UUID.randomUUID().toString())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
@@ -227,7 +229,7 @@ class ModuleAuthorizationMatrixTest extends PostgreSqlIntegrationTestSupport {
                 .andExpect(jsonPath("$.code").value("AUTH_FORBIDDEN"));
 
         mockMvc.perform(post("/api/orders/ORD-NOT-REACHED/payments/reconciliation")
-                        .header("X-Session-Token", loginSuperAdmin())
+                        .with(session(loginSuperAdmin()))
                         .header("Idempotency-Key", UUID.randomUUID().toString())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
@@ -241,7 +243,7 @@ class ModuleAuthorizationMatrixTest extends PostgreSqlIntegrationTestSupport {
         Account intruder = createAccount("intruder", "CUSTOMER");
 
         mockMvc.perform(get("/api/orders/customer/" + owner.username())
-                        .header("X-Session-Token", intruder.token()))
+                        .with(session(intruder.token())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(0));
     }
@@ -253,7 +255,7 @@ class ModuleAuthorizationMatrixTest extends PostgreSqlIntegrationTestSupport {
         Account customer = createAccount("buyer", "CUSTOMER");
 
         mockMvc.perform(post("/api/orders")
-                        .header("X-Session-Token", customer.token())
+                        .with(session(customer.token()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -269,7 +271,7 @@ class ModuleAuthorizationMatrixTest extends PostgreSqlIntegrationTestSupport {
                 .andExpect(jsonPath("$.status").value("DRAFT"));
 
         mockMvc.perform(get("/api/orders/customer/" + customer.username())
-                        .header("X-Session-Token", customer.token()))
+                        .with(session(customer.token())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].customer").value(customer.username()));
     }
@@ -285,7 +287,7 @@ class ModuleAuthorizationMatrixTest extends PostgreSqlIntegrationTestSupport {
         String orderCode = createFulfilledOrder(employee.token(), "document_customer", productCode);
 
         mockMvc.perform(post("/api/documents/invoice")
-                        .header("X-Session-Token", customer.token())
+                        .with(session(customer.token()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -295,7 +297,7 @@ class ModuleAuthorizationMatrixTest extends PostgreSqlIntegrationTestSupport {
                 .andExpect(status().isForbidden());
 
         mockMvc.perform(post("/api/documents/invoice")
-                        .header("X-Session-Token", employee.token())
+                        .with(session(employee.token()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -315,17 +317,17 @@ class ModuleAuthorizationMatrixTest extends PostgreSqlIntegrationTestSupport {
         String orderCode = createDraftOrder(customer.token(), "forged_customer", productCode);
 
         mockMvc.perform(post("/api/orders/" + orderCode + "/confirm")
-                        .header("X-Session-Token", customer.token()))
+                        .with(session(customer.token())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("CONFIRMED"));
 
         mockMvc.perform(post("/api/orders/" + orderCode + "/fulfill")
-                        .header("X-Session-Token", customer.token()))
+                        .with(session(customer.token())))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("AUTH_FORBIDDEN"));
 
         mockMvc.perform(post("/api/orders/" + orderCode + "/fulfill")
-                        .header("X-Session-Token", employee.token()))
+                        .with(session(employee.token())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("FULFILLED"));
     }
@@ -340,7 +342,7 @@ class ModuleAuthorizationMatrixTest extends PostgreSqlIntegrationTestSupport {
         createPartner(employee.token(), customerCode, "CUSTOMER", "Cliente Anagrafica");
 
         MvcResult result = mockMvc.perform(post("/api/orders")
-                        .header("X-Session-Token", employee.token())
+                        .with(session(employee.token()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -367,7 +369,7 @@ class ModuleAuthorizationMatrixTest extends PostgreSqlIntegrationTestSupport {
         Account anotherAdmin = createAdmin(superToken, "matrix_admin_target");
 
         mockMvc.perform(post("/api/accounts")
-                        .header("X-Session-Token", admin.token())
+                        .with(session(admin.token()))
                         .header("X-Reauth-Password", admin.password())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -381,13 +383,13 @@ class ModuleAuthorizationMatrixTest extends PostgreSqlIntegrationTestSupport {
                 .andExpect(jsonPath("$.message").value("Solo il super admin può creare altri account admin."));
 
         mockMvc.perform(delete("/api/accounts/" + anotherAdmin.username())
-                        .header("X-Session-Token", admin.token())
+                        .with(session(admin.token()))
                         .header("X-Reauth-Password", admin.password()))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Solo il super admin può gestire account admin."));
 
         mockMvc.perform(delete("/api/accounts/" + anotherAdmin.username())
-                        .header("X-Session-Token", superToken)
+                        .with(session(superToken))
                         .header("X-Reauth-Password", SUPER_ADMIN_PASSWORD))
                 .andExpect(status().isNoContent());
     }
@@ -398,7 +400,7 @@ class ModuleAuthorizationMatrixTest extends PostgreSqlIntegrationTestSupport {
         Account admin = createAdmin(superToken, "self_delete_admin");
 
         mockMvc.perform(delete("/api/accounts/" + admin.username())
-                        .header("X-Session-Token", admin.token())
+                        .with(session(admin.token()))
                         .header("X-Reauth-Password", admin.password()))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Non puoi disabilitare il tuo account mentre sei autenticato."));
@@ -420,7 +422,7 @@ class ModuleAuthorizationMatrixTest extends PostgreSqlIntegrationTestSupport {
         } else {
             String superToken = loginSuperAdmin();
             mockMvc.perform(post("/api/accounts")
-                            .header("X-Session-Token", superToken)
+                            .with(session(superToken))
                             .header("X-Reauth-Password", SUPER_ADMIN_PASSWORD)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content("""
@@ -439,7 +441,7 @@ class ModuleAuthorizationMatrixTest extends PostgreSqlIntegrationTestSupport {
         String username = uniqueUsername(prefix);
         String password = "AdminUser123!";
         mockMvc.perform(post("/api/accounts")
-                        .header("X-Session-Token", superToken)
+                        .with(session(superToken))
                         .header("X-Reauth-Password", SUPER_ADMIN_PASSWORD)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -466,7 +468,7 @@ class ModuleAuthorizationMatrixTest extends PostgreSqlIntegrationTestSupport {
     }
 
     private String login(String username, String password, String role) throws Exception {
-        String response = mockMvc.perform(post("/api/accounts/login")
+        MvcResult response = mockMvc.perform(post("/api/accounts/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -476,21 +478,19 @@ class ModuleAuthorizationMatrixTest extends PostgreSqlIntegrationTestSupport {
                                 }
                                 """.formatted(username, password, role)))
                 .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        return objectMapper.readTree(response).path("token").asText();
+                .andReturn();
+        return sessionToken(response);
     }
 
     private void createProduct(String token, String code) throws Exception {
         mockMvc.perform(post("/api/products")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(productPayload(code)))
                 .andExpect(status().isCreated());
 
         mockMvc.perform(post("/api/inventory/initial-balance")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -504,7 +504,7 @@ class ModuleAuthorizationMatrixTest extends PostgreSqlIntegrationTestSupport {
 
     private void createPartner(String token, String code, String type, String displayName) throws Exception {
         mockMvc.perform(post("/api/partners")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(partnerPayload(code, type, displayName)))
                 .andExpect(status().isCreated());
@@ -513,11 +513,11 @@ class ModuleAuthorizationMatrixTest extends PostgreSqlIntegrationTestSupport {
     private String createFulfilledOrder(String token, String customer, String productCode) throws Exception {
         String orderCode = createDraftOrder(token, customer, productCode);
         mockMvc.perform(post("/api/orders/" + orderCode + "/confirm")
-                        .header("X-Session-Token", token))
+                        .with(session(token)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("CONFIRMED"));
         mockMvc.perform(post("/api/orders/" + orderCode + "/fulfill")
-                        .header("X-Session-Token", token))
+                        .with(session(token)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("FULFILLED"));
         return orderCode;
@@ -525,7 +525,7 @@ class ModuleAuthorizationMatrixTest extends PostgreSqlIntegrationTestSupport {
 
     private String createDraftOrder(String token, String customer, String productCode) throws Exception {
         MvcResult result = mockMvc.perform(post("/api/orders")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {

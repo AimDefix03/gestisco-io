@@ -1,6 +1,5 @@
 package it.giovannidefilippo.gestionale.product;
 
-import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -11,6 +10,8 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.UUID;
 
+import static it.giovannidefilippo.gestionale.support.SessionRequests.session;
+import static it.giovannidefilippo.gestionale.support.SessionRequests.sessionToken;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -26,9 +27,6 @@ class ProductLookupControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     @Test
     void productLookupRequiresCatalogPermission() throws Exception {
         mockMvc.perform(get("/api/products/lookup"))
@@ -42,7 +40,7 @@ class ProductLookupControllerTest {
         String code = "LOOK-" + UUID.randomUUID().toString().substring(0, 8);
         createProduct(token, code);
 
-        mockMvc.perform(get("/api/products/lookup").header("X-Session-Token", token))
+        mockMvc.perform(get("/api/products/lookup").with(session(token)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[*].code", hasItem(code)))
                 .andExpect(jsonPath("$[*].brand", hasItem("LookupBrand")))
@@ -65,12 +63,12 @@ class ProductLookupControllerTest {
                                 """.formatted(username, password, role)))
                 .andExpect(status().isOk())
                 .andReturn();
-        return objectMapper.readTree(result.getResponse().getContentAsString()).path("token").asText();
+        return sessionToken(result);
     }
 
     private void createProduct(String token, String code) throws Exception {
         mockMvc.perform(post("/api/products")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {

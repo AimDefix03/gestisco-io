@@ -1,10 +1,11 @@
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { AuthSession, clearSessionToken, SessionExpiredError, setSessionToken, subscribeToSessionExpiration, UserAccount } from '../api';
+import { AuthSession, fetchCurrentSession, markSessionActive, markSessionEnded, SessionExpiredError, subscribeToSessionExpiration, UserAccount } from '../api';
 
 type SessionContextValue = {
   currentUser: UserAccount | null;
   sessionExpiresAt: string;
   renewalMessage: string | null;
+  restoring: boolean;
   startSession: (session: AuthSession) => void;
   clearSession: () => void;
   requestSessionRenewal: (message: string) => void;
@@ -16,16 +17,17 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useState<UserAccount | null>(null);
   const [sessionExpiresAt, setSessionExpiresAt] = useState('');
   const [renewalMessage, setRenewalMessage] = useState<string | null>(null);
+  const [restoring, setRestoring] = useState(true);
 
   const startSession = useCallback((session: AuthSession) => {
-    setSessionToken(session.token);
+    markSessionActive();
     setCurrentUser(session.user);
     setSessionExpiresAt(session.expiresAt);
     setRenewalMessage(null);
   }, []);
 
   const clearSession = useCallback(() => {
-    clearSessionToken();
+    markSessionEnded();
     setCurrentUser(null);
     setSessionExpiresAt('');
     setRenewalMessage(null);
@@ -34,6 +36,19 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const requestSessionRenewal = useCallback((message: string) => {
     if (currentUser) setRenewalMessage(message);
   }, [currentUser]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    fetchCurrentSession(controller.signal)
+      .then((session) => {
+        if (session && !controller.signal.aborted) startSession(session);
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        if (!controller.signal.aborted) setRestoring(false);
+      });
+    return () => controller.abort();
+  }, [startSession]);
 
   useEffect(() => subscribeToSessionExpiration((error) => {
     requestSessionRenewal(formatSessionError(error));
@@ -60,10 +75,11 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     currentUser,
     sessionExpiresAt,
     renewalMessage,
+    restoring,
     startSession,
     clearSession,
     requestSessionRenewal
-  }), [clearSession, currentUser, renewalMessage, requestSessionRenewal, sessionExpiresAt, startSession]);
+  }), [clearSession, currentUser, renewalMessage, requestSessionRenewal, restoring, sessionExpiresAt, startSession]);
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
 }

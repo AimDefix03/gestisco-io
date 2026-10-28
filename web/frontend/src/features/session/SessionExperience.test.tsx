@@ -8,7 +8,7 @@ import useSessionFlow from './useSessionFlow';
 
 vi.mock('../../api', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../../api')>();
-  return { ...actual, login: vi.fn() };
+  return { ...actual, fetchCurrentSession: vi.fn().mockResolvedValue(null), login: vi.fn() };
 });
 
 const loginMock = vi.mocked(login);
@@ -28,12 +28,11 @@ describe('SessionExperience', () => {
         disabledBy: null,
         disabledReason: null
       },
-      token: 'session-token',
       expiresAt: new Date(Date.now() + 3600000).toISOString()
     });
     render(<SessionProvider><Harness /></SessionProvider>);
 
-    await user.type(screen.getByLabelText('Username'), 'superadmin');
+    await user.type(await screen.findByLabelText('Username'), 'superadmin');
     await user.type(screen.getByLabelText('Password'), 'Secret123!');
     await user.click(screen.getByRole('button', { name: 'Accedi' }));
     expect(await screen.findByText('Workspace autenticato')).toBeInTheDocument();

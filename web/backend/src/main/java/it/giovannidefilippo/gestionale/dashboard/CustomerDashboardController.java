@@ -2,8 +2,9 @@ package it.giovannidefilippo.gestionale.dashboard;
 
 import it.giovannidefilippo.gestionale.user.AuthSessionService;
 import it.giovannidefilippo.gestionale.user.AuthenticatedUser;
+import it.giovannidefilippo.gestionale.user.SessionCookies;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,7 +20,7 @@ class CustomerDashboardController {
     }
 
     @GetMapping
-    CustomerDashboardResponse summary(@RequestHeader(value = "X-Session-Token", required = false) String token) {
+    CustomerDashboardResponse summary(@CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token) {
         AuthenticatedUser actor = authSessionService.requireCustomer(token);
         return dashboardService.customerSummary(actor);
     }

@@ -45,6 +45,8 @@ Prerequisiti:
 - curl;
 - porte locali `55433`, `55434`, `55435`, `28080`, `28081` e `29091` disponibili.
 
+Il frontend della verifica e servito in HTTPS su `https://127.0.0.1:28081` (ADR 0009): `scripts/ci/frontend-tls.sh` genera a ogni run un certificato autofirmato per `127.0.0.1` e `localhost` nella cartella dei secret effimeri, `docker-compose.e2e-tls.yml` lo monta in Nginx, curl lo verifica tramite `CURL_CA_BUNDLE` e soltanto i browser Playwright lo accettano con `ignoreHTTPSErrors` (`PLAYWRIGHT_TLS_SELF_SIGNED=true`). Senza HTTPS WebKit rifiuta i cookie `Secure` anche su `127.0.0.1`. Lo smoke E2E (`scripts/e2e/run-web-smoke.sh`) usa la stessa modalita sulla porta 18081.
+
 Comando:
 
 ```bash

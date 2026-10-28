@@ -1,6 +1,5 @@
 package it.giovannidefilippo.gestionale.dashboard;
 
-import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -11,6 +10,8 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.UUID;
 
+import static it.giovannidefilippo.gestionale.support.SessionRequests.session;
+import static it.giovannidefilippo.gestionale.support.SessionRequests.sessionToken;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -26,9 +27,6 @@ class DashboardControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     @Test
     void dashboardRequiresSession() throws Exception {
         mockMvc.perform(get("/api/dashboard"))
@@ -43,7 +41,7 @@ class DashboardControllerTest {
         createProduct(token, productCode, 2);
         createMovement(token, productCode);
 
-        mockMvc.perform(get("/api/dashboard").header("X-Session-Token", token))
+        mockMvc.perform(get("/api/dashboard").with(session(token)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.products").value(greaterThanOrEqualTo(1)))
                 .andExpect(jsonPath("$.potentialRetailStockValue").isNumber())
@@ -80,10 +78,10 @@ class DashboardControllerTest {
         createOrder(customerToken, productCode);
         createOrder(otherCustomerToken, productCode);
 
-        mockMvc.perform(get("/api/dashboard").header("X-Session-Token", customerToken))
+        mockMvc.perform(get("/api/dashboard").with(session(customerToken)))
                 .andExpect(status().isForbidden());
 
-        mockMvc.perform(get("/api/customer/dashboard").header("X-Session-Token", customerToken))
+        mockMvc.perform(get("/api/customer/dashboard").with(session(customerToken)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalOrders").value(1))
                 .andExpect(jsonPath("$.draftOrders").value(1))
@@ -108,7 +106,7 @@ class DashboardControllerTest {
     void staffCannotUseCustomerDashboardProjection() throws Exception {
         String adminToken = login("test_super_admin", SUPER_ADMIN_PASSWORD, "SUPER_ADMIN");
 
-        mockMvc.perform(get("/api/customer/dashboard").header("X-Session-Token", adminToken))
+        mockMvc.perform(get("/api/customer/dashboard").with(session(adminToken)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("AUTH_FORBIDDEN"));
     }
@@ -125,7 +123,7 @@ class DashboardControllerTest {
                                 """.formatted(username, password, role)))
                 .andExpect(status().isOk())
                 .andReturn();
-        return objectMapper.readTree(result.getResponse().getContentAsString()).path("token").asText();
+        return sessionToken(result);
     }
 
     private void register(String username, String password) throws Exception {
@@ -142,7 +140,7 @@ class DashboardControllerTest {
 
     private void createProduct(String token, String code, int quantity) throws Exception {
         mockMvc.perform(post("/api/products")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -160,7 +158,7 @@ class DashboardControllerTest {
                 .andExpect(status().isCreated());
 
         mockMvc.perform(post("/api/inventory/initial-balance")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -174,7 +172,7 @@ class DashboardControllerTest {
 
     private void createMovement(String token, String productCode) throws Exception {
         mockMvc.perform(post("/api/inventory/movements")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -189,7 +187,7 @@ class DashboardControllerTest {
 
     private void createOrder(String token, String productCode) throws Exception {
         mockMvc.perform(post("/api/orders")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {

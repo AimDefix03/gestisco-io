@@ -74,6 +74,7 @@ test('passes environment by name only, never secret values', () => {
     'HOME=/tmp',
     'CI',
     'PLAYWRIGHT_BASE_URL',
+    'PLAYWRIGHT_TLS_SELF_SIGNED',
     'E2E_USERNAME',
     'E2E_PASSWORD',
     'GESTIONALE_BOOTSTRAP_SUPER_ADMIN_USERNAME',

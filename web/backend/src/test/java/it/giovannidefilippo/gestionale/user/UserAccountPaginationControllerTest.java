@@ -12,6 +12,8 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.UUID;
 
+import static it.giovannidefilippo.gestionale.support.SessionRequests.session;
+import static it.giovannidefilippo.gestionale.support.SessionRequests.sessionToken;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -38,7 +40,7 @@ class UserAccountPaginationControllerTest {
         createAccount(token, prefix + "_03");
 
         MvcResult result = mockMvc.perform(get("/api/accounts")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .param("q", prefix)
                         .param("role", "EMPLOYEE")
                         .param("page", "0")
@@ -70,12 +72,12 @@ class UserAccountPaginationControllerTest {
                                 """.formatted(SUPER_ADMIN_PASSWORD)))
                 .andExpect(status().isOk())
                 .andReturn();
-        return objectMapper.readTree(result.getResponse().getContentAsString()).path("token").asText();
+        return sessionToken(result);
     }
 
     private void createAccount(String token, String username) throws Exception {
         mockMvc.perform(post("/api/accounts")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .header("X-Reauth-Password", SUPER_ADMIN_PASSWORD)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""

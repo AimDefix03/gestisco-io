@@ -2,7 +2,7 @@
 
 ## Stato
 
-Accettata per il deployment browser-first corrente.
+Sostituita il 2026-10-27 dall'[ADR 0009](0009-browser-session-cookie-and-csrf.md) (sessione in cookie `HttpOnly` con CSRF double-submit, step P1.6). Resta come storico della scelta precedente.
 
 ## Contesto
 

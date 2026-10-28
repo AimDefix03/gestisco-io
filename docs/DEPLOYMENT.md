@@ -162,6 +162,8 @@ La shell HTML usa `Cache-Control: no-store`; gli asset Vite con hash usano `publ
 scripts/security/verify-browser-security.sh https://dominio-gestionale.example
 ```
 
+I cookie di sessione e CSRF sono `Secure` con prefisso `__Host-` (ADR 0009): i browser li accettano su HTTP solo per `localhost` e `127.0.0.1`. Ogni altra installazione deve essere servita in HTTPS, altrimenti l'accesso riesce ma la sessione non viene mantenuta.
+
 HSTS non deve essere aggiunto allo stack HTTP locale. Va attivato sul dominio reale soltanto dopo avere verificato HTTPS end-to-end, rinnovo certificati e redirect HTTP definitivo.
 
 Prima di un rilascio reale servono ancora:

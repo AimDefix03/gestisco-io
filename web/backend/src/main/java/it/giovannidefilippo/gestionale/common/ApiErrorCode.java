@@ -3,6 +3,7 @@ package it.giovannidefilippo.gestionale.common;
 public enum ApiErrorCode {
     AUTH_UNAUTHORIZED,
     AUTH_FORBIDDEN,
+    AUTH_CSRF_INVALID,
     REQUEST_INVALID,
     REQUEST_MALFORMED,
     VALIDATION_FAILED,

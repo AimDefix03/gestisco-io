@@ -1,0 +1,17 @@
+# HTTPS per gli stack di verifica (E2E e prod-like): certificato autofirmato generato a ogni run dai runner.
+# I cookie di sessione e CSRF sono Secure con prefisso __Host- (ADR 0009) e WebKit li rifiuta su HTTP,
+# anche su 127.0.0.1. Usare insieme a GESTIONALE_FRONTEND_CONTAINER_PORT=8443.
+services:
+  frontend:
+    environment:
+      NGINX_TLS_CERTIFICATE_FILE: /run/secrets/gestionale_frontend_tls_certificate
+      NGINX_TLS_CERTIFICATE_KEY_FILE: /run/secrets/gestionale_frontend_tls_key
+    secrets:
+      - gestionale_frontend_tls_certificate
+      - gestionale_frontend_tls_key
+
+secrets:
+  gestionale_frontend_tls_certificate:
+    file: ${GESTIONALE_FRONTEND_TLS_CERTIFICATE_FILE:?Set GESTIONALE_FRONTEND_TLS_CERTIFICATE_FILE}
+  gestionale_frontend_tls_key:
+    file: ${GESTIONALE_FRONTEND_TLS_KEY_FILE:?Set GESTIONALE_FRONTEND_TLS_KEY_FILE}

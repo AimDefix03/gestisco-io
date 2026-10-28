@@ -6,9 +6,11 @@ import it.giovannidefilippo.gestionale.idempotency.IdempotencyService;
 import it.giovannidefilippo.gestionale.product.ProductResponse;
 import it.giovannidefilippo.gestionale.user.AuthSessionService;
 import it.giovannidefilippo.gestionale.user.AuthenticatedUser;
+import it.giovannidefilippo.gestionale.user.SessionCookies;
 import it.giovannidefilippo.gestionale.user.UserPermission;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,7 +37,7 @@ class InventoryController {
 
     @GetMapping("/movements")
     PageResponse<StockMovementResponse> movements(
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "25") int size,
             @RequestParam(required = false) String q,
@@ -50,7 +52,7 @@ class InventoryController {
     @ResponseStatus(HttpStatus.CREATED)
     StockMovementResponse register(
             @Valid @RequestBody StockMovementRequest request,
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestHeader(value = IdempotencyService.HEADER_NAME, required = false) String idempotencyKey
     ) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.MANAGE_INVENTORY);
@@ -61,7 +63,7 @@ class InventoryController {
     @ResponseStatus(HttpStatus.CREATED)
     StockMovementResponse initialBalance(
             @Valid @RequestBody InitialStockRequest request,
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestHeader(value = IdempotencyService.HEADER_NAME, required = false) String idempotencyKey
     ) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.MANAGE_INVENTORY);
@@ -72,7 +74,7 @@ class InventoryController {
     @ResponseStatus(HttpStatus.CREATED)
     StockMovementResponse adjust(
             @Valid @RequestBody InventoryAdjustmentRequest request,
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestHeader(value = IdempotencyService.HEADER_NAME, required = false) String idempotencyKey
     ) {
         authSessionService.requirePermission(token, UserPermission.MANAGE_INVENTORY);
@@ -80,13 +82,13 @@ class InventoryController {
     }
 
     @GetMapping("/reconciliation")
-    InventoryReconciliationReport reconciliation(@RequestHeader(value = "X-Session-Token", required = false) String token) {
+    InventoryReconciliationReport reconciliation(@CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token) {
         authSessionService.requirePermission(token, UserPermission.MANAGE_INVENTORY);
         return service.reconciliation();
     }
 
     @GetMapping("/low-stock")
-    List<ProductResponse> lowStock(@RequestHeader(value = "X-Session-Token", required = false) String token) {
+    List<ProductResponse> lowStock(@CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token) {
         authSessionService.requirePermission(token, UserPermission.MANAGE_INVENTORY);
         return service.lowStockProducts();
     }

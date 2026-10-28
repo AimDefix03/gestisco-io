@@ -11,7 +11,7 @@ type SessionFlowOptions = {
 };
 
 export default function useSessionFlow({ onAuthenticated, onSignedOut, onNotice }: SessionFlowOptions) {
-  const { currentUser, sessionExpiresAt, renewalMessage, startSession, clearSession, requestSessionRenewal } = useSession();
+  const { currentUser, sessionExpiresAt, renewalMessage, restoring, startSession, clearSession, requestSessionRenewal } = useSession();
   const [authMode, setAuthMode] = useState<AuthMode>('login');
   const [authForm, setAuthForm] = useState<AuthFormState>({ username: '', password: '' });
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -126,6 +126,7 @@ export default function useSessionFlow({ onAuthenticated, onSignedOut, onNotice 
     currentUser,
     sessionExpiresAt,
     renewalMessage,
+    restoring,
     authMode,
     authForm,
     passwordVisible,

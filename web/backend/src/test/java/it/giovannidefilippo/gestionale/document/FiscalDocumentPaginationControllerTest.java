@@ -20,11 +20,14 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+import static it.giovannidefilippo.gestionale.support.SessionRequests.session;
+import static it.giovannidefilippo.gestionale.support.SessionRequests.sessionToken;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -69,7 +72,7 @@ class FiscalDocumentPaginationControllerTest {
         String token = login();
 
         String response = mockMvc.perform(get("/api/documents")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .param("page", "0")
                         .param("size", "2")
                         .param("q", customer)
@@ -102,7 +105,7 @@ class FiscalDocumentPaginationControllerTest {
         String token = login();
 
         mockMvc.perform(get("/api/documents")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .param("page", "0")
                         .param("size", "1")
                         .param("q", customer)
@@ -143,7 +146,7 @@ class FiscalDocumentPaginationControllerTest {
     }
 
     private String login() throws Exception {
-        String response = mockMvc.perform(post("/api/accounts/login")
+        MvcResult response = mockMvc.perform(post("/api/accounts/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -153,10 +156,8 @@ class FiscalDocumentPaginationControllerTest {
                                 }
                                 """))
                 .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        return objectMapper.readTree(response).path("token").asText();
+                .andReturn();
+        return sessionToken(response);
     }
 
     private static AuthenticatedUser actor() {

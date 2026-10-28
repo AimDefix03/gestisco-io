@@ -6,14 +6,15 @@ import it.giovannidefilippo.gestionale.audit.AuditSeverity;
 import it.giovannidefilippo.gestionale.order.OrderStatus;
 import it.giovannidefilippo.gestionale.user.AuthSessionService;
 import it.giovannidefilippo.gestionale.user.AuthenticatedUser;
+import it.giovannidefilippo.gestionale.user.SessionCookies;
 import it.giovannidefilippo.gestionale.user.UserPermission;
 import org.springframework.http.CacheControl;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,7 +39,7 @@ class ReportingController {
 
     @GetMapping("/sales")
     SalesReportResponse sales(
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestParam(required = false) LocalDate from,
             @RequestParam(required = false) LocalDate to,
             @RequestParam(required = false) OrderStatus status
@@ -49,7 +50,7 @@ class ReportingController {
 
     @GetMapping("/sales/export")
     ResponseEntity<byte[]> exportSales(
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestParam(required = false) LocalDate from,
             @RequestParam(required = false) LocalDate to,
             @RequestParam(required = false) OrderStatus status,
@@ -64,7 +65,7 @@ class ReportingController {
 
     @GetMapping("/inventory")
     InventoryReportResponse inventory(
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestParam(required = false) String q,
             @RequestParam(required = false) String category,
             @RequestParam(defaultValue = "ALL") String stock,
@@ -76,7 +77,7 @@ class ReportingController {
 
     @GetMapping("/inventory/export")
     ResponseEntity<byte[]> exportInventory(
-            @RequestHeader(value = "X-Session-Token", required = false) String token,
+            @CookieValue(value = SessionCookies.SESSION_COOKIE, required = false) String token,
             @RequestParam(required = false) String q,
             @RequestParam(required = false) String category,
             @RequestParam(defaultValue = "ALL") String stock,

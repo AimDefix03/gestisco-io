@@ -9,10 +9,13 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+import static it.giovannidefilippo.gestionale.support.SessionRequests.session;
+import static it.giovannidefilippo.gestionale.support.SessionRequests.sessionToken;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -34,7 +37,7 @@ class CompanySettingsControllerTest {
     @Test
     void superAdminCanReadCompanySettings() throws Exception {
         mockMvc.perform(get("/api/company-settings")
-                        .header("X-Session-Token", login("test_super_admin", "Test-Bootstrap-9842!", UserRole.SUPER_ADMIN)))
+                        .with(session(login("test_super_admin", "Test-Bootstrap-9842!", UserRole.SUPER_ADMIN))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.defaultVatRate").value(0.22))
                 .andExpect(jsonPath("$.invoicePrefix").value("FS"))
@@ -48,19 +51,17 @@ class CompanySettingsControllerTest {
         userService.createAccount(username, password, UserRole.ADMIN, "test_super_admin", "Account test configurazione aziendale");
 
         mockMvc.perform(get("/api/company-settings")
-                        .header("X-Session-Token", login(username, password, UserRole.ADMIN)))
+                        .with(session(login(username, password, UserRole.ADMIN))))
                 .andExpect(status().isForbidden());
     }
 
     private String login(String username, String password, UserRole role) throws Exception {
-        String response = mockMvc.perform(post("/api/accounts/login")
+        MvcResult response = mockMvc.perform(post("/api/accounts/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new LoginRequest(username, password, role))))
                 .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        return objectMapper.readTree(response).path("token").asText();
+                .andReturn();
+        return sessionToken(response);
     }
 
     private record LoginRequest(String username, String password, UserRole role) {

@@ -10,9 +10,11 @@ COMPOSE_FILE="$ROOT_DIR/docker-compose.prod-like.yml"
 SECRETS_COMPOSE_FILE="$ROOT_DIR/docker-compose.secrets.yml"
 BOOTSTRAP_SECRET_COMPOSE_FILE="$ROOT_DIR/docker-compose.bootstrap-secret.yml"
 RUN_LABELS_COMPOSE_FILE="$ROOT_DIR/docker-compose.run-labels.yml"
+TLS_COMPOSE_FILE="$ROOT_DIR/docker-compose.e2e-tls.yml"
 PROJECT_PREFIX=gestionale-e2e-
 
 . "$ROOT_DIR/scripts/ci/docker-run-safety.sh"
+. "$ROOT_DIR/scripts/ci/frontend-tls.sh"
 
 for command in docker openssl curl npm; do
   command -v "$command" >/dev/null 2>&1 || {
@@ -42,6 +44,7 @@ printf '%s' "$(openssl rand -hex 32)" >"$SECRET_DIR/database-runtime-password"
 printf '%s' "$(openssl rand -hex 32)" >"$SECRET_DIR/database-backup-password"
 printf '%s' "$(openssl rand -hex 32)" >"$SECRET_DIR/database-restore-password"
 printf '%s' "$E2E_PASSWORD" >"$SECRET_DIR/bootstrap-password"
+frontend_tls_prepare "$SECRET_DIR"
 chmod 0444 "$SECRET_DIR"/*
 
 export COMPOSE_PROJECT_NAME=$PROJECT_NAME
@@ -80,7 +83,7 @@ export GESTIONALE_POSTGRES_PORT=${E2E_POSTGRES_PORT:-55433}
 export GESTIONALE_BACKEND_PORT=${E2E_BACKEND_PORT:-18080}
 export GESTIONALE_MANAGEMENT_PORT=${E2E_MANAGEMENT_PORT:-19090}
 export GESTIONALE_FRONTEND_PORT=${E2E_FRONTEND_PORT:-18081}
-export PLAYWRIGHT_BASE_URL="http://127.0.0.1:$GESTIONALE_FRONTEND_PORT"
+export PLAYWRIGHT_BASE_URL="https://127.0.0.1:$GESTIONALE_FRONTEND_PORT"
 
 compose() {
   docker compose -p "$PROJECT_NAME" \
@@ -88,6 +91,7 @@ compose() {
     -f "$SECRETS_COMPOSE_FILE" \
     -f "$BOOTSTRAP_SECRET_COMPOSE_FILE" \
     -f "$RUN_LABELS_COMPOSE_FILE" \
+    -f "$TLS_COMPOSE_FILE" \
     "$@"
 }
 

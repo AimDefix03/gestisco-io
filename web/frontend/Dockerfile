@@ -35,6 +35,6 @@ RUN NGINX_LOGIN_RATE=10r/m \
 
 USER nginx
 
-EXPOSE 8080
+EXPOSE 8080 8443
 
 ENTRYPOINT ["/usr/local/bin/gestionale-frontend-entrypoint"]

@@ -1,6 +1,7 @@
 package it.giovannidefilippo.gestionale.security;
 
 import it.giovannidefilippo.gestionale.common.ApiErrorCode;
+import it.giovannidefilippo.gestionale.user.SessionCookies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,15 +15,20 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
+import org.springframework.security.web.csrf.CsrfException;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
 @Configuration
 @EnableMethodSecurity
 class SecurityConfig {
     private final SessionAuthenticationFilter sessionAuthenticationFilter;
+    private final SessionCookies sessionCookies;
     private final SecurityErrorWriter errorWriter;
 
-    SecurityConfig(SessionAuthenticationFilter sessionAuthenticationFilter, SecurityErrorWriter errorWriter) {
+    SecurityConfig(SessionAuthenticationFilter sessionAuthenticationFilter, SessionCookies sessionCookies, SecurityErrorWriter errorWriter) {
         this.sessionAuthenticationFilter = sessionAuthenticationFilter;
+        this.sessionCookies = sessionCookies;
         this.errorWriter = errorWriter;
     }
 
@@ -41,18 +47,30 @@ class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**", "/actuator/**"))
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(sessionCookies.csrfTokenRepository())
+                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                        // Il token CSRF ruota su login e rinnovo (SessionCookies), non a ogni richiesta autenticata dal filtro.
+                        .sessionAuthenticationStrategy(new NullAuthenticatedSessionStrategy())
+                        .ignoringRequestMatchers("/api/accounts/login", "/api/accounts/register", "/api/accounts/password-strength", "/actuator/**"))
                 .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.deny()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint((request, response, exception) -> errorWriter.write(request, response, HttpStatus.UNAUTHORIZED, ApiErrorCode.AUTH_UNAUTHORIZED, "Sessione mancante o non valida."))
-                        .accessDeniedHandler((request, response, exception) -> errorWriter.write(request, response, HttpStatus.FORBIDDEN, ApiErrorCode.AUTH_FORBIDDEN, "Permessi insufficienti per questa operazione."))
+                        .accessDeniedHandler((request, response, exception) -> {
+                            if (exception instanceof CsrfException) {
+                                errorWriter.write(request, response, HttpStatus.FORBIDDEN, ApiErrorCode.AUTH_CSRF_INVALID, "Protezione della richiesta mancante o non valida. Ricarica la pagina e riprova.");
+                                return;
+                            }
+                            errorWriter.write(request, response, HttpStatus.FORBIDDEN, ApiErrorCode.AUTH_FORBIDDEN, "Permessi insufficienti per questa operazione.");
+                        })
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/accounts/login", "/api/accounts/register", "/api/accounts/password-strength").permitAll()
                         .requestMatchers("/actuator/health/liveness", "/actuator/health/readiness").permitAll()
                         .requestMatchers("/actuator/prometheus").permitAll()
                         .requestMatchers("/actuator/**").denyAll()
+                        .requestMatchers(HttpMethod.GET, "/api/accounts/session").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/accounts/logout").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/accounts/session/renew").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/accounts/me/password").authenticated()

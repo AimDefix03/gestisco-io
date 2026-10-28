@@ -14,6 +14,8 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.UUID;
 
+import static it.giovannidefilippo.gestionale.support.SessionRequests.session;
+import static it.giovannidefilippo.gestionale.support.SessionRequests.sessionToken;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -83,7 +85,7 @@ class AuthorizationSecurityTest extends PostgreSqlIntegrationTestSupport {
     void authenticatedUsersCannotBypassActuatorDenyRule() throws Exception {
         String token = login("test_super_admin", "Test-Bootstrap-9842!", "SUPER_ADMIN");
 
-        mockMvc.perform(get("/actuator/health").header("X-Session-Token", token))
+        mockMvc.perform(get("/actuator/health").with(session(token)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("AUTH_FORBIDDEN"));
     }
@@ -112,8 +114,8 @@ class AuthorizationSecurityTest extends PostgreSqlIntegrationTestSupport {
         register(username, "Client123!", "CUSTOMER");
         String originalToken = login(username, "Client123!", "CUSTOMER");
 
-        String response = mockMvc.perform(post("/api/accounts/session/renew")
-                        .header("X-Session-Token", originalToken)
+        MvcResult response = mockMvc.perform(post("/api/accounts/session/renew")
+                        .with(session(originalToken))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 { "password": "Client123!" }
@@ -121,17 +123,15 @@ class AuthorizationSecurityTest extends PostgreSqlIntegrationTestSupport {
                 .andExpect(status().isOk())
                 .andExpect(header().string("Cache-Control", "no-store"))
                 .andExpect(header().string("Pragma", "no-cache"))
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
+                .andReturn();
 
-        String rotatedToken = objectMapper.readTree(response).path("token").asText();
+        String rotatedToken = sessionToken(response);
         assertThat(rotatedToken).isNotBlank().isNotEqualTo(originalToken);
 
-        mockMvc.perform(get("/api/customer/catalog").header("X-Session-Token", originalToken))
+        mockMvc.perform(get("/api/customer/catalog").with(session(originalToken)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value("AUTH_UNAUTHORIZED"));
-        mockMvc.perform(get("/api/customer/catalog").header("X-Session-Token", rotatedToken))
+        mockMvc.perform(get("/api/customer/catalog").with(session(rotatedToken)))
                 .andExpect(status().isOk());
     }
 
@@ -142,7 +142,7 @@ class AuthorizationSecurityTest extends PostgreSqlIntegrationTestSupport {
         String token = login(username, "Client123!", "CUSTOMER");
 
         mockMvc.perform(post("/api/accounts/session/renew")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 { "password": "PasswordErrata123!" }
@@ -150,13 +150,14 @@ class AuthorizationSecurityTest extends PostgreSqlIntegrationTestSupport {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("REQUEST_INVALID"));
 
-        mockMvc.perform(get("/api/customer/catalog").header("X-Session-Token", token))
+        mockMvc.perform(get("/api/customer/catalog").with(session(token)))
                 .andExpect(status().isOk());
     }
 
     @Test
     void renewalRequiresAuthenticatedSession() throws Exception {
         mockMvc.perform(post("/api/accounts/session/renew")
+                        .with(session(null))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 { "password": "Client123!" }
@@ -182,18 +183,18 @@ class AuthorizationSecurityTest extends PostgreSqlIntegrationTestSupport {
     void superAdminCanAccessAccountsAndAudit() throws Exception {
         String token = login("test_super_admin", "Test-Bootstrap-9842!", "SUPER_ADMIN");
 
-        mockMvc.perform(get("/api/accounts").header("X-Session-Token", token))
+        mockMvc.perform(get("/api/accounts").with(session(token)))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(get("/api/audit").header("X-Session-Token", token))
+        mockMvc.perform(get("/api/audit").with(session(token)))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(get("/api/financial-reconciliation").header("X-Session-Token", token))
+        mockMvc.perform(get("/api/financial-reconciliation").with(session(token)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.balanced").isBoolean())
                 .andExpect(jsonPath("$.mismatchCount").isNumber());
 
-        mockMvc.perform(get("/api/system/status").header("X-Session-Token", token))
+        mockMvc.perform(get("/api/system/status").with(session(token)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("UP"))
                 .andExpect(jsonPath("$.database.status").value("UP"))
@@ -208,29 +209,29 @@ class AuthorizationSecurityTest extends PostgreSqlIntegrationTestSupport {
         register(username, "Client123!", "CUSTOMER");
         String token = login(username, "Client123!", "CUSTOMER");
 
-        mockMvc.perform(get("/api/products").header("X-Session-Token", token))
+        mockMvc.perform(get("/api/products").with(session(token)))
                 .andExpect(status().isForbidden());
 
-        mockMvc.perform(get("/api/customer/catalog").header("X-Session-Token", token))
+        mockMvc.perform(get("/api/customer/catalog").with(session(token)))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(get("/api/dashboard").header("X-Session-Token", token))
+        mockMvc.perform(get("/api/dashboard").with(session(token)))
                 .andExpect(status().isForbidden());
 
-        mockMvc.perform(get("/api/accounts").header("X-Session-Token", token))
+        mockMvc.perform(get("/api/accounts").with(session(token)))
                 .andExpect(status().isForbidden());
 
-        mockMvc.perform(get("/api/documents").header("X-Session-Token", token))
+        mockMvc.perform(get("/api/documents").with(session(token)))
                 .andExpect(status().isForbidden());
 
-        mockMvc.perform(get("/api/system/status").header("X-Session-Token", token))
+        mockMvc.perform(get("/api/system/status").with(session(token)))
                 .andExpect(status().isForbidden());
 
-        mockMvc.perform(get("/api/financial-reconciliation").header("X-Session-Token", token))
+        mockMvc.perform(get("/api/financial-reconciliation").with(session(token)))
                 .andExpect(status().isForbidden());
 
         mockMvc.perform(post("/api/orders/ORD-NOT-FOUND/payments/receipts")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 { "amount": 10.00, "reason": "Operazione non consentita" }
@@ -238,7 +239,7 @@ class AuthorizationSecurityTest extends PostgreSqlIntegrationTestSupport {
                 .andExpect(status().isForbidden());
 
         mockMvc.perform(post("/api/orders/ORD-NOT-FOUND/returns/RES-NOT-FOUND/approve")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 { "note": "Operazione non consentita" }
@@ -253,7 +254,7 @@ class AuthorizationSecurityTest extends PostgreSqlIntegrationTestSupport {
         String token = login(username, "Employee123!", "EMPLOYEE");
 
         mockMvc.perform(post("/api/accounts")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .header("X-Reauth-Password", "Employee123!")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -301,7 +302,7 @@ class AuthorizationSecurityTest extends PostgreSqlIntegrationTestSupport {
         String token = login("test_super_admin", "Test-Bootstrap-9842!", "SUPER_ADMIN");
 
         mockMvc.perform(post("/api/products")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -332,7 +333,7 @@ class AuthorizationSecurityTest extends PostgreSqlIntegrationTestSupport {
         String code = "SEC-" + UUID.randomUUID().toString().substring(0, 8);
 
         mockMvc.perform(post("/api/products")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -350,7 +351,7 @@ class AuthorizationSecurityTest extends PostgreSqlIntegrationTestSupport {
                 .andExpect(status().isCreated());
 
         mockMvc.perform(post("/api/inventory/initial-balance")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -362,7 +363,7 @@ class AuthorizationSecurityTest extends PostgreSqlIntegrationTestSupport {
                 .andExpect(status().isCreated());
 
         mockMvc.perform(post("/api/inventory/movements")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -377,7 +378,7 @@ class AuthorizationSecurityTest extends PostgreSqlIntegrationTestSupport {
                 .andExpect(status().isCreated());
 
         String response = mockMvc.perform(get("/api/inventory/movements")
-                        .header("X-Session-Token", token))
+                        .with(session(token)))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -397,7 +398,7 @@ class AuthorizationSecurityTest extends PostgreSqlIntegrationTestSupport {
         String requestId = "audit-" + UUID.randomUUID();
 
         mockMvc.perform(post("/api/products")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .header("X-Request-Id", requestId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -416,7 +417,7 @@ class AuthorizationSecurityTest extends PostgreSqlIntegrationTestSupport {
                 .andExpect(status().isCreated());
 
         mockMvc.perform(get("/api/audit")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .param("q", requestId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].requestId").value(requestId))
@@ -436,7 +437,7 @@ class AuthorizationSecurityTest extends PostgreSqlIntegrationTestSupport {
         createProduct(token, prefix + "-C", prefix + " Gamma", "AMD", "Processore");
 
         mockMvc.perform(get("/api/products")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .param("q", prefix)
                         .param("category", "HARDWARE")
                         .param("page", "0")
@@ -467,7 +468,7 @@ class AuthorizationSecurityTest extends PostgreSqlIntegrationTestSupport {
 
         String token = login("test_super_admin", "Test-Bootstrap-9842!", "SUPER_ADMIN");
         mockMvc.perform(post("/api/accounts")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .header("X-Reauth-Password", "Test-Bootstrap-9842!")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -481,7 +482,7 @@ class AuthorizationSecurityTest extends PostgreSqlIntegrationTestSupport {
     }
 
     private String login(String username, String password, String role) throws Exception {
-        String response = mockMvc.perform(post("/api/accounts/login")
+        MvcResult response = mockMvc.perform(post("/api/accounts/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -491,15 +492,13 @@ class AuthorizationSecurityTest extends PostgreSqlIntegrationTestSupport {
                                 }
                                 """.formatted(username, password, role)))
                 .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        return objectMapper.readTree(response).path("token").asText();
+                .andReturn();
+        return sessionToken(response);
     }
 
     private void createProduct(String token, String code, String name, String brand, String productType) throws Exception {
         mockMvc.perform(post("/api/products")
-                        .header("X-Session-Token", token)
+                        .with(session(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {

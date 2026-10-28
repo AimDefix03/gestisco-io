@@ -25,7 +25,8 @@ class MvpEndToEndGateContractTest {
                 .contains("/api/inventory/counts/${session.id}/items/${item!.id}")
                 .contains("/api/inventory/counts/${session.id}/submit")
                 .contains("/api/inventory/counts/${session.id}/approve")
-                .contains("sessionHeaders(adminToken)")
+                .contains("const approver = await adminApi();")
+                .contains("requestHeaders(csrfToken(adminState))")
                 .contains("/payments/receipts")
                 .contains("/returns/")
                 .contains("Puoi operare solo sui tuoi ordini.");

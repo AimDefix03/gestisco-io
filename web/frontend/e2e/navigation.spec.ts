@@ -1,10 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { APIResponse, expect, Page, Response, test } from '@playwright/test';
 
-type AuthSession = {
-  token: string;
-};
-
 type Order = {
   code: string;
 };
@@ -27,9 +23,12 @@ test('ogni sezione ha un indirizzo che regge tasto indietro, link diretti e rica
 
   await page.goto('/ordini');
   await expect(page).toHaveURL(/\/ordini$/);
-  const session = await login(page, 'Ordini cliente');
+  await login(page, 'Ordini cliente');
   await expect(page).toHaveURL(/\/ordini$/);
-  const order = await createWalkInOrder(page, session.token);
+  const scriptCookies = await page.evaluate(() => document.cookie);
+  expect(scriptCookies).not.toContain('__Host-gestionale_session');
+  expect(scriptCookies).toContain('__Host-gestionale_xsrf=');
+  const order = await createWalkInOrder(page);
 
   await openMenuEntry(page, 'Workspace', 'Catalogo prodotti');
   await expect(page).toHaveURL(/\/catalogo$/);
@@ -57,15 +56,14 @@ test('ogni sezione ha un indirizzo che regge tasto indietro, link diretti e rica
   await expectOrderDetail(page, order.code);
 
   await page.reload();
-  await login(page, 'Ordini cliente');
+  await expect(page.locator('.workspace-header h1')).toHaveText('Ordini cliente');
   await expect(page).toHaveURL(new RegExp(`/ordini/${order.code}$`));
   await expectOrderDetail(page, order.code);
 
   await page.goto('/amministrazione/audit');
-  await login(page, 'Audit log');
+  await expect(page.locator('.workspace-header h1')).toHaveText('Audit log');
 
   await page.goto('/pagina-inesistente');
-  await login(page, 'Dashboard operativa');
   await expect(page.getByRole('heading', { name: 'Pagina non trovata' })).toBeVisible();
   await page.getByRole('button', { name: 'Vai alla dashboard' }).click();
   await expect(page).toHaveURL(/\/$/);
@@ -74,6 +72,8 @@ test('ogni sezione ha un indirizzo che regge tasto indietro, link diretti e rica
   await page.getByRole('button', { name: 'Logout' }).click();
   await expect(page.getByRole('heading', { name: 'Accedi al workspace' })).toBeVisible();
   await expect(page).toHaveURL(/\/$/);
+  await page.goto(`/ordini/${order.code}`);
+  await expect(page.getByRole('heading', { name: 'Accedi al workspace' })).toBeVisible();
   expect(runtimeErrors).toEqual([]);
 });
 
@@ -105,20 +105,19 @@ test('il tasto indietro chiede conferma quando la scheda ha una bozza', async ({
   expect(runtimeErrors).toEqual([]);
 });
 
-async function login(page: Page, expectedHeading: string): Promise<AuthSession> {
+async function login(page: Page, expectedHeading: string) {
   await expect(page.getByRole('heading', { name: 'Accedi al workspace' })).toBeVisible();
   await page.getByLabel('Username').fill(adminUsername!);
   await page.getByLabel('Password').fill(adminPassword!);
   const responsePromise = page.waitForResponse((response) => response.request().method() === 'POST' && new URL(response.url()).pathname === '/api/accounts/login');
   await page.getByRole('button', { name: 'Accedi' }).click();
-  const session = await readJson<AuthSession>(await responsePromise);
+  await readJson(await responsePromise);
   await expect(page.locator('.workspace-header h1')).toHaveText(expectedHeading);
-  return session;
 }
 
-async function createWalkInOrder(page: Page, token: string): Promise<Order> {
+async function createWalkInOrder(page: Page): Promise<Order> {
   await readJson(await page.request.post('/api/products', {
-    headers: sessionHeaders(token),
+    headers: await commandHeaders(page),
     data: {
       code: productCode,
       name: `Prodotto navigazione ${runId}`,
@@ -135,11 +134,11 @@ async function createWalkInOrder(page: Page, token: string): Promise<Order> {
     }
   }));
   await readJson(await page.request.post('/api/inventory/initial-balance', {
-    headers: { ...sessionHeaders(token), 'Idempotency-Key': `e2e-${randomUUID()}` },
+    headers: { ...await commandHeaders(page), 'Idempotency-Key': `e2e-${randomUUID()}` },
     data: { productCode, quantity: 3, reason: 'Saldo iniziale test navigazione' }
   }));
   return readJson<Order>(await page.request.post('/api/orders', {
-    headers: { ...sessionHeaders(token), 'Idempotency-Key': `e2e-${randomUUID()}` },
+    headers: { ...await commandHeaders(page), 'Idempotency-Key': `e2e-${randomUUID()}` },
     data: { customerType: 'WALK_IN', walkInCustomerName: `Cliente navigazione ${runId}`, paymentMethod: 'CASH', items: [{ productCode, quantity: 1 }] }
   }));
 }
@@ -167,10 +166,12 @@ async function readJson<T = unknown>(response: Response | APIResponse): Promise<
   return body ? JSON.parse(body) as T : undefined as T;
 }
 
-function sessionHeaders(token: string) {
+async function commandHeaders(page: Page) {
+  const csrf = (await page.context().cookies()).find((cookie) => cookie.name === '__Host-gestionale_xsrf');
+  expect(csrf, 'cookie CSRF assente nel contesto del browser').toBeDefined();
   return {
     'Content-Type': 'application/json',
-    'X-Session-Token': token,
+    'X-XSRF-TOKEN': csrf!.value,
     'X-Request-Id': `e2e-${randomUUID()}`
   };
 }

@@ -16,12 +16,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import tools.jackson.databind.ObjectMapper;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+import static it.giovannidefilippo.gestionale.support.SessionRequests.session;
+import static it.giovannidefilippo.gestionale.support.SessionRequests.sessionToken;
 import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
@@ -35,9 +37,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class OperationalDetailControllerTest {
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Autowired
     private ProductService productService;
@@ -65,7 +64,7 @@ class OperationalDetailControllerTest {
         }
 
         mockMvc.perform(get("/api/products/{code}/detail", targetCode)
-                        .header("X-Session-Token", login()))
+                        .with(session(login())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.product.code").value(targetCode))
                 .andExpect(jsonPath("$.product.capabilities.canMoveStock").value(true))
@@ -83,7 +82,7 @@ class OperationalDetailControllerTest {
         OrderResponse order = createOrder(productCode, "cliente_ordine_dettaglio");
 
         mockMvc.perform(get("/api/orders/{code}/detail", order.code())
-                        .header("X-Session-Token", login()))
+                        .with(session(login())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.order.code").value(order.code()))
                 .andExpect(jsonPath("$.order.capabilities.canConfirm").value(true))
@@ -119,7 +118,7 @@ class OperationalDetailControllerTest {
     }
 
     private String login() throws Exception {
-        String response = mockMvc.perform(post("/api/accounts/login")
+        MvcResult response = mockMvc.perform(post("/api/accounts/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -129,10 +128,8 @@ class OperationalDetailControllerTest {
                                 }
                                 """))
                 .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        return objectMapper.readTree(response).path("token").asText();
+                .andReturn();
+        return sessionToken(response);
     }
 
     private static AuthenticatedUser actor() {

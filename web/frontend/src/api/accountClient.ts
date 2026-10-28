@@ -1,4 +1,4 @@
-import { clearSessionToken, fetchAllPages, request, toQueryString } from './httpClient';
+import { fetchAllPages, markSessionEnded, request, toQueryString } from './httpClient';
 import type { AccountQuery, AuthSession, PageResponse, PasswordStrength, UserAccount, UserRole } from './types';
 
 const baseUrl = '/api/accounts';
@@ -10,6 +10,11 @@ export function login(username: string, password: string): Promise<AuthSession> 
   });
 }
 
+/** Sessione del cookie dopo una ricarica; `null` quando il server risponde 204 perche non c'e una sessione valida. */
+export async function fetchCurrentSession(signal?: AbortSignal): Promise<AuthSession | null> {
+  return (await request<AuthSession | undefined>(`${baseUrl}/session`, { signal })) ?? null;
+}
+
 export function renewSession(password: string): Promise<AuthSession> {
   return request<AuthSession>(`${baseUrl}/session/renew`, {
     method: 'POST',
@@ -19,7 +24,7 @@ export function renewSession(password: string): Promise<AuthSession> {
 
 export async function logoutSession(): Promise<void> {
   await request<void>(`${baseUrl}/logout`, { method: 'POST' });
-  clearSessionToken();
+  markSessionEnded();
 }
 
 export function register(username: string, password: string): Promise<UserAccount> {

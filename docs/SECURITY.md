@@ -2,7 +2,7 @@
 
 ## Stato attuale
 
-Il backend web usa Spring Boot 4.1 e Spring Security 7.1 con filtro custom su header `X-Session-Token`. Le password sono hashate con BCrypt tramite `PasswordEncoder`.
+Il backend web usa Spring Boot 4.1 e Spring Security 7.1 con filtro custom sul cookie di sessione `HttpOnly` `__Host-gestionale_session` e protezione CSRF double-submit ([ADR 0009](DECISIONS/0009-browser-session-cookie-and-csrf.md)). Le password sono hashate con BCrypt tramite `PasswordEncoder`.
 
 Sono presenti:
 
@@ -92,8 +92,9 @@ Sono presenti:
 
 - H2 console disabilitata nella configurazione web corrente.
 - Lo stack Compose supporta file secret e una procedura di rotazione; l'integrazione con il secret manager remoto scelto resta responsabilita del deployment reale.
-- Token gestito dal frontend esclusivamente in memoria JS e inviato tramite header custom, mai in `localStorage` o `sessionStorage`.
-- CSRF disabilitato intenzionalmente perche il deployment corrente non usa cookie di autenticazione ambientali; la decisione e documentata in `docs/DECISIONS/0004-browser-session-token-and-csrf.md`.
+- Token di sessione solo nel cookie `HttpOnly`, `Secure`, `SameSite=Strict` con prefisso `__Host-`, eliminato alla chiusura del browser: JavaScript non puo leggerlo, ma un XSS puo ancora inviare richieste dalla pagina compromessa.
+- CSRF attivo con double-submit di Spring Security (cookie `__Host-gestionale_xsrf` e header `X-XSRF-TOKEN`) su ogni richiesta che modifica dati, oltre a `SameSite=Strict`; esenti solo login, registrazione e verifica password, che accettano solo JSON senza CORS. Decisione in `docs/DECISIONS/0009-browser-session-cookie-and-csrf.md`.
+- I cookie `Secure` richiedono HTTPS: fuori da `localhost`/`127.0.0.1` un'installazione su HTTP in chiaro non mantiene la sessione.
 - La CSP riduce la superficie XSS ma non neutralizza codice same-origin compromesso, dipendenze malevole o vulnerabilita DOM future; ogni estensione della policy deve essere revisionata.
 - HSTS non e abilitato nello stack HTTP locale: deve essere introdotto solo sul dominio reale dopo avere verificato terminazione TLS e assenza di traffico HTTP necessario.
 - Il rate limiting Nginx e locale alla singola istanza e non condivide lo stato tra repliche.
@@ -119,8 +120,8 @@ Sono presenti:
 - Le operazioni applicative devono usare sempre attore e ruolo della sessione backend.
 - Le autorizzazioni cliente sugli ordini devono usare esclusivamente l'ID account della sessione; i campi snapshot non sono subject di sicurezza.
 - Non loggare password, token o segreti.
-- Non persistere il token browser in storage accessibili tra sessioni.
-- Una futura migrazione a cookie HttpOnly deve includere nello stesso rilascio TLS, attributi cookie sicuri e protezione CSRF.
+- Non esporre il token di sessione a JavaScript: niente token nel corpo delle risposte, in `localStorage` o `sessionStorage`.
+- Non introdurre endpoint che modificano dati con `GET` e non aggiungere esenzioni CSRF senza una decisione registrata.
 - Ogni azione distruttiva deve essere autorizzata e auditata.
 - Gli endpoint amministrativi devono avere test di autorizzazione.
 - La registrazione pubblica deve creare esclusivamente account `CUSTOMER` e rifiutare ogni ruolo fornito dal client.
