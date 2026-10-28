@@ -5,7 +5,9 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 @Service
 class ReportExportService {
@@ -73,8 +75,10 @@ class ReportExportService {
         csv.row("Prodotti", "Unita fisiche", "Unita riservate", "Unita disponibili", "Valore potenziale a prezzo vendita", "Valore noto a costo", "Margine potenziale su quota valorizzata", "Unita valorizzate", "Unita senza costo", "Copertura costo %", "Scorte basse", "Esauriti", "Disattivati");
         csv.row(report.productCount(), report.physicalUnits(), report.reservedUnits(), report.availableUnits(), report.potentialRetailStockValue(), report.knownInventoryCostValue(), report.potentialGrossMarginOnCostedStock(), report.costedUnits(), report.uncostedUnits(), report.costCoveragePercentage(), report.lowStockCount(), report.outOfStockCount(), report.discontinuedCount());
         csv.row();
-        csv.row("Codice", "Nome", "Categoria", "Brand", "Tipo", "Fisico", "Riservato", "Disponibile", "Prezzo", "Sconto %", "Prezzo netto", "Valore potenziale vendita", "Ultimo costo", "Costo medio", "Quantita valorizzata", "Quantita senza costo", "Copertura costo %", "Valore noto a costo", "Margine potenziale", "Stato stock", "Stato prodotto");
-        report.products().forEach(product -> csv.row(
+        List<Object> header = new ArrayList<>(List.of("Codice", "Nome", "Categoria", "Brand", "Tipo", "Fisico", "Riservato", "Disponibile", "Prezzo", "Sconto %", "Prezzo netto", "Valore potenziale vendita", "Ultimo costo", "Costo medio", "Quantita valorizzata", "Quantita senza costo", "Copertura costo %", "Valore noto a costo", "Margine potenziale", "Stato stock", "Stato prodotto"));
+        report.attributeColumns().forEach(column -> header.add(column.label()));
+        csv.row(header.toArray());
+        report.products().forEach(product -> csv.row(withAttributes(product,
                 product.code(),
                 product.name(),
                 product.categoryLabel(),
@@ -96,8 +100,14 @@ class ReportExportService {
                 product.potentialGrossMarginOnCostedStock(),
                 product.stockStatusLabel(),
                 product.discontinued() ? "Disattivato" : "Attivo"
-        ));
+        )));
         return csv.bytes();
+    }
+
+    private static Object[] withAttributes(InventoryReportResponse.InventoryProductRow product, Object... values) {
+        List<Object> row = new ArrayList<>(Arrays.asList(values));
+        row.addAll(product.attributeValues());
+        return row.toArray();
     }
 
     private static String safeText(Object value) {

@@ -16,6 +16,36 @@ export type ProductCategoryPayload = {
   parentCode: string | null;
   active: boolean;
 };
+
+/** Attributo personalizzato di prodotto (P1.2): testo libero o voce di un elenco, senza generare varianti. */
+export type ProductAttributeType = 'TEXT' | 'LIST';
+
+export type ProductAttributeOption = {
+  code: string;
+  label: string;
+  type: ProductAttributeType;
+  categoryCode: string | null;
+  categoryPath: string | null;
+  options: string[];
+  active: boolean;
+};
+
+export type ProductAttributePayload = {
+  code: string;
+  label: string;
+  type: ProductAttributeType;
+  categoryCode: string | null;
+  options: string[];
+  active: boolean;
+};
+
+export type ProductAttributeValue = {
+  code: string;
+  label: string;
+  type: ProductAttributeType;
+  value: string;
+  active: boolean;
+};
 export type BusinessPartnerType = 'CUSTOMER' | 'SUPPLIER';
 export type UnitOfMeasure = 'PIECE' | 'PAIR' | 'PACK' | 'KILOGRAM' | 'METER' | 'LITER';
 
@@ -58,6 +88,7 @@ export type Product = SellableProduct & {
   vatRateCode: string;
   vatRate: number;
   vatLabel: string;
+  attributes: ProductAttributeValue[];
   discontinued: boolean;
   quantity: number;
   reservedQuantity: number;
@@ -125,6 +156,8 @@ export type ProductPayload = {
   barcode: string | null;
   unitOfMeasure: UnitOfMeasure;
   vatRateCode: string | null;
+  /** Codice attributo -> valore per gli attributi attivi; un valore vuoto toglie l'attributo. Assente = invariati. */
+  attributes?: Record<string, string>;
 };
 
 export type BusinessPartner = {
@@ -180,6 +213,8 @@ export type ProductQuery = PageQuery & {
   brand?: string;
   productType?: string;
   stock?: 'ALL' | 'AVAILABLE' | 'LOW' | 'OUT';
+  attribute?: string;
+  attributeValue?: string;
   sort?: 'NAME_ASC' | 'PRICE_ASC' | 'PRICE_DESC' | 'QTY_ASC' | 'QTY_DESC';
 };
 
@@ -872,6 +907,8 @@ export type InventoryReportQuery = {
   category?: ProductCategory | 'ALL';
   stock?: 'ALL' | 'AVAILABLE' | 'LOW' | 'OUT';
   discontinued?: boolean;
+  attribute?: string;
+  attributeValue?: string;
 };
 
 export type SalesReport = {
@@ -922,6 +959,8 @@ export type InventoryReport = {
   lowStockCount: number;
   outOfStockCount: number;
   discontinuedCount: number;
+  /** Attributi attivi esportati come colonne; `attributeValues` di ogni riga segue lo stesso ordine. */
+  attributeColumns: { code: string; label: string }[];
   products: {
     code: string;
     name: string;
@@ -946,5 +985,6 @@ export type InventoryReport = {
     discontinued: boolean;
     stockStatus: 'AVAILABLE' | 'LOW' | 'OUT';
     stockStatusLabel: string;
+    attributeValues: string[];
   }[];
 };

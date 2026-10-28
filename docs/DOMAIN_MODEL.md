@@ -99,6 +99,10 @@ Regole attuali:
 
 Categoria configurabile e gerarchica (V36, step P1.1). Campi: codice univoco canonico e non modificabile, nome univoco tra fratelli (`parent_key` + nome canonico), categoria padre opzionale, stato attivo, date di creazione e modifica. Massimo tre livelli, nessun ciclo, nessuna eliminazione fisica. Le categorie storiche `HARDWARE` e `SOFTWARE` sono le prime due voci; ogni altro valore presente nei prodotti al momento della migrazione diventa una categoria radice.
 
+### ProductAttribute
+
+Attributo personalizzato di prodotto (V39, step P1.2 ridotto): informazione descrittiva definita dall'utente che non genera varianti (glossario). Campi: codice univoco canonico e non modificabile, etichetta, tipo `TEXT` o `LIST` non modificabile, elenco ordinato di voci ammesse per `LIST` (`product_attribute_options`, univoche ignorando maiuscole), categoria opzionale che limita l'attributo a quella categoria e alle sottocategorie, stato attivo. I valori stanno in `product_attribute_values` (un valore per prodotto e attributo, massimo 200 caratteri). Nessuna eliminazione fisica: un attributo disattivato non si assegna piu, i valori restano come storico e non compaiono negli export. Non sostituisce gli attributi di variante (taglia, colore) previsti in P2.
+
 ### StockMovement
 
 Rappresenta il ledger autorevole delle variazioni fisiche di magazzino. Ogni record collega il prodotto tramite ID stabile, conserva gli snapshot descrittivi, una variazione firmata, la giacenza precedente e nuova, l'origine e lo stato di autorevolezza.

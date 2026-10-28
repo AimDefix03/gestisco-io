@@ -132,7 +132,7 @@ class ReportingServiceTest {
     @Test
     void inventoryReportCalculatesPhysicalReservedAvailableAndDiscountedValue() {
         when(timeProvider.localDateTime()).thenReturn(NOW);
-        when(inventoryUsage.findForReport("gpu", "HARDWARE", "ALL", false, ReportingService.MAX_REPORT_ROWS)).thenReturn(List.of(
+        when(inventoryUsage.findForReport("gpu", "HARDWARE", "ALL", false, null, null, ReportingService.MAX_REPORT_ROWS)).thenReturn(List.of(
                 product("GPU-1", 5, 2, "100.00", "10.00", false),
                 product("GPU-2", 2, 2, "50.00", "0.00", false)
         ));

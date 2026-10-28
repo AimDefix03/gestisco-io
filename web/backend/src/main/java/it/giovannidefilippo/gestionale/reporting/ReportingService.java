@@ -85,9 +85,16 @@ public class ReportingService {
     }
 
     public InventoryReportResponse inventory(String query, String category, String stock, Boolean discontinued) {
-        List<InventoryProductReportSource> sources = inventoryReportingUsage.findForReport(query, category, stock, discontinued, MAX_REPORT_ROWS);
+        return inventory(query, category, stock, discontinued, null, null);
+    }
+
+    public InventoryReportResponse inventory(String query, String category, String stock, Boolean discontinued, String attribute, String attributeValue) {
+        List<InventoryProductReportSource> sources = inventoryReportingUsage.findForReport(query, category, stock, discontinued, attribute, attributeValue, MAX_REPORT_ROWS);
+        List<InventoryReportResponse.AttributeColumn> attributeColumns = inventoryReportingUsage.reportAttributes().stream()
+                .map(column -> new InventoryReportResponse.AttributeColumn(column.code(), column.label()))
+                .toList();
         List<InventoryReportResponse.InventoryProductRow> rows = sources.stream()
-                .map(ReportingService::toInventoryRow)
+                .map(source -> toInventoryRow(source, attributeColumns))
                 .toList();
         long physical = sources.stream().mapToLong(InventoryProductReportSource::quantity).sum();
         long reserved = sources.stream().mapToLong(InventoryProductReportSource::reservedQuantity).sum();
@@ -119,6 +126,7 @@ public class ReportingService {
                 lowStock,
                 outOfStock,
                 discontinuedCount,
+                attributeColumns,
                 rows
         );
     }
@@ -167,7 +175,7 @@ public class ReportingService {
                 .toList();
     }
 
-    private static InventoryReportResponse.InventoryProductRow toInventoryRow(InventoryProductReportSource source) {
+    private static InventoryReportResponse.InventoryProductRow toInventoryRow(InventoryProductReportSource source, List<InventoryReportResponse.AttributeColumn> attributeColumns) {
         StockState stockState = StockState.from(source.availableQuantity());
         BigDecimal potentialRetailValue = source.discountedPrice().multiply(BigDecimal.valueOf(source.quantity()));
         return new InventoryReportResponse.InventoryProductRow(
@@ -193,7 +201,8 @@ public class ReportingService {
                 source.potentialGrossMarginOnCostedStock(),
                 source.discontinued(),
                 stockState.name(),
-                stockState.label
+                stockState.label,
+                attributeColumns.stream().map(column -> source.attributes().getOrDefault(column.code(), "")).toList()
         );
     }
 

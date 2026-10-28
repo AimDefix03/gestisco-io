@@ -36,7 +36,8 @@ const inventory: InventoryReport = {
   lowStockCount: 1,
   outOfStockCount: 0,
   discontinuedCount: 0,
-  products: [{ code: 'GPU-1', name: 'Scheda grafica', category: 'HARDWARE', categoryLabel: 'Hardware', brand: 'Brand', productType: 'Scheda grafica', quantity: 4, reservedQuantity: 1, availableQuantity: 3, price: 120, discount: 10, discountedPrice: 108, potentialRetailValue: 432, lastPurchaseCost: 70, averagePurchaseCost: 70, costedQuantity: 4, uncostedQuantity: 0, costCoveragePercentage: 100, knownInventoryCost: 280, potentialGrossMarginOnCostedStock: 152, discontinued: false, stockStatus: 'LOW', stockStatusLabel: 'Scorta bassa' }]
+  attributeColumns: [],
+  products: [{ code: 'GPU-1', name: 'Scheda grafica', category: 'HARDWARE', categoryLabel: 'Hardware', brand: 'Brand', productType: 'Scheda grafica', quantity: 4, reservedQuantity: 1, availableQuantity: 3, price: 120, discount: 10, discountedPrice: 108, potentialRetailValue: 432, lastPurchaseCost: 70, averagePurchaseCost: 70, costedQuantity: 4, uncostedQuantity: 0, costCoveragePercentage: 100, knownInventoryCost: 280, potentialGrossMarginOnCostedStock: 152, discontinued: false, stockStatus: 'LOW', stockStatusLabel: 'Scorta bassa', attributeValues: [] }]
 };
 
 function setup() {

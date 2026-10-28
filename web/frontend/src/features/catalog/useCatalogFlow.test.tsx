@@ -31,6 +31,7 @@ const product: Product = {
   vatRateCode: 'IVA22',
   vatRate: 0.22,
   vatLabel: 'IVA 22% ordinaria',
+  attributes: [],
   brand: 'Example Brand',
   productType: 'GPU',
   usageContext: 'Gaming',

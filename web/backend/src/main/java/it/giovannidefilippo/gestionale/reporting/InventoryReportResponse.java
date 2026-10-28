@@ -19,8 +19,22 @@ public record InventoryReportResponse(
         long lowStockCount,
         long outOfStockCount,
         long discontinuedCount,
+        List<AttributeColumn> attributeColumns,
         List<InventoryProductRow> products
 ) {
+    public InventoryReportResponse(OffsetDateTime generatedAt, int productCount, long physicalUnits, long reservedUnits, long availableUnits,
+                                   BigDecimal potentialRetailStockValue, BigDecimal knownInventoryCostValue, BigDecimal potentialGrossMarginOnCostedStock,
+                                   long costedUnits, long uncostedUnits, BigDecimal costCoveragePercentage, long lowStockCount, long outOfStockCount,
+                                   long discontinuedCount, List<InventoryProductRow> products) {
+        this(generatedAt, productCount, physicalUnits, reservedUnits, availableUnits, potentialRetailStockValue, knownInventoryCostValue,
+                potentialGrossMarginOnCostedStock, costedUnits, uncostedUnits, costCoveragePercentage, lowStockCount, outOfStockCount,
+                discontinuedCount, List.of(), products);
+    }
+
+    /** Attributo di prodotto attivo esportato come colonna (P1.2); i valori delle righe seguono lo stesso ordine. */
+    public record AttributeColumn(String code, String label) {
+    }
+
     public record InventoryProductRow(
             String code,
             String name,
@@ -44,7 +58,18 @@ public record InventoryReportResponse(
             BigDecimal potentialGrossMarginOnCostedStock,
             boolean discontinued,
             String stockStatus,
-            String stockStatusLabel
+            String stockStatusLabel,
+            List<String> attributeValues
     ) {
+        public InventoryProductRow(String code, String name, String category, String categoryLabel, String brand, String productType,
+                                   int quantity, int reservedQuantity, int availableQuantity, BigDecimal price, BigDecimal discount,
+                                   BigDecimal discountedPrice, BigDecimal potentialRetailValue, BigDecimal lastPurchaseCost,
+                                   BigDecimal averagePurchaseCost, int costedQuantity, int uncostedQuantity, BigDecimal costCoveragePercentage,
+                                   BigDecimal knownInventoryCost, BigDecimal potentialGrossMarginOnCostedStock, boolean discontinued,
+                                   String stockStatus, String stockStatusLabel) {
+            this(code, name, category, categoryLabel, brand, productType, quantity, reservedQuantity, availableQuantity, price, discount,
+                    discountedPrice, potentialRetailValue, lastPurchaseCost, averagePurchaseCost, costedQuantity, uncostedQuantity,
+                    costCoveragePercentage, knownInventoryCost, potentialGrossMarginOnCostedStock, discontinued, stockStatus, stockStatusLabel, List.of());
+        }
     }
 }

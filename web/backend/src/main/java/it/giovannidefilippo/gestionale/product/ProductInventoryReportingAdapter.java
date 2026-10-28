@@ -8,8 +8,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 @Component
@@ -19,15 +21,25 @@ class ProductInventoryReportingAdapter implements InventoryReportingUsage {
 
     private final ProductRepository repository;
     private final ProductCategoryService categoryService;
+    private final ProductAttributeService attributeService;
 
-    ProductInventoryReportingAdapter(ProductRepository repository, ProductCategoryService categoryService) {
+    ProductInventoryReportingAdapter(ProductRepository repository, ProductCategoryService categoryService, ProductAttributeService attributeService) {
         this.repository = repository;
         this.categoryService = categoryService;
+        this.attributeService = attributeService;
     }
 
     @Override
-    public List<InventoryProductReportSource> findForReport(String query, String category, String stock, Boolean discontinued, int maxRows) {
-        Specification<Product> specification = specification(query, categoryService.filterIds(category).orElse(null), stock, discontinued);
+    public List<InventoryReportAttribute> reportAttributes() {
+        return attributeService.activeAttributes().stream()
+                .map(attribute -> new InventoryReportAttribute(attribute.getCode(), attribute.getLabel()))
+                .toList();
+    }
+
+    @Override
+    public List<InventoryProductReportSource> findForReport(String query, String category, String stock, Boolean discontinued, String attribute, String attributeValue, int maxRows) {
+        Specification<Product> specification = specification(query, categoryService.filterIds(category).orElse(null), stock, discontinued)
+                .and(ProductAttributeFilter.of(attributeService, attribute, attributeValue));
         long totalRows = repository.count(specification);
         if (totalRows > maxRows) {
             throw new IllegalArgumentException("Il report contiene " + totalRows + " prodotti. Restringi i filtri a un massimo di " + maxRows + " righe.");
@@ -104,8 +116,17 @@ class ProductInventoryReportingAdapter implements InventoryReportingUsage {
                 product.getCostCoveragePercentage(),
                 product.getKnownInventoryCost(),
                 product.getPotentialGrossMarginOnCostedStock(),
-                product.isDiscontinued()
+                product.isDiscontinued(),
+                activeAttributeValues(product)
         );
+    }
+
+    private static Map<String, String> activeAttributeValues(Product product) {
+        Map<String, String> values = new LinkedHashMap<>();
+        product.getAttributeValues().forEach((attribute, value) -> {
+            if (attribute.isActive()) values.put(attribute.getCode(), value);
+        });
+        return values;
     }
 
     private static boolean hasText(String value) {

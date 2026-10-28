@@ -347,6 +347,7 @@ function inventoryFixture(): InventoryReport {
     lowStockCount: 1,
     outOfStockCount: 0,
     discontinuedCount: 0,
+    attributeColumns: [],
     products: []
   };
 }

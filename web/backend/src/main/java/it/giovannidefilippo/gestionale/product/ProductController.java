@@ -42,10 +42,12 @@ class ProductController {
             @RequestParam(required = false) String brand,
             @RequestParam(required = false) String productType,
             @RequestParam(required = false) String stock,
+            @RequestParam(required = false) String attribute,
+            @RequestParam(required = false) String attributeValue,
             @RequestParam(required = false) String sort
     ) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.MANAGE_INVENTORY);
-        return service.search(q, category, brand, productType, stock, sort, page, size, actor);
+        return service.search(q, category, brand, productType, stock, attribute, attributeValue, sort, page, size, actor);
     }
 
     @GetMapping("/lookup")

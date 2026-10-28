@@ -93,6 +93,11 @@ class SpreadsheetReportWriter {
             rowIndex += 2;
             Row header = sheet.createRow(rowIndex++);
             writeHeader(header, styles, "Codice", "Nome", "Categoria", "Brand", "Tipo", "Fisico", "Riservato", "Disponibile", "Prezzo", "Sconto %", "Prezzo netto", "Valore potenziale vendita", "Ultimo costo", "Costo medio", "Valorizzate", "Senza costo", "Copertura costo %", "Valore noto a costo", "Margine potenziale", "Stato stock", "Stato prodotto");
+            int attributeStart = 21;
+            for (int index = 0; index < report.attributeColumns().size(); index++) {
+                text(header, attributeStart + index, report.attributeColumns().get(index).label(), styles.header());
+            }
+            int lastColumn = attributeStart + report.attributeColumns().size() - 1;
             int tableStart = rowIndex - 1;
             for (InventoryReportResponse.InventoryProductRow product : report.products()) {
                 Row row = sheet.createRow(rowIndex++);
@@ -117,10 +122,13 @@ class SpreadsheetReportWriter {
                 number(row, 18, product.potentialGrossMarginOnCostedStock(), styles.currency());
                 text(row, 19, product.stockStatusLabel(), styles.text());
                 text(row, 20, product.discontinued() ? "Disattivato" : "Attivo", styles.text());
+                for (int index = 0; index < product.attributeValues().size(); index++) {
+                    text(row, attributeStart + index, product.attributeValues().get(index), styles.text());
+                }
             }
-            sheet.setAutoFilter(new org.apache.poi.ss.util.CellRangeAddress(tableStart, Math.max(tableStart, rowIndex - 1), 0, 20));
+            sheet.setAutoFilter(new org.apache.poi.ss.util.CellRangeAddress(tableStart, Math.max(tableStart, rowIndex - 1), 0, lastColumn));
             sheet.createFreezePane(0, tableStart + 1);
-            finish(sheet, 21);
+            finish(sheet, lastColumn + 1);
             workbook.write(output);
             return output.toByteArray();
         } catch (IOException exception) {

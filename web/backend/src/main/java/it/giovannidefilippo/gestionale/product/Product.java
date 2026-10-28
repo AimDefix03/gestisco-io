@@ -1,7 +1,9 @@
 package it.giovannidefilippo.gestionale.product;
 
 import it.giovannidefilippo.gestionale.common.BusinessIdentifierCanonicalizer;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -10,11 +12,17 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapKeyJoinColumn;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 
+import org.hibernate.annotations.BatchSize;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @Entity
 @Table(name = "products")
@@ -64,6 +72,13 @@ public class Product {
     @ManyToOne(optional = false)
     @JoinColumn(name = "vat_rate_id", nullable = false)
     private VatRate vatRate;
+
+    @ElementCollection
+    @CollectionTable(name = "product_attribute_values", joinColumns = @JoinColumn(name = "product_id"))
+    @MapKeyJoinColumn(name = "attribute_id")
+    @Column(name = "attribute_value", nullable = false, length = ProductAttributeService.MAX_VALUE_LENGTH)
+    @BatchSize(size = 100)
+    private Map<ProductAttribute, String> attributeValues = new HashMap<>();
 
     @Column(nullable = false)
     private int quantity;
@@ -224,6 +239,16 @@ public class Product {
 
     public String getBarcode() {
         return barcode;
+    }
+
+    /** Sostituisce i valori degli attributi attivi; quelli di attributi disattivati restano come storico. */
+    void replaceActiveAttributeValues(Map<ProductAttribute, String> values) {
+        attributeValues.keySet().removeIf(ProductAttribute::isActive);
+        attributeValues.putAll(values);
+    }
+
+    public Map<ProductAttribute, String> getAttributeValues() {
+        return Collections.unmodifiableMap(attributeValues);
     }
 
     public VatRate getVatRate() {
