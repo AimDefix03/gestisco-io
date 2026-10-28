@@ -99,6 +99,7 @@ Accettazione: ricaricare la pagina non richiede il login; test CSRF negativi; R-
 Accettazione: un'unita creata da UI si assegna a un prodotto senza modifiche al codice; prodotti esistenti invariati; nessuna unita fissa nel codice.
 
 Gate **G1**: catalogo senza valori fissi nel codice, IVA per riga, indirizzi e sessione persistenti, tutti i gate CI verdi.
+Esito: raggiunto il 2026-10-28 su main `7303bce`, con P1.7 aggiunto alla revisione del gate. P1 ha richiesto 4 giorni di calendario contro le 3-5 settimane stimate: lo scarto non va proiettato sulle fasi successive, perche P2 tocca ledger, ordini e migrazione dei dati e le fasi P8-P9 dipendono da tempi esterni.
 
 ### P2 - Varianti
 
