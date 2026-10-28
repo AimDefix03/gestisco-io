@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.1.1</version>
+        <version>4.1.2</version>
         <relativePath/>
     </parent>
 
@@ -19,7 +19,7 @@
     <properties>
         <java.version>17</java.version>
         <mockito.agent.path>target/agents/byte-buddy-agent.jar</mockito.agent.path>
-        <spring-modulith.version>2.1.1</spring-modulith.version>
+        <spring-modulith.version>2.1.2</spring-modulith.version>
         <testcontainers.version>2.0.5</testcontainers.version>
         <owasp-dependency-check.version>13.0.0</owasp-dependency-check.version>
         <h2.version>2.3.232</h2.version>
@@ -171,7 +171,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.6.0</version>
+                <version>3.6.1</version>
                 <configuration>
                     <argLine>-javaagent:${mockito.agent.path}</argLine>
                 </configuration>
