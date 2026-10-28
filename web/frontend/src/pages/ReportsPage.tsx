@@ -9,6 +9,7 @@ import type {
 import StatCard from '../components/common/StatCard';
 import { categoryOptionLabel, useProductCategories } from '../features/catalog/ProductCategoriesContext';
 import { dateTime, money } from '../utils/formatters';
+import AttributeFilterFields from '../components/catalog/AttributeFilterFields';
 
 type Props = {
   sales: SalesReport | null;
@@ -115,6 +116,7 @@ function InventoryView(props: Props) {
           <label className="search-field">Cerca<input value={props.inventoryQuery.q ?? ''} placeholder="Codice, nome, brand o tipo" onChange={(event) => props.onInventoryQueryChange({ ...props.inventoryQuery, q: event.target.value || undefined })} /></label>
           <label>Categoria<select value={props.inventoryQuery.category ?? 'ALL'} onChange={(event) => props.onInventoryQueryChange({ ...props.inventoryQuery, category: event.target.value as InventoryReportQuery['category'] })}><option value="ALL">Tutte</option>{categories.map((category) => <option key={category.code} value={category.code}>{categoryOptionLabel(category)}</option>)}</select></label>
           <label>Stock<select value={props.inventoryQuery.stock ?? 'ALL'} onChange={(event) => props.onInventoryQueryChange({ ...props.inventoryQuery, stock: event.target.value as InventoryReportQuery['stock'] })}><option value="ALL">Tutto</option><option value="AVAILABLE">Disponibile</option><option value="LOW">Scorta bassa</option><option value="OUT">Esaurito</option></select></label>
+          <AttributeFilterFields attribute={props.inventoryQuery.attribute} attributeValue={props.inventoryQuery.attributeValue} onChange={(filter) => props.onInventoryQueryChange({ ...props.inventoryQuery, ...filter })} />
           <label>Prodotto<select value={lifecycle} onChange={(event) => props.onInventoryQueryChange({ ...props.inventoryQuery, discontinued: event.target.value === 'ALL' ? undefined : event.target.value === 'DISCONTINUED' })}><option value="ALL">Tutti</option><option value="ACTIVE">Attivi</option><option value="DISCONTINUED">Disattivati</option></select></label>
         </div>
         {report && <ReportTimestamp generatedAt={report.generatedAt} caption={`${report.productCount} prodotti nel risultato`} />}
@@ -138,7 +140,7 @@ function InventoryView(props: Props) {
                 <caption className="sr-only">Posizione articoli inclusi nel report magazzino</caption>
                 <thead><tr><th scope="col">Prodotto</th><th scope="col">Classificazione</th><th scope="col">Fisico</th><th scope="col">Riservato</th><th scope="col">Disponibile</th><th scope="col">Prezzo netto</th><th scope="col">Costo medio</th><th scope="col">Copertura</th><th scope="col">Valore a costo</th><th scope="col">Stato</th></tr></thead>
                 <tbody>
-                  {report.products.map((product) => <tr key={product.code}><th scope="row"><div className="product-cell"><strong>{product.name}</strong><span>{product.code} · {product.brand}</span></div></th><td><div className="product-cell"><strong>{product.productType}</strong><span>{product.categoryLabel}</span></div></td><td>{product.quantity}</td><td>{product.reservedQuantity}</td><td>{product.availableQuantity}</td><td>{money.format(product.discountedPrice)}</td><td>{product.averagePurchaseCost === null ? 'Non disponibile' : money.format(product.averagePurchaseCost)}</td><td>{product.costCoveragePercentage.toFixed(2)}%</td><td>{money.format(product.knownInventoryCost)}</td><td><span className={`report-status ${product.discontinued ? 'canceled' : product.stockStatus.toLowerCase()}`}>{product.discontinued ? 'Disattivato' : product.stockStatusLabel}</span></td></tr>)}
+                  {report.products.map((product) => <tr key={product.code}><th scope="row"><div className="product-cell"><strong>{product.name}</strong><span>{product.code} · {product.brand}</span></div></th><td><div className="product-cell"><strong>{product.productType}</strong><span>{product.categoryLabel}</span>{attributeSummary(report.attributeColumns, product.attributeValues) && <span>{attributeSummary(report.attributeColumns, product.attributeValues)}</span>}</div></td><td>{product.quantity}</td><td>{product.reservedQuantity}</td><td>{product.availableQuantity}</td><td>{money.format(product.discountedPrice)}</td><td>{product.averagePurchaseCost === null ? 'Non disponibile' : money.format(product.averagePurchaseCost)}</td><td>{product.costCoveragePercentage.toFixed(2)}%</td><td>{money.format(product.knownInventoryCost)}</td><td><span className={`report-status ${product.discontinued ? 'canceled' : product.stockStatus.toLowerCase()}`}>{product.discontinued ? 'Disattivato' : product.stockStatusLabel}</span></td></tr>)}
                   {report.products.length === 0 && <tr><td colSpan={10} className="empty-table-cell">Nessun prodotto per i filtri selezionati.</td></tr>}
                 </tbody>
               </table>
@@ -171,4 +173,8 @@ function ReportFailure({ message, onRetry, compact = false }: { message: string;
       <button className="button secondary compact-button" type="button" onClick={onRetry}>Riprova</button>
     </section>
   );
+}
+
+function attributeSummary(columns: { label: string }[], values: string[]): string {
+  return columns.map((column, index) => values[index] ? `${column.label}: ${values[index]}` : '').filter(Boolean).join(' · ');
 }

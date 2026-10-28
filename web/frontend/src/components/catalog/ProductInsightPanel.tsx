@@ -32,6 +32,9 @@ export default function ProductInsightPanel({ product, movements, orders, loadin
       <div className="insight-summary"><span className={`status-badge ${status.className}`}>{status.label}</span><strong>{money.format(potentialRetailValue)}</strong><small>Valore potenziale a prezzo vendita</small></div>
       <div className="insight-grid">
         <div><span>Categoria</span><strong>{product.categoryName || product.category}</strong></div>
+        {product.attributes.map((attribute) => (
+          <div key={attribute.code}><span>{attribute.label}{attribute.active ? '' : ' (disattivato)'}</span><strong>{attribute.value}</strong></div>
+        ))}
         <div><span>Giacenza</span><strong>{product.quantity}</strong></div>
         <div><span>Riservato</span><strong>{product.reservedQuantity}</strong></div>
         <div><span>Disponibile</span><strong>{product.availableQuantity}</strong></div>

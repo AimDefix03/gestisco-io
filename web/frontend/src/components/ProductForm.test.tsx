@@ -3,7 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import ProductForm from './ProductForm';
 import { renderWithDrafts } from '../test/renderWithDrafts';
-import type { ProductCategoryOption, VatRateOption } from '../api';
+import type { ProductAttributeOption, ProductCategoryOption, VatRateOption } from '../api';
+import { StaticProductAttributes } from '../features/catalog/ProductAttributesContext';
 import { StaticProductCategories } from '../features/catalog/ProductCategoriesContext';
 import { StaticVatRates } from '../features/catalog/VatRatesContext';
 
@@ -20,10 +21,18 @@ const vatRates: VatRateOption[] = [
   { code: 'IVA5', rate: 0.05, nature: null, description: 'IVA 5% ridotta', defaultRate: false, active: false }
 ];
 
-function renderForm(ui: Parameters<typeof renderWithDrafts>[0]) {
+const attributes: ProductAttributeOption[] = [
+  { code: 'MEMORIA', label: 'Memoria', type: 'LIST', categoryCode: 'GPU', categoryPath: 'Hardware / Schede video', options: ['8 GB', '16 GB'], active: true },
+  { code: 'NOTE', label: 'Note tecniche', type: 'TEXT', categoryCode: null, categoryPath: null, options: [], active: true },
+  { code: 'VECCHIO', label: 'Attributo dismesso', type: 'TEXT', categoryCode: null, categoryPath: null, options: [], active: false }
+];
+
+function renderForm(ui: Parameters<typeof renderWithDrafts>[0], withAttributes: ProductAttributeOption[] = []) {
   return renderWithDrafts(
     <StaticProductCategories categories={categories}>
-      <StaticVatRates vatRates={vatRates}>{ui}</StaticVatRates>
+      <StaticProductAttributes attributes={withAttributes}>
+        <StaticVatRates vatRates={vatRates}>{ui}</StaticVatRates>
+      </StaticProductAttributes>
     </StaticProductCategories>
   );
 }
@@ -63,7 +72,8 @@ describe('ProductForm', () => {
       discount: 5,
       barcode: '8001234567897',
       unitOfMeasure: 'PAIR',
-      vatRateCode: null
+      vatRateCode: null,
+      attributes: {}
     });
     expect(screen.getByLabelText('Codice')).toHaveValue('');
   });
@@ -86,6 +96,7 @@ describe('ProductForm', () => {
           vatRateCode: 'IVA22',
           vatRate: 0.22,
           vatLabel: 'IVA 22% ordinaria',
+          attributes: [],
           brand: 'Example Brand',
           productType: 'CPU',
           usageContext: '',
@@ -132,6 +143,7 @@ describe('ProductForm', () => {
           vatRateCode: 'IVA22',
           vatRate: 0.22,
           vatLabel: 'IVA 22% ordinaria',
+          attributes: [],
           brand: 'Example Brand',
           productType: 'CPU',
           usageContext: '',
@@ -194,5 +206,49 @@ describe('ProductForm', () => {
 
     await waitFor(() => expect(onSubmit).toHaveBeenCalledOnce());
     expect(onSubmit.mock.calls[0][0]).toMatchObject({ code: 'TSH-001', vatRateCode: 'IVA10' });
+  });
+
+  it('mostra solo gli attributi attivi validi per la categoria e invia i valori', async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn().mockResolvedValue(true);
+    renderForm(<ProductForm editingProduct={null} busy={false} onSubmit={onSubmit} onCancel={vi.fn()} />, attributes);
+
+    expect(screen.queryByLabelText('Note tecniche')).not.toBeInTheDocument();
+    await user.selectOptions(screen.getByLabelText('Categoria'), 'HARDWARE');
+    expect(screen.getByLabelText('Note tecniche')).toBeInTheDocument();
+    expect(screen.queryByLabelText('Memoria')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Attributo dismesso')).not.toBeInTheDocument();
+
+    await user.selectOptions(screen.getByLabelText('Categoria'), 'GPU');
+    await user.selectOptions(screen.getByLabelText('Memoria'), '16 GB');
+    await user.type(screen.getByLabelText('Note tecniche'), ' Doppia ventola ');
+    await user.type(screen.getByLabelText('Codice'), 'GPU-016');
+    await user.type(screen.getByLabelText('Nome'), 'Scheda 16 GB');
+    await user.type(screen.getByLabelText('Brand'), 'Example Brand');
+    await user.type(screen.getByLabelText('Tipo prodotto'), 'Scheda grafica');
+    await user.type(screen.getByLabelText('Descrizione'), 'Prodotto con attributi.');
+    await user.click(screen.getByRole('button', { name: 'Crea prodotto' }));
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledOnce());
+    expect(onSubmit.mock.calls[0][0].attributes).toEqual({ MEMORIA: '16 GB', NOTE: 'Doppia ventola' });
+  });
+
+  it('toglie gli attributi che non valgono piu per la nuova categoria', async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn().mockResolvedValue(true);
+    renderForm(<ProductForm editingProduct={null} busy={false} onSubmit={onSubmit} onCancel={vi.fn()} />, attributes);
+
+    await user.selectOptions(screen.getByLabelText('Categoria'), 'GPU');
+    await user.selectOptions(screen.getByLabelText('Memoria'), '8 GB');
+    await user.selectOptions(screen.getByLabelText('Categoria'), 'HARDWARE');
+    await user.type(screen.getByLabelText('Codice'), 'GPU-008');
+    await user.type(screen.getByLabelText('Nome'), 'Scheda');
+    await user.type(screen.getByLabelText('Brand'), 'Example Brand');
+    await user.type(screen.getByLabelText('Tipo prodotto'), 'Scheda grafica');
+    await user.type(screen.getByLabelText('Descrizione'), 'Cambio categoria.');
+    await user.click(screen.getByRole('button', { name: 'Crea prodotto' }));
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledOnce());
+    expect(onSubmit.mock.calls[0][0].attributes).toEqual({ NOTE: '' });
   });
 });

@@ -138,6 +138,10 @@ Il campo **Aliquota IVA** del form prodotto indica l'IVA applicata alla vendita:
 
 Chi gestisce i prodotti trova il riquadro **Categorie** nella colonna laterale del catalogo. Si possono creare categorie fino a tre livelli (per esempio Abbigliamento, poi Pantaloni, poi Jeans), rinominarle, spostarle sotto un'altra categoria e disattivarle. Il codice di una categoria non si modifica dopo la creazione. Una categoria in uso non si elimina: si disattiva, e i prodotti che la usano la mantengono; i nuovi prodotti possono usare solo categorie attive. Filtrando il catalogo o il report di magazzino per una categoria si vedono anche i prodotti delle sue sottocategorie.
 
+### Attributi
+
+Il riquadro **Attributi**, sotto le categorie, permette di definire informazioni descrittive come materiale, vestibilita o stagione, senza modificare il programma. Un attributo e un **elenco di valori** (per esempio Cotone, Lino) oppure un **testo libero**, e puo valere per tutti i prodotti o solo per una categoria e le sue sottocategorie. Nel modulo prodotto compaiono soltanto gli attributi attivi validi per la categoria scelta; cambiando categoria, i valori che non valgono piu vengono tolti al salvataggio. Codice e tipo non si modificano dopo la creazione; una voce dell'elenco ancora usata da qualche prodotto non si toglie. Un attributo non piu necessario si disattiva: non si assegna piu ai nuovi prodotti, i valori gia salvati restano visibili nel dettaglio come storico. Nel catalogo e nel report di magazzino i filtri **Attributo** e **Valore attributo** cercano la voce esatta per gli elenchi e il testo contenuto per gli attributi liberi; gli export CSV ed Excel aggiungono una colonna per ogni attributo attivo, il PDF una colonna riassuntiva. Gli attributi non sostituiscono taglie e colori, che arriveranno con le varianti.
+
 ### Modifica, disattivazione ed eliminazione
 
 - `Modifica` aggiorna l'anagrafica del prodotto.

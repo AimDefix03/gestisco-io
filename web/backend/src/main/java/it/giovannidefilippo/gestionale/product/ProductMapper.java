@@ -1,5 +1,8 @@
 package it.giovannidefilippo.gestionale.product;
 
+import java.util.Comparator;
+import java.util.List;
+
 final class ProductMapper {
     private ProductMapper() {
     }
@@ -25,6 +28,7 @@ final class ProductMapper {
                 product.getVatRate().getCode(),
                 product.getVatRate().getRate(),
                 product.getVatRate().getDescription(),
+                attributes(product),
                 product.getQuantity(),
                 product.getReservedQuantity(),
                 product.getAvailableQuantity(),
@@ -41,5 +45,18 @@ final class ProductMapper {
                 product.isDiscontinued(),
                 capabilities
         );
+    }
+
+    static List<ProductAttributeValueResponse> attributes(Product product) {
+        return product.getAttributeValues().entrySet().stream()
+                .sorted(Comparator.comparing(entry -> entry.getKey().getLabel(), String.CASE_INSENSITIVE_ORDER))
+                .map(entry -> new ProductAttributeValueResponse(
+                        entry.getKey().getCode(),
+                        entry.getKey().getLabel(),
+                        entry.getKey().getType(),
+                        entry.getValue(),
+                        entry.getKey().isActive()
+                ))
+                .toList();
     }
 }

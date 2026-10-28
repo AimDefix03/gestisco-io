@@ -4,6 +4,7 @@ import { UNIT_OF_MEASURE_LABELS } from '../utils/units';
 import { vatRateLabel } from '../utils/vat';
 import { useVatRates } from '../features/catalog/VatRatesContext';
 import { categoryOptionLabel, useProductCategories } from '../features/catalog/ProductCategoriesContext';
+import { attributeAppliesTo, useProductAttributes } from '../features/catalog/ProductAttributesContext';
 import useDraftState from '../hooks/useDraftState';
 
 type Props = {
@@ -25,11 +26,13 @@ const initialForm = {
   discount: '0',
   barcode: '',
   unitOfMeasure: 'PIECE' as UnitOfMeasure,
-  vatRateCode: ''
+  vatRateCode: '',
+  attributes: {} as Record<string, string>
 };
 
 export default function ProductForm({ editingProduct, busy, onSubmit, onCancel }: Props) {
   const { categories } = useProductCategories();
+  const { attributes } = useProductAttributes();
   const vatRates = useVatRates();
   const defaultVatRate = vatRates.find((rate) => rate.defaultRate);
   const initialValue = useMemo(() => editingProduct ? ({
@@ -44,7 +47,8 @@ export default function ProductForm({ editingProduct, busy, onSubmit, onCancel }
       discount: String(editingProduct.discount),
       barcode: editingProduct.barcode ?? '',
       unitOfMeasure: editingProduct.unitOfMeasure,
-      vatRateCode: editingProduct.vatRateCode
+      vatRateCode: editingProduct.vatRateCode,
+      attributes: Object.fromEntries(editingProduct.attributes.filter((attribute) => attribute.active).map((attribute) => [attribute.code, attribute.value]))
     }) : initialForm, [editingProduct]);
   const { value: form, setValue: setForm, dirty, clear } = useDraftState({
     key: `catalog:${editingProduct?.code ?? 'new'}`,
@@ -52,6 +56,10 @@ export default function ProductForm({ editingProduct, busy, onSubmit, onCancel }
     label: editingProduct ? `Modifica prodotto ${editingProduct.code}` : 'Nuovo prodotto',
     initialValue
   });
+  const attributeValues = form.attributes ?? {};
+  const applicableAttributes = form.category
+    ? attributes.filter((attribute) => attribute.active && attributeAppliesTo(attribute, form.category, categories))
+    : [];
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -67,13 +75,19 @@ export default function ProductForm({ editingProduct, busy, onSubmit, onCancel }
       discount: Number(form.discount),
       barcode: form.barcode.trim() || null,
       unitOfMeasure: form.unitOfMeasure,
-      vatRateCode: form.vatRateCode || null
+      vatRateCode: form.vatRateCode || null,
+      // Solo gli attributi validi per la categoria scelta: quelli omessi vengono tolti dal prodotto.
+      attributes: Object.fromEntries(applicableAttributes.map((attribute) => [attribute.code, (attributeValues[attribute.code] ?? '').trim()]))
     });
     if (saved) clear();
   }
 
   function updateField<Key extends keyof typeof form>(key: Key, value: (typeof form)[Key]) {
     setForm((current) => ({ ...current, [key]: value }));
+  }
+
+  function updateAttribute(code: string, value: string) {
+    setForm((current) => ({ ...current, attributes: { ...(current.attributes ?? {}), [code]: value } }));
   }
 
   function cancelEdit() {
@@ -152,6 +166,22 @@ export default function ProductForm({ editingProduct, busy, onSubmit, onCancel }
           Sconto %
           <input type="number" min="0" max="100" step="0.01" value={form.discount} onChange={(event) => updateField('discount', event.target.value)} required />
         </label>
+        {applicableAttributes.map((attribute) => (
+          <label key={attribute.code}>
+            {attribute.label}
+            {attribute.type === 'LIST' ? (
+              <select value={attributeValues[attribute.code] ?? ''} onChange={(event) => updateAttribute(attribute.code, event.target.value)}>
+                <option value="">Non indicato</option>
+                {attribute.options.map((option) => <option key={option} value={option}>{option}</option>)}
+                {attributeValues[attribute.code] && !attribute.options.includes(attributeValues[attribute.code]) && (
+                  <option value={attributeValues[attribute.code]}>{attributeValues[attribute.code]}</option>
+                )}
+              </select>
+            ) : (
+              <input value={attributeValues[attribute.code] ?? ''} maxLength={200} onChange={(event) => updateAttribute(attribute.code, event.target.value)} />
+            )}
+          </label>
+        ))}
         <label className="wide">
           Descrizione
           <textarea value={form.description} onChange={(event) => updateField('description', event.target.value)} required />

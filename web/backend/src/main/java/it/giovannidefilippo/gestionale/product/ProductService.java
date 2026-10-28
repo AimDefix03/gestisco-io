@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -34,14 +35,16 @@ public class ProductService {
     private final ProductProcurementUsage productProcurementUsage;
     private final ProductCategoryService categoryService;
     private final VatRateService vatRateService;
+    private final ProductAttributeService attributeService;
 
-    ProductService(ProductRepository repository, AuditService auditService, ProductOrderUsage productOrderUsage, ProductProcurementUsage productProcurementUsage, ProductCategoryService categoryService, VatRateService vatRateService) {
+    ProductService(ProductRepository repository, AuditService auditService, ProductOrderUsage productOrderUsage, ProductProcurementUsage productProcurementUsage, ProductCategoryService categoryService, VatRateService vatRateService, ProductAttributeService attributeService) {
         this.repository = repository;
         this.auditService = auditService;
         this.productOrderUsage = productOrderUsage;
         this.productProcurementUsage = productProcurementUsage;
         this.categoryService = categoryService;
         this.vatRateService = vatRateService;
+        this.attributeService = attributeService;
     }
 
     public List<ProductResponse> findAll() {
@@ -56,7 +59,12 @@ public class ProductService {
     }
 
     public PageResponse<ProductResponse> search(String q, String category, String brand, String productType, String stock, String sort, int page, int size, AuthenticatedUser actor) {
-        return PageResponse.from(repository.findAll(specification(q, category, brand, productType, stock, false), PageRequests.of(page, size, sort(sort)))
+        return search(q, category, brand, productType, stock, null, null, sort, page, size, actor);
+    }
+
+    public PageResponse<ProductResponse> search(String q, String category, String brand, String productType, String stock, String attribute, String attributeValue, String sort, int page, int size, AuthenticatedUser actor) {
+        Specification<Product> specification = specification(q, category, brand, productType, stock, false).and(ProductAttributeFilter.of(attributeService, attribute, attributeValue));
+        return PageResponse.from(repository.findAll(specification, PageRequests.of(page, size, sort(sort)))
                 .map(product -> ProductMapper.toResponse(product, capabilities(product, actor))));
     }
 
@@ -121,7 +129,7 @@ public class ProductService {
 
     @Transactional
     public ProductResponse create(ProductRequest request) {
-        Product product = saveAndFlush(new Product(request, categoryService.requireAssignable(request.category()), vatRateService.requireAssignable(request.vatRateCode())));
+        Product product = saveAndFlush(withAttributes(new Product(request, categoryService.requireAssignable(request.category()), vatRateService.requireAssignable(request.vatRateCode())), request));
         return ProductMapper.toResponse(product);
     }
 
@@ -134,7 +142,7 @@ public class ProductService {
 
     @Transactional
     public ProductResponse create(ProductRequest request, AuthenticatedUser actor) {
-        Product product = saveAndFlush(new Product(request, categoryService.requireAssignable(request.category()), vatRateService.requireAssignable(request.vatRateCode())));
+        Product product = saveAndFlush(withAttributes(new Product(request, categoryService.requireAssignable(request.category()), vatRateService.requireAssignable(request.vatRateCode())), request));
         ProductResponse response = ProductMapper.toResponse(product, capabilities(product, actor));
         auditService.record(actor.username(), actor.roleLabel(), "CREATE_PRODUCT", response.code(), "Creata anagrafica " + response.name() + " - brand " + response.brand() + " - tipo " + response.productType() + " - prezzo " + response.price(), AuditCategory.PRODUCT, AuditSeverity.INFO, "PRODUCT");
         return response;
@@ -145,6 +153,7 @@ public class ProductService {
         Product product = requireProduct(code);
         validateCodeChangeAllowed(product, request.code());
         product.update(request, assignableCategory(product, request.category()), assignableVatRate(product, request.vatRateCode()));
+        withAttributes(product, request);
         flushCanonicalCode();
         return ProductMapper.toResponse(product);
     }
@@ -155,6 +164,7 @@ public class ProductService {
         ProductResponse before = ProductMapper.toResponse(product);
         validateCodeChangeAllowed(product, request.code());
         product.update(request, assignableCategory(product, request.category()), assignableVatRate(product, request.vatRateCode()));
+        withAttributes(product, request);
         flushCanonicalCode();
         ProductResponse response = ProductMapper.toResponse(product);
         auditService.record(actor, role, "UPDATE_PRODUCT", response.code(), "Aggiornato " + response.name() + " - modifiche: " + changeSummary(before, response), AuditCategory.PRODUCT, AuditSeverity.INFO, "PRODUCT");
@@ -167,6 +177,7 @@ public class ProductService {
         ProductResponse before = ProductMapper.toResponse(product);
         validateCodeChangeAllowed(product, request.code());
         product.update(request, assignableCategory(product, request.category()), assignableVatRate(product, request.vatRateCode()));
+        withAttributes(product, request);
         flushCanonicalCode();
         ProductResponse response = ProductMapper.toResponse(product, capabilities(product, actor));
         auditService.record(actor.username(), actor.roleLabel(), "UPDATE_PRODUCT", response.code(), "Aggiornato " + response.name() + " - modifiche: " + changeSummary(before, response), AuditCategory.PRODUCT, AuditSeverity.INFO, "PRODUCT");
@@ -535,7 +546,32 @@ public class ProductService {
         addChange(changes, "IVA", before.vatRateCode(), after.vatRateCode());
         addChange(changes, "prezzo", before.price(), after.price());
         addChange(changes, "sconto", before.discount(), after.discount());
+        addChange(changes, "attributi", attributeSummary(before), attributeSummary(after));
         return changes.isEmpty() ? "nessuna variazione rilevante" : String.join("; ", changes);
+    }
+
+    private static String attributeSummary(ProductResponse product) {
+        return product.attributes().stream()
+                .map(attribute -> attribute.label() + "=" + attribute.value())
+                .collect(Collectors.joining(", "));
+    }
+
+    /**
+     * Applica i valori degli attributi richiesti (se la richiesta li contiene) e verifica che quelli attivi valgano
+     * ancora per la categoria del prodotto, anche dopo un cambio di categoria.
+     */
+    private Product withAttributes(Product product, ProductRequest request) {
+        if (request.attributes() != null) {
+            product.replaceActiveAttributeValues(attributeService.resolveValues(request.attributes(), product.getCategory()));
+        }
+        product.getAttributeValues().keySet().stream()
+                .filter(ProductAttribute::isActive)
+                .filter(attribute -> !attribute.appliesTo(product.getCategory()))
+                .findFirst()
+                .ifPresent(attribute -> {
+                    throw new IllegalArgumentException("L'attributo " + attribute.getLabel() + " non vale per la categoria " + product.getCategory().getPath() + ": svuotarlo prima di cambiare categoria.");
+                });
+        return product;
     }
 
     private static void addChange(List<String> changes, String label, Object before, Object after) {

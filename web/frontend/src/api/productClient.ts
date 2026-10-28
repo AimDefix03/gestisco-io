@@ -1,5 +1,5 @@
 import { fetchAllPages, request, toQueryString } from './httpClient';
-import type { CustomerProduct, PageResponse, Product, ProductCategoryOption, ProductCategoryPayload, ProductLookup, VatRateOption, ProductOperationalDetail, ProductPayload, ProductQuery } from './types';
+import type { CustomerProduct, PageResponse, Product, ProductAttributeOption, ProductAttributePayload, ProductCategoryOption, ProductCategoryPayload, ProductLookup, VatRateOption, ProductOperationalDetail, ProductPayload, ProductQuery } from './types';
 
 const baseUrl = '/api/products';
 
@@ -73,4 +73,22 @@ export function updateProductCategory(code: string, payload: ProductCategoryPayl
 
 export function fetchVatRates(signal?: AbortSignal): Promise<VatRateOption[]> {
   return request<VatRateOption[]>('/api/vat-rates', { signal });
+}
+
+export function fetchProductAttributes(includeInactive = false, signal?: AbortSignal): Promise<ProductAttributeOption[]> {
+  return request<ProductAttributeOption[]>(`/api/product-attributes${includeInactive ? '?includeInactive=true' : ''}`, { signal });
+}
+
+export function createProductAttribute(payload: ProductAttributePayload): Promise<ProductAttributeOption> {
+  return request<ProductAttributeOption>('/api/product-attributes', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
+}
+
+export function updateProductAttribute(code: string, payload: ProductAttributePayload): Promise<ProductAttributeOption> {
+  return request<ProductAttributeOption>(`/api/product-attributes/${encodeURIComponent(code)}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload)
+  });
 }

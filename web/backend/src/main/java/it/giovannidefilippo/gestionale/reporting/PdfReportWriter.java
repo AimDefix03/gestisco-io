@@ -19,6 +19,9 @@ import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 @Component
@@ -86,9 +89,13 @@ class PdfReportWriter {
                     {"Disattivati", String.valueOf(report.discontinuedCount())}
             }));
             document.add(spacer());
-            PdfPTable products = table(new float[]{1.05f, 1.8f, 1.05f, 1.15f, 1.35f, .7f, .7f, .7f, 1f, 1f, 1f, .8f, 1f},
+            boolean withAttributes = !report.attributeColumns().isEmpty();
+            PdfPTable products = withAttributes
+                    ? table(new float[]{1.05f, 1.8f, 1.05f, 1.15f, 1.35f, .7f, .7f, .7f, 1f, 1f, 1f, .8f, 1f, 2f},
+                    "Codice", "Nome", "Categoria", "Brand", "Tipo", "Fisico", "Ris.", "Disp.", "Prezzo netto", "Costo medio", "Valore costo", "Copertura", "Stato", "Attributi")
+                    : table(new float[]{1.05f, 1.8f, 1.05f, 1.15f, 1.35f, .7f, .7f, .7f, 1f, 1f, 1f, .8f, 1f},
                     "Codice", "Nome", "Categoria", "Brand", "Tipo", "Fisico", "Ris.", "Disp.", "Prezzo netto", "Costo medio", "Valore costo", "Copertura", "Stato");
-            report.products().forEach(product -> row(products,
+            report.products().forEach(product -> row(products, withAttributes, attributeSummary(report, product),
                     product.code(),
                     product.name(),
                     product.categoryLabel(),
@@ -171,6 +178,26 @@ class PdfReportWriter {
             table.addCell(cell);
         }
         return table;
+    }
+
+    /** Nel PDF, per restare leggibile in orizzontale, gli attributi stanno in una sola colonna "Etichetta: valore". */
+    private static String attributeSummary(InventoryReportResponse report, InventoryReportResponse.InventoryProductRow product) {
+        List<String> parts = new ArrayList<>();
+        for (int index = 0; index < report.attributeColumns().size(); index++) {
+            String value = product.attributeValues().get(index);
+            if (!value.isBlank()) parts.add(report.attributeColumns().get(index).label() + ": " + value);
+        }
+        return String.join("; ", parts);
+    }
+
+    private static void row(PdfPTable table, boolean withAttributes, String attributes, String... values) {
+        if (!withAttributes) {
+            row(table, values);
+            return;
+        }
+        String[] extended = Arrays.copyOf(values, values.length + 1);
+        extended[values.length] = attributes;
+        row(table, extended);
     }
 
     private static void row(PdfPTable table, String... values) {

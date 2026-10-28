@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { PageResponse, Product, ProductLookup, ProductQuery } from '../api';
 import PaginationControls from './PaginationControls';
 import { categoryOptionLabel, useProductCategories } from '../features/catalog/ProductCategoriesContext';
+import AttributeFilterFields from './catalog/AttributeFilterFields';
 
 type Props = {
   page: PageResponse<Product>;
@@ -110,6 +111,9 @@ export default function ProductTable({ page, filterSource, query, selectedCodes,
             <option value="OUT">Esaurito</option>
           </select>
         </label>
+        {context === 'catalog' && (
+          <AttributeFilterFields attribute={query.attribute} attributeValue={query.attributeValue} onChange={(filter) => updateQuery(filter)} />
+        )}
         <label>
           Ordina
           <select value={query.sort ?? 'NAME_ASC'} onChange={(event) => updateQuery({ sort: event.target.value as SortMode })}>

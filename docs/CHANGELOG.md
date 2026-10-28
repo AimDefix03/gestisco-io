@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-28 - Attributi di prodotto (P1.2 ridotto)
+
+- Attributi personalizzati di prodotto, testuali o a elenco, definiti dal catalogo senza modifiche al codice, validi per tutti i prodotti o per una categoria e le sue sottocategorie. Valori validati lato server, filtri per attributo in catalogo e report di magazzino, una colonna per attributo negli export CSV ed Excel e una colonna riassuntiva nel PDF. Migrazione V39 senza modifiche ai dati esistenti. I campi personalizzati su clienti e fornitori restano in P6.4.
+
 ## 2026-10-27 - Sessione persistente sicura (P1.6)
 
 - La sessione del browser passa in un cookie `HttpOnly`, `Secure`, `SameSite=Strict` con prefisso `__Host-`, che dura fino alla chiusura del browser: ricaricare la pagina o aprire un link non richiede piu il login e il token non e piu leggibile da JavaScript. Protezione CSRF double-submit su ogni richiesta che modifica dati, nuovo endpoint `GET /api/accounts/session`, header `X-Session-Token` rimosso. ADR 0009 sostituisce l'ADR 0004; R-024 mitigato.

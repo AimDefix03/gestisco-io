@@ -69,10 +69,12 @@ class ReportingController {
             @RequestParam(required = false) String q,
             @RequestParam(required = false) String category,
             @RequestParam(defaultValue = "ALL") String stock,
-            @RequestParam(required = false) Boolean discontinued
+            @RequestParam(required = false) Boolean discontinued,
+            @RequestParam(required = false) String attribute,
+            @RequestParam(required = false) String attributeValue
     ) {
         authSessionService.requirePermission(token, UserPermission.VIEW_REPORTS);
-        return reportingService.inventory(q, category, stock, discontinued);
+        return reportingService.inventory(q, category, stock, discontinued, attribute, attributeValue);
     }
 
     @GetMapping("/inventory/export")
@@ -82,10 +84,12 @@ class ReportingController {
             @RequestParam(required = false) String category,
             @RequestParam(defaultValue = "ALL") String stock,
             @RequestParam(required = false) Boolean discontinued,
+            @RequestParam(required = false) String attribute,
+            @RequestParam(required = false) String attributeValue,
             @RequestParam(defaultValue = "CSV") ReportFormat format
     ) {
         AuthenticatedUser actor = authSessionService.requirePermission(token, UserPermission.VIEW_REPORTS);
-        InventoryReportResponse report = reportingService.inventory(q, category, stock, discontinued);
+        InventoryReportResponse report = reportingService.inventory(q, category, stock, discontinued, attribute, attributeValue);
         ReportFile file = exportService.inventory(report, format);
         auditExport(actor, "EXPORT_INVENTORY_REPORT", file, "Prodotti esportati: " + report.productCount());
         return download(file);

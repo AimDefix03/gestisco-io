@@ -1,6 +1,7 @@
 package it.giovannidefilippo.gestionale.product;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public record ProductResponse(
         Long id,
@@ -18,6 +19,7 @@ public record ProductResponse(
         String vatRateCode,
         BigDecimal vatRate,
         String vatLabel,
+        List<ProductAttributeValueResponse> attributes,
         int quantity,
         int reservedQuantity,
         int availableQuantity,

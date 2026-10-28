@@ -57,6 +57,52 @@ class ReportExportServiceTest {
         assertThat(inventory.filename()).endsWith(".pdf");
     }
 
+    @Test
+    void inventoryExportsAddOneColumnPerActiveAttributeInEveryFormat() throws Exception {
+        InventoryReportResponse report = inventoryReportWithAttributes();
+
+        String csv = new String(service.inventory(report, ReportFormat.CSV).content(), StandardCharsets.UTF_8);
+        assertThat(csv).contains("Stato prodotto;Materiale;Vestibilita");
+        assertThat(csv).contains("Attivo;Cotone;'=1+1");
+
+        try (XSSFWorkbook workbook = new XSSFWorkbook(new ByteArrayInputStream(service.inventory(report, ReportFormat.XLSX).content()))) {
+            var sheet = workbook.getSheet("Magazzino");
+            int headerRow = -1;
+            for (int index = 0; index <= sheet.getLastRowNum(); index++) {
+                if (sheet.getRow(index) != null && sheet.getRow(index).getCell(0) != null && "Codice".equals(sheet.getRow(index).getCell(0).toString())) headerRow = index;
+            }
+            assertThat(headerRow).isNotNegative();
+            assertThat(sheet.getRow(headerRow).getCell(21).getStringCellValue()).isEqualTo("Materiale");
+            assertThat(sheet.getRow(headerRow).getCell(22).getStringCellValue()).isEqualTo("Vestibilita");
+            assertThat(sheet.getRow(headerRow + 1).getCell(21).getStringCellValue()).isEqualTo("Cotone");
+            assertThat(sheet.getRow(headerRow + 1).getCell(22).getStringCellValue()).isEqualTo("'=1+1");
+        }
+
+        ReportFile pdf = service.inventory(report, ReportFormat.PDF);
+        assertThat(new String(pdf.content(), 0, 5, StandardCharsets.US_ASCII)).isEqualTo("%PDF-");
+    }
+
+    private static InventoryReportResponse inventoryReportWithAttributes() {
+        InventoryReportResponse base = inventoryReport();
+        InventoryReportResponse.InventoryProductRow row = base.products().get(0);
+        InventoryReportResponse.InventoryProductRow withValues = new InventoryReportResponse.InventoryProductRow(
+                row.code(), row.name(), row.category(), row.categoryLabel(), row.brand(), row.productType(),
+                row.quantity(), row.reservedQuantity(), row.availableQuantity(), row.price(), row.discount(),
+                row.discountedPrice(), row.potentialRetailValue(), row.lastPurchaseCost(), row.averagePurchaseCost(),
+                row.costedQuantity(), row.uncostedQuantity(), row.costCoveragePercentage(), row.knownInventoryCost(),
+                row.potentialGrossMarginOnCostedStock(), row.discontinued(), row.stockStatus(), row.stockStatusLabel(),
+                List.of("Cotone", "=1+1")
+        );
+        return new InventoryReportResponse(
+                base.generatedAt(), base.productCount(), base.physicalUnits(), base.reservedUnits(), base.availableUnits(),
+                base.potentialRetailStockValue(), base.knownInventoryCostValue(), base.potentialGrossMarginOnCostedStock(),
+                base.costedUnits(), base.uncostedUnits(), base.costCoveragePercentage(), base.lowStockCount(),
+                base.outOfStockCount(), base.discontinuedCount(),
+                List.of(new InventoryReportResponse.AttributeColumn("MATERIALE", "Materiale"), new InventoryReportResponse.AttributeColumn("VESTIBILITA", "Vestibilita")),
+                List.of(withValues)
+        );
+    }
+
     private static SalesReportResponse salesReport(String code, String customer) {
         OffsetDateTime generatedAt = OffsetDateTime.of(2026, 7, 14, 10, 30, 0, 0, ZoneOffset.UTC);
         SalesReportResponse.SalesOrderRow order = new SalesReportResponse.SalesOrderRow(
