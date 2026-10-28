@@ -50,6 +50,13 @@ afterEach(() => {
 });
 
 describe('AuthPage', () => {
+  it('mostra il nome Gestisco.IO nella pagina di accesso', () => {
+    render(<AuthHarness />);
+
+    expect(screen.getByText('Gestisco.IO')).toBeInTheDocument();
+    expect(screen.queryByText(/Negozio Computer/)).not.toBeInTheDocument();
+  });
+
   it('non valuta la robustezza password durante il login', async () => {
     const user = userEvent.setup();
     render(<AuthHarness />);

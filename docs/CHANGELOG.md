@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-28 - Nome Gestisco.IO nell'interfaccia
+
+- Titolo del browser, pagina di accesso, intestazione del workspace e autore dei PDF esportati mostrano Gestisco.IO al posto di "Gestionale Negozio Computer". Nomi tecnici (package, API, variabili `GESTIONALE_*`, cookie, database e volumi) invariati per compatibilita.
+
 ## 2026-10-28 - Unita di misura configurabili (P1.7)
 
 - Le unita di misura passano dall'elenco fisso nel codice a una tabella gestita dal catalogo: si creano, si rinominano e si disattivano senza modifiche al codice, con il numero di prodotti che le usano. Il pezzo resta l'unita base, predefinita e sempre attiva. Migrazione V40: le sei unita storiche diventano le voci iniziali e i prodotti conservano la propria unita, ora garantita da una chiave esterna. Chiude l'ultimo valore fisso del catalogo richiesto dal gate G1.

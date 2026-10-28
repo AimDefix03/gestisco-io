@@ -34,6 +34,8 @@ La cronologia comune e preservata. Non cancellare vecchie ref o resoconti per na
 
 ORG-4 non cambia codice, UI, logo, titolo browser, package Java, artifact Maven/npm, API, schema, migrazioni, immagini, metriche, variabili `GESTIONALE_*`, nomi database, container o volumi. I nomi tecnici storici restano validi; non eseguire sostituzioni globali per farli coincidere con il marchio.
 
+Il 2026-10-28, alla revisione del gate G1, l'utente ha deciso di portare il nome nei testi visibili: titolo del browser, intestazioni della pagina di accesso e del workspace, autore dei PDF esportati. Package, artifact, API, schema, variabili `GESTIONALE_*`, cookie, database, container e volumi mantengono i nomi tecnici storici.
+
 Non e un revamp grafico. Eventuali futuri cambiamenti tecnici o di interfaccia richiedono uno step separato, verifiche e gestione della compatibilita. Rinominare la cartella non ricollega automaticamente i dati: seguire [Layout locale](LOCAL_LAYOUT.md) e [Deployment](DEPLOYMENT.md).
 
 ## Regole di presentazione

@@ -26,7 +26,7 @@ export default function AuthPage({ mode, form, passwordVisible, busy, message, o
       <section className="auth-card">
         <div className="brand-card clean">
           <div className="prompt-mark">&gt;_</div>
-          <div><span>Gestionale web</span><strong>Negozio Computer</strong></div>
+          <div><span>Gestionale per il negozio</span><strong>Gestisco.IO</strong></div>
         </div>
         <form onSubmit={onSubmit} className="product-form">
           <div className="section-heading compact">

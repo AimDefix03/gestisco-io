@@ -121,7 +121,7 @@ class PdfReportWriter {
         Document document = new Document(PageSize.A4.rotate(), 28, 28, 28, 28);
         PdfWriter.getInstance(document, output);
         document.addTitle(title);
-        document.addCreator("Gestionale Negozio Computer");
+        document.addCreator("Gestisco.IO");
         document.open();
         Paragraph heading = new Paragraph(title, font(18, Font.BOLD, NAVY));
         heading.setSpacingAfter(4);

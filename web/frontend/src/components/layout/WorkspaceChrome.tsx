@@ -56,7 +56,7 @@ export default function WorkspaceChrome(props: Props) {
   return (
     <main className="desktop-shell">
       <header className="topbar">
-        <div className="topbar-brand"><div className="prompt-mark">&gt;_</div><div><span>Gestionale Computer</span><strong>Workspace operativo</strong></div></div>
+        <div className="topbar-brand"><div className="prompt-mark">&gt;_</div><div><span>Gestisco.IO</span><strong>Workspace operativo</strong></div></div>
         <div className="topbar-actions">
           <div className="session-pill"><span>{props.currentUser.roleLabel}</span><strong>{props.currentUser.username}</strong></div>
           <button className="button secondary compact-button" onClick={props.onRefresh}>Aggiorna</button>
