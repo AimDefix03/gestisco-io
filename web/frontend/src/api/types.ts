@@ -47,7 +47,25 @@ export type ProductAttributeValue = {
   active: boolean;
 };
 export type BusinessPartnerType = 'CUSTOMER' | 'SUPPLIER';
-export type UnitOfMeasure = 'PIECE' | 'PAIR' | 'PACK' | 'KILOGRAM' | 'METER' | 'LITER';
+/** Codice di un'unita di misura configurabile (per esempio `PIECE`). */
+export type UnitOfMeasure = string;
+
+export type UnitOfMeasureOption = {
+  code: UnitOfMeasure;
+  label: string;
+  symbol: string;
+  active: boolean;
+  /** Unita base: predefinita per i nuovi prodotti, non si puo disattivare. */
+  base: boolean;
+  productCount: number;
+};
+
+export type UnitOfMeasurePayload = {
+  code: string;
+  label: string;
+  symbol: string;
+  active: boolean;
+};
 
 export type VatRateOption = {
   code: string;

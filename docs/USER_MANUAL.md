@@ -128,7 +128,11 @@ Il codice identifica stabilmente il prodotto. Scegliere un codice coerente prima
 
 ### Codice a barre e unita di misura
 
-Nel form del prodotto il campo **Codice a barre** accetta l'EAN stampato sull'etichetta del fornitore o un codice interno (lettere, cifre, punto, trattino). Un EAN digitato male viene rifiutato perche la cifra di controllo non torna, e lo stesso codice non puo appartenere a due prodotti. L'**unita di misura** indica come si vende l'articolo, per esempio a paio per le calzature. Cercando nel catalogo un codice a barre completo si trova il prodotto corrispondente.
+Nel form del prodotto il campo **Codice a barre** accetta l'EAN stampato sull'etichetta del fornitore o un codice interno (lettere, cifre, punto, trattino). Un EAN digitato male viene rifiutato perche la cifra di controllo non torna, e lo stesso codice non puo appartenere a due prodotti. L'**unita di misura** indica come si vende l'articolo, per esempio a paio per le calzature; il form offre le unita attive. Cercando nel catalogo un codice a barre completo si trova il prodotto corrispondente.
+
+### Unita di misura
+
+Chi gestisce i prodotti trova il riquadro **Unita di misura** nella colonna laterale del catalogo, con le unita disponibili e quanti prodotti usano ciascuna. Per aggiungerne una (per esempio Rotolo, simbolo rot) indicare codice, nome e simbolo; il codice usa lettere, cifre e trattino basso e non si modifica dopo la creazione. Nome e simbolo si possono correggere in ogni momento. Un'unita non piu usata si disattiva: i prodotti che la hanno la conservano, mentre i nuovi prodotti possono scegliere solo unita attive. Il **Pezzo** e l'unita base, assegnata ai prodotti creati senza indicare l'unita, e non si puo disattivare.
 
 ### Aliquota IVA del prodotto
 

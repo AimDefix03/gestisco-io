@@ -4,6 +4,7 @@ import ProductTable from '../components/ProductTable';
 import ProductInsightPanel from '../components/catalog/ProductInsightPanel';
 import AttributeManager from '../components/catalog/AttributeManager';
 import CategoryManager from '../components/catalog/CategoryManager';
+import UnitManager from '../components/catalog/UnitManager';
 
 type Props = {
   productPage: PageResponse<Product>;
@@ -70,6 +71,7 @@ export default function CatalogPage(props: Props) {
         )}
         {props.canManageProducts && <CategoryManager disabled={props.busy} />}
         {props.canManageProducts && <AttributeManager disabled={props.busy} />}
+        {props.canManageProducts && <UnitManager disabled={props.busy} catalogVersion={props.productPage} />}
       </aside>
     </div>
   );

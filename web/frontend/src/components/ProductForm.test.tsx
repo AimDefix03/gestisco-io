@@ -3,9 +3,10 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import ProductForm from './ProductForm';
 import { renderWithDrafts } from '../test/renderWithDrafts';
-import type { ProductAttributeOption, ProductCategoryOption, VatRateOption } from '../api';
+import type { Product, ProductAttributeOption, ProductCategoryOption, UnitOfMeasureOption, VatRateOption } from '../api';
 import { StaticProductAttributes } from '../features/catalog/ProductAttributesContext';
 import { StaticProductCategories } from '../features/catalog/ProductCategoriesContext';
+import { StaticUnitsOfMeasure } from '../features/catalog/UnitsOfMeasureContext';
 import { StaticVatRates } from '../features/catalog/VatRatesContext';
 
 const categories: ProductCategoryOption[] = [
@@ -21,6 +22,12 @@ const vatRates: VatRateOption[] = [
   { code: 'IVA5', rate: 0.05, nature: null, description: 'IVA 5% ridotta', defaultRate: false, active: false }
 ];
 
+const units: UnitOfMeasureOption[] = [
+  { code: 'PIECE', label: 'Pezzo', symbol: 'pz', active: true, base: true, productCount: 3 },
+  { code: 'PAIR', label: 'Paio', symbol: 'paia', active: true, base: false, productCount: 0 },
+  { code: 'ROLL', label: 'Rotolo', symbol: 'rot', active: false, base: false, productCount: 1 }
+];
+
 const attributes: ProductAttributeOption[] = [
   { code: 'MEMORIA', label: 'Memoria', type: 'LIST', categoryCode: 'GPU', categoryPath: 'Hardware / Schede video', options: ['8 GB', '16 GB'], active: true },
   { code: 'NOTE', label: 'Note tecniche', type: 'TEXT', categoryCode: null, categoryPath: null, options: [], active: true },
@@ -31,7 +38,9 @@ function renderForm(ui: Parameters<typeof renderWithDrafts>[0], withAttributes: 
   return renderWithDrafts(
     <StaticProductCategories categories={categories}>
       <StaticProductAttributes attributes={withAttributes}>
-        <StaticVatRates vatRates={vatRates}>{ui}</StaticVatRates>
+        <StaticUnitsOfMeasure units={units}>
+          <StaticVatRates vatRates={vatRates}>{ui}</StaticVatRates>
+        </StaticUnitsOfMeasure>
       </StaticProductAttributes>
     </StaticProductCategories>
   );
@@ -250,5 +259,25 @@ describe('ProductForm', () => {
 
     await waitFor(() => expect(onSubmit).toHaveBeenCalledOnce());
     expect(onSubmit.mock.calls[0][0].attributes).toEqual({ NOTE: '' });
+  });
+
+  it('offre solo le unita attive ma conserva quella disattivata del prodotto in modifica', async () => {
+    const newProduct = renderForm(<ProductForm editingProduct={null} busy={false} onSubmit={vi.fn()} onCancel={vi.fn()} />);
+    const unitSelect = screen.getByLabelText('Unita di misura') as HTMLSelectElement;
+    expect(Array.from(unitSelect.options).map((option) => option.text)).toEqual(['Pezzo (pz)', 'Paio (paia)']);
+    newProduct.unmount();
+
+    const rollProduct: Product = {
+      id: 7, code: 'TES-001', name: 'Tessuto', description: 'Tessuto a rotolo', category: 'HARDWARE', categoryName: 'Hardware',
+      barcode: null, unitOfMeasure: 'ROLL', unitLabel: 'Rotolo', vatRateCode: 'IVA22', vatRate: 0.22, vatLabel: 'IVA 22% ordinaria',
+      attributes: [], brand: 'Brand', productType: 'Tessuto', usageContext: '', quantity: 1, reservedQuantity: 0, availableQuantity: 1,
+      lastPurchaseCost: null, averagePurchaseCost: null, costedQuantity: 0, uncostedQuantity: 1, costCoveragePercentage: 0, knownInventoryCost: 0, potentialGrossMarginOnCostedStock: 0,
+      price: 10, discount: 0, discountedPrice: 10, discontinued: false,
+      capabilities: { canEdit: true, canChangeCode: true, canDelete: true, canDiscontinue: true, canMoveStock: true }
+    };
+    renderForm(<ProductForm editingProduct={rollProduct} busy={false} onSubmit={vi.fn()} onCancel={vi.fn()} />);
+
+    expect(screen.getByLabelText('Unita di misura')).toHaveValue('ROLL');
+    expect(screen.getByRole('option', { name: 'Rotolo (rot)' })).toBeInTheDocument();
   });
 });

@@ -45,6 +45,7 @@ class HistoricalFixtureContractTest {
             "assertions/v37.sql",
             "assertions/v38.sql",
             "assertions/v39.sql",
+            "assertions/v40.sql",
             "profiles/small.properties",
             "profiles/medium.properties",
             "profiles/large.properties"
@@ -72,7 +73,7 @@ class HistoricalFixtureContractTest {
         String manifest = readText("manifest.json");
 
         assertThat(manifest)
-                .contains("\"version\": 14", "\"version\": 16", "\"version\": 18", "\"version\": 19", "\"version\": 20", "\"version\": 21", "\"version\": 22", "\"version\": 30", "\"version\": 31", "\"version\": 32", "\"version\": 33", "\"version\": 34", "\"version\": 35", "\"version\": 36", "\"version\": 37", "\"version\": 38", "\"version\": 39")
+                .contains("\"version\": 14", "\"version\": 16", "\"version\": 18", "\"version\": 19", "\"version\": 20", "\"version\": 21", "\"version\": 22", "\"version\": 30", "\"version\": 31", "\"version\": 32", "\"version\": 33", "\"version\": 34", "\"version\": 35", "\"version\": 36", "\"version\": 37", "\"version\": 38", "\"version\": 39", "\"version\": 40")
                 .contains("all-order-statuses")
                 .contains("case-insensitive-collisions")
                 .contains("inventory-ledger-drift")
@@ -85,7 +86,7 @@ class HistoricalFixtureContractTest {
                 .contains("populated-upgrade-v33")
                 .contains("populated-upgrade-v34")
                 .contains("populated-upgrade-v35")
-                .contains("populated-upgrade-v36", "populated-upgrade-v37", "populated-upgrade-v38", "populated-upgrade-v39")
+                .contains("populated-upgrade-v36", "populated-upgrade-v37", "populated-upgrade-v38", "populated-upgrade-v39", "populated-upgrade-v40")
                 .contains("concurrent-login-attempt-merge")
                 .contains("\"F-01\"", "\"F-02\"", "\"F-05\"", "\"F-06\"", "\"F-07\"")
                 .contains("\"F-08\"", "\"F-09\"", "\"F-10\"", "\"F-11\"", "\"F-13\"")

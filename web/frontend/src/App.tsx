@@ -34,6 +34,7 @@ import usePhysicalInventoryFlow from './features/inventory/usePhysicalInventoryF
 import { SessionEntry, SessionOverlays } from './features/session/SessionExperience';
 import useSessionFlow from './features/session/useSessionFlow';
 import { ProductAttributesProvider } from './features/catalog/ProductAttributesContext';
+import { UnitsOfMeasureProvider } from './features/catalog/UnitsOfMeasureContext';
 import { ProductCategoriesProvider } from './features/catalog/ProductCategoriesContext';
 import { VatRatesProvider } from './features/catalog/VatRatesContext';
 import useCommandExecution, { type UiNotice } from './hooks/useCommandExecution';
@@ -446,6 +447,7 @@ export default function App() {
   return (
     <ProductCategoriesProvider enabled={hasPermission('VIEW_CATALOG')} includeInactive={canManageProducts}>
     <ProductAttributesProvider enabled={hasPermission('VIEW_CATALOG')} includeInactive={canManageProducts}>
+    <UnitsOfMeasureProvider enabled={hasPermission('VIEW_CATALOG')} includeInactive={canManageProducts}>
     <VatRatesProvider enabled={hasPermission('MANAGE_INVENTORY')}>
       <WorkspaceChrome
         currentUser={currentUser!}
@@ -478,6 +480,7 @@ export default function App() {
         />
       )}
     </VatRatesProvider>
+    </UnitsOfMeasureProvider>
     </ProductAttributesProvider>
     </ProductCategoriesProvider>
   );

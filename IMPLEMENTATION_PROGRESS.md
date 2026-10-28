@@ -4,9 +4,9 @@ Stato corrente del progetto. I resoconti dettagliati fino al 2026-10-24 (step 0.
 
 ## Stato generale
 
-- Current step: P1.5 (#44), P1.6 (#45) e P1.2 ridotto (#46) in review; fase P1 completata nel codice, in attesa del gate G1
-- Next eligible step: gate G1 (decisione dell'utente dopo l'integrazione di #43-#46), poi P2.1 griglie e attributi di variante
-- Last completed step: P1.4 IVA per prodotto e per riga (#41, `78f7c0f`)
+- Current step: P1.7 unita di misura configurabili, in review; ultimo requisito del gate G1
+- Next eligible step: chiusura del gate G1 dopo l'integrazione di P1.7, poi P2.1 griglie e attributi di variante, con la validazione V1 in parallelo
+- Last completed step: P1.2 ridotto Attributi di prodotto (#46, `8159791`)
 - Last update: 2026-10-28
 - Roadmap: [ROADMAP_PRODOTTO.md](docs/ROADMAP_PRODOTTO.md), fasi P0-P11 e gate G1-G7 ([ADR 0008](docs/DECISIONS/0008-product-direction-generalist-core-apparel-pilot.md)). Storico master: 32/48 step; nessuno dei due conteggi misura la prontezza alla vendita.
 - Open P0: nessuno
@@ -14,7 +14,7 @@ Stato corrente del progetto. I resoconti dettagliati fino al 2026-10-24 (step 0.
 - Open P2: F-29 (P8), F-30 (P9.2)
 - Open P3: nessuno
 - PR in attesa per scelta: Dependabot #27 Apache POI 6, da rivalutare a inizio novembre o alla 6.0.1
-- Main: `06210a7` dopo #42; 12 controlli obbligatori, job prod-like nel container Playwright
+- Main: `8159791` dopo #46; 12 controlli obbligatori verdi dopo il merge, job prod-like nel container Playwright
 - Dependabot 2026-10-27: patch Maven #37, #38, #39 raggruppate in #43
 
 ## Step
@@ -29,14 +29,16 @@ Stato corrente del progetto. I resoconti dettagliati fino al 2026-10-24 (step 0.
 | P1.1 Categorie configurabili | COMPLETED | #36 | V36, API categorie, filtri gerarchici, gestione da UI |
 | P1.3 Codici a barre e unita di misura | COMPLETED | #40 | V37, verifica EAN, ricerca per codice |
 | P1.4 IVA per prodotto e per riga | COMPLETED | #41 | V38, aliquote, riepilogo IVA per documento |
-| P1.5 Indirizzi per pagina | IN REVIEW | #44 | Router su History API, dettagli ordini, acquisti e inventari |
-| P1.6 Sessione persistente sicura | IN REVIEW | #45 | ADR 0009, cookie `HttpOnly` e CSRF double-submit, stack di verifica in HTTPS |
-| P1.2 ridotto Attributi di prodotto | IN REVIEW | #46 | V39, attributi testuali e a elenco con ambito di categoria, filtri ed export; campi su clienti e fornitori in P6.4 |
-| Gate G1 | PENDING | - | Dopo l'integrazione di #43-#46 |
+| P1.5 Indirizzi per pagina | COMPLETED | #44 | Router su History API, dettagli ordini, acquisti e inventari |
+| P1.6 Sessione persistente sicura | COMPLETED | #45 | ADR 0009, cookie `HttpOnly` e CSRF double-submit, stack di verifica in HTTPS |
+| P1.2 ridotto Attributi di prodotto | COMPLETED | #46 | V39, attributi testuali e a elenco con ambito di categoria, filtri ed export; campi su clienti e fornitori in P6.4 |
+| P1.7 Unita di misura configurabili | IN REVIEW | - | V40, unita in tabella gestite da UI, pezzo come unita base |
+| Gate G1 | IN REVIEW | - | Criteri verificati il 2026-10-28 su `8159791`; resta P1.7 |
 | P2 - P11 | PENDING | - | Vedere roadmap di prodotto |
 
 ## Decisioni approvate
 
+- 2026-10-28, revisione del gate G1: le unita di misura diventano configurabili con lo step P1.7 prima di chiudere il gate; la validazione V1 con negozi di abbigliamento si svolge in parallelo a P2.1 e se ne tiene conto prima di P2.2 (modello dati delle varianti); i testi visibili dell'interfaccia passano da "Gestionale Computer" a Gestisco.IO, senza toccare package, database, volumi e variabili `GESTIONALE_*`; confermate le scelte di P1.2 (ambito di categoria con sottocategorie, codice e tipo immutabili, disattivazione invece di cancellazione).
 - 2026-10-27, P1.6 (ADR 0009): CSRF double-submit di Spring Security, cookie di sessione fino alla chiusura del browser, header `X-Session-Token` rimosso del tutto; stack E2E e prod-like serviti in HTTPS con certificato autofirmato per runner, perche WebKit rifiuta i cookie `Secure` su HTTP.
 - 2026-10-26, P1.4: prezzi IVA inclusa; scorporo una volta per aliquota con arrotondamento `HALF_UP` al centesimo, provvisorio fino alla conferma del consulente in P8; sconto per riga spostato a P3.2.
 - 2026-10-24, ADR 0008: gestionale generalista per il commercio al dettaglio, segmento pilota abbigliamento e calzature, istanza dedicata per cliente, prodotto completo e non beta; obiettivo dell'utente 2-3 mesi.
@@ -69,6 +71,8 @@ Una riga per step o evento rilevante, dal piu recente.
 
 | Data | Step | PR / commit | Esito |
 |---|---|---|---|
+| 2026-10-28 | P1.7 Unita di misura configurabili | PR P1.7 | Backend 364/364 (+4: API unita, migrazione V40), verifica per mutazione sul rifiuto delle unita disattivate; frontend 248/248 (+5); E2E locale 23/23 in HTTPS con il nuovo `units-of-measure.spec.ts` |
+| 2026-10-28 | Revisione gate G1 | `8159791` | #43-#46 integrate, CI su main verde (12 controlli); criteri soddisfatti tranne le unita di misura fisse, da cui P1.7 |
 | 2026-10-28 | P1.2 ridotto Attributi di prodotto | #46 | Backend 360/360 (+5: API e validazione attributi, filtri, colonne di export in CSV/Excel/PDF), verifica per mutazione sulla validazione degli elenchi; frontend 243/243 (+6); E2E locale 22/22 in HTTPS con il nuovo `product-attributes.spec.ts` |
 | 2026-10-27 | P1.6 Sessione persistente sicura | #45 | Backend 355/355 (+8 `BrowserSessionCookieSecurityTest`), frontend 237/237 (+3), E2E locale 21/21 in HTTPS su Chromium, Firefox e WebKit; verifiche per mutazione su CSRF e rotazione del token; R-024 mitigato |
 | 2026-10-27 | P1.5 Indirizzi per pagina | #44 | Frontend 234/234 (+18: indirizzi, cronologia, controllo bozze sul tasto indietro, sincronizzazione dei dettagli), verifica per mutazione sul controllo bozze; E2E locale 21/21 sullo stack isolato con il nuovo `navigation.spec.ts` |

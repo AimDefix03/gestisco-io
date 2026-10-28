@@ -23,7 +23,7 @@ final class ProductMapper {
                 product.getProductType(),
                 product.getUsageContext(),
                 product.getBarcode(),
-                product.getUnitOfMeasure(),
+                product.getUnitOfMeasure().getCode(),
                 product.getUnitOfMeasure().getLabel(),
                 product.getVatRate().getCode(),
                 product.getVatRate().getRate(),

@@ -70,7 +70,7 @@ Campi principali:
 - nome;
 - descrizione;
 - categoria configurabile (`ProductCategory`, riferimento `category_id`, V36);
-- codice a barre facoltativo e univoco (EAN-8, UPC-A, EAN-13 con cifra di controllo, oppure codice interno) e unita di misura (pezzo, paio, confezione, chilogrammo, metro, litro), V37; con le varianti (P2) il codice a barre passera alla variante;
+- codice a barre facoltativo e univoco (EAN-8, UPC-A, EAN-13 con cifra di controllo, oppure codice interno) e unita di misura, V37, configurabile da V40 (tabella `units_of_measure` con codice immutabile, nome, simbolo e stato; voci iniziali pezzo, paio, confezione, chilogrammo, metro, litro; il pezzo e l'unita base sempre attiva); con le varianti (P2) il codice a barre passera alla variante;
 - aliquota IVA (`VatRate`, riferimento `vat_rate_id`, V38): codice, aliquota, natura di esenzione per l'aliquota zero, descrizione, predefinita e attiva;
 - brand;
 - tipo prodotto;

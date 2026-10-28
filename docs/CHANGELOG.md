@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-28 - Unita di misura configurabili (P1.7)
+
+- Le unita di misura passano dall'elenco fisso nel codice a una tabella gestita dal catalogo: si creano, si rinominano e si disattivano senza modifiche al codice, con il numero di prodotti che le usano. Il pezzo resta l'unita base, predefinita e sempre attiva. Migrazione V40: le sei unita storiche diventano le voci iniziali e i prodotti conservano la propria unita, ora garantita da una chiave esterna. Chiude l'ultimo valore fisso del catalogo richiesto dal gate G1.
+
 ## 2026-10-28 - Attributi di prodotto (P1.2 ridotto)
 
 - Attributi personalizzati di prodotto, testuali o a elenco, definiti dal catalogo senza modifiche al codice, validi per tutti i prodotti o per una categoria e le sue sottocategorie. Valori validati lato server, filtri per attributo in catalogo e report di magazzino, una colonna per attributo negli export CSV ed Excel e una colonna riassuntiva nel PDF. Migrazione V39 senza modifiche ai dati esistenti. I campi personalizzati su clienti e fornitori restano in P6.4.

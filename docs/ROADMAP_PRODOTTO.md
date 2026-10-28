@@ -74,7 +74,7 @@ Accettazione: stato leggibile in una schermata; nessuna evidenza cancellata.
 
 ### P1 - Catalogo configurabile e frontend da prodotto
 
-Ordine di esecuzione rivisto con l'utente il 2026-10-25: P1.1, P1.3, P1.4, P1.5, P1.6, poi P1.2 ridotto (attributi di prodotto testuali e a elenco) prima del gate G1. I campi personalizzati su clienti e fornitori passano a P6.4.
+Ordine di esecuzione rivisto con l'utente il 2026-10-25: P1.1, P1.3, P1.4, P1.5, P1.6, poi P1.2 ridotto (attributi di prodotto testuali e a elenco) prima del gate G1. I campi personalizzati su clienti e fornitori passano a P6.4. Alla revisione del gate G1 (2026-10-28) l'utente ha aggiunto P1.7, perche le unita di misura erano ancora un elenco fisso nel codice.
 
 **P1.1 Categorie gerarchiche configurabili (M).** Tabelle categoria con padre, migrazione di `HARDWARE`/`SOFTWARE` come voci iniziali, gestione da UI con permessi.
 Accettazione: nessuna categoria fissa nel codice; prodotti esistenti migrati; test di migrazione su database popolato.
@@ -94,6 +94,9 @@ Accettazione: ogni pagina ha un indirizzo; E2E di navigazione e ricarica.
 
 **P1.6 Sessione persistente sicura (M).** Nuova ADR che aggiorna ADR 0004: sessione in cookie `HttpOnly`, `Secure`, `SameSite=Strict` con protezione CSRF; il token non e piu accessibile a JavaScript.
 Accettazione: ricaricare la pagina non richiede il login; test CSRF negativi; R-024 chiuso.
+
+**P1.7 Unita di misura configurabili (S).** Tabella delle unita con migrazione delle sei voci di P1.3, gestione da UI con permessi, unita base non disattivabile.
+Accettazione: un'unita creata da UI si assegna a un prodotto senza modifiche al codice; prodotti esistenti invariati; nessuna unita fissa nel codice.
 
 Gate **G1**: catalogo senza valori fissi nel codice, IVA per riga, indirizzi e sessione persistenti, tutti i gate CI verdi.
 
