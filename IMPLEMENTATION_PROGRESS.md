@@ -71,7 +71,7 @@ Una riga per step o evento rilevante, dal piu recente.
 
 | Data | Step | PR / commit | Esito |
 |---|---|---|---|
-| 2026-10-28 | P1.7 Unita di misura configurabili | PR P1.7 | Backend 364/364 (+4: API unita, migrazione V40), verifica per mutazione sul rifiuto delle unita disattivate; frontend 247/247 (+4); E2E locale 23/23 in HTTPS con il nuovo `units-of-measure.spec.ts` |
+| 2026-10-28 | P1.7 Unita di misura configurabili | PR P1.7 | Backend 364/364 (+4: API unita, migrazione V40), verifica per mutazione sul rifiuto delle unita disattivate; frontend 248/248 (+5); E2E locale 23/23 in HTTPS con il nuovo `units-of-measure.spec.ts` |
 | 2026-10-28 | Revisione gate G1 | `8159791` | #43-#46 integrate, CI su main verde (12 controlli); criteri soddisfatti tranne le unita di misura fisse, da cui P1.7 |
 | 2026-10-28 | P1.2 ridotto Attributi di prodotto | #46 | Backend 360/360 (+5: API e validazione attributi, filtri, colonne di export in CSV/Excel/PDF), verifica per mutazione sulla validazione degli elenchi; frontend 243/243 (+6); E2E locale 22/22 in HTTPS con il nuovo `product-attributes.spec.ts` |
 | 2026-10-27 | P1.6 Sessione persistente sicura | #45 | Backend 355/355 (+8 `BrowserSessionCookieSecurityTest`), frontend 237/237 (+3), E2E locale 21/21 in HTTPS su Chromium, Firefox e WebKit; verifiche per mutazione su CSRF e rotazione del token; R-024 mitigato |
