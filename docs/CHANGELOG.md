@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-27 - Indirizzi per pagina (P1.5)
+
+- Ogni sezione del workspace ha un indirizzo proprio e i dettagli di ordini cliente, ordini fornitore e inventari fisici hanno un indirizzo di dettaglio; tasti indietro e avanti, preferiti e link diretti funzionano, e dopo una ricarica il login riapre la pagina richiesta. Il tasto indietro chiede conferma come il cambio di scheda quando ci sono bozze; indirizzi sconosciuti o non consentiti mostrano uno stato dedicato.
+
 ## 2026-10-26 - IVA per prodotto e per riga (P1.4)
 
 - Aliquote IVA configurate a database (22%, 10%, 5%, 4%, Esente con natura N4) con un'aliquota predefinita; ogni prodotto ha la propria aliquota, copiata sulla riga d'ordine e sulla riga documento. I documenti simulati riportano un riepilogo per aliquota con imponibile e imposta, scorporati una volta per gruppo con arrotondamento al centesimo. Migrazione V38: prodotti, righe e documenti esistenti mantengono l'aliquota aziendale con cui erano stati calcolati.

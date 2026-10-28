@@ -65,9 +65,11 @@ La barra superiore e organizzata in menu orizzontali:
 
 Ogni voce aperta crea una scheda nel workspace. E possibile passare da una scheda all'altra o chiuderla senza uscire dalla sessione. Il comando `Aggiorna dati` ricarica le informazioni operative dal server.
 
+Ogni sezione ha un proprio indirizzo nella barra del browser, per esempio `/catalogo`, `/magazzino` o `/amministrazione/audit`; ordini cliente, ordini fornitore e inventari fisici aperti hanno un indirizzo di dettaglio (`/ordini/<codice>`, `/acquisti/<codice>`, `/magazzino/inventari/<numero>`). I tasti indietro e avanti del browser ripercorrono sezioni e dettagli aperti e un indirizzo puo essere salvato nei preferiti o condiviso con un collega autorizzato. Finche la sessione persistente (P1.6) non e attiva, ricaricare la pagina o aprire un link richiede un nuovo accesso, dopo il quale il gestionale riapre l'indirizzo richiesto. Un indirizzo sconosciuto mostra `Pagina non trovata`; una sezione non consentita al profilo mostra `Sezione non disponibile`, e il server rifiuta comunque i dati non autorizzati. All'uscita il gestionale torna all'indirizzo iniziale, cosi l'utente successivo non riapre la pagina del precedente.
+
 Le schede possono essere percorse da tastiera con `Freccia sinistra`, `Freccia destra`, `Home` ed `End`. I menu si aprono con `Invio` o `Spazio` e si chiudono con `Escape`; dopo la chiusura il focus torna al controllo di origine. I dialog mantengono il focus al proprio interno fino alla conferma o all'annullamento.
 
-I form operativi conservano una bozza per vista ed entita nella sessione del browser. Un punto accanto al titolo della scheda segnala dati non completati. Se si cambia vista, si chiude la scheda, si esce dal gestionale o si chiude la pagina, il sistema chiede conferma senza perdere automaticamente la bozza. Le password non vengono salvate nelle bozze. Il salvataggio e locale al browser e non sostituisce la registrazione del comando sul server.
+I form operativi conservano una bozza per vista ed entita nella sessione del browser. Un punto accanto al titolo della scheda segnala dati non completati. Se si cambia vista, anche con il tasto indietro del browser, si chiude la scheda, si esce dal gestionale o si chiude la pagina, il sistema chiede conferma senza perdere automaticamente la bozza. Le password non vengono salvate nelle bozze. Il salvataggio e locale al browser e non sostituisce la registrazione del comando sul server.
 
 ## Ruoli e responsabilita
 

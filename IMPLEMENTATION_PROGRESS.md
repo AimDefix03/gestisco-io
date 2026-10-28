@@ -4,17 +4,18 @@ Stato corrente del progetto. I resoconti dettagliati fino al 2026-10-24 (step 0.
 
 ## Stato generale
 
-- Current step: nessuno in corso; spostamento del checkout fuori da iCloud Drive (in review)
-- Next eligible step: P1.5 indirizzi per pagina; ordine P1 rivisto il 2026-10-25 (P1.3, P1.4, P1.5, P1.6, P1.2 ridotto)
+- Current step: P1.5 indirizzi per pagina (in review)
+- Next eligible step: P1.6 sessione persistente sicura, dopo la decisione dell'utente sulla nuova ADR; poi P1.2 ridotto e gate G1
 - Last completed step: P1.4 IVA per prodotto e per riga (#41, `78f7c0f`)
-- Last update: 2026-10-26
+- Last update: 2026-10-27
 - Roadmap: [ROADMAP_PRODOTTO.md](docs/ROADMAP_PRODOTTO.md), fasi P0-P11 e gate G1-G7 ([ADR 0008](docs/DECISIONS/0008-product-direction-generalist-core-apparel-pilot.md)). Storico master: 32/48 step; nessuno dei due conteggi misura la prontezza alla vendita.
 - Open P0: nessuno
 - Open P1: F-17, F-18 (P9.1), F-19 (P9.2)
 - Open P2: F-29 (P8), F-30 (P9.2)
 - Open P3: nessuno
 - PR in attesa per scelta: Dependabot #27 Apache POI 6, da rivalutare a inizio novembre o alla 6.0.1
-- Main: `78f7c0f` dopo #41; 12 controlli obbligatori, job prod-like nel container Playwright
+- Main: `06210a7` dopo #42; 12 controlli obbligatori, job prod-like nel container Playwright
+- Dependabot 2026-10-27: patch Maven #37, #38, #39 raggruppate in #43
 
 ## Step
 
@@ -28,7 +29,8 @@ Stato corrente del progetto. I resoconti dettagliati fino al 2026-10-24 (step 0.
 | P1.1 Categorie configurabili | COMPLETED | #36 | V36, API categorie, filtri gerarchici, gestione da UI |
 | P1.3 Codici a barre e unita di misura | COMPLETED | #40 | V37, verifica EAN, ricerca per codice |
 | P1.4 IVA per prodotto e per riga | COMPLETED | #41 | V38, aliquote, riepilogo IVA per documento |
-| P1.5, P1.6, P1.2 ridotto | PENDING | - | Gate G1 |
+| P1.5 Indirizzi per pagina | IN REVIEW | #44 | Router su History API, dettagli ordini, acquisti e inventari |
+| P1.6, P1.2 ridotto | PENDING | - | Gate G1 |
 | P2 - P11 | PENDING | - | Vedere roadmap di prodotto |
 
 ## Decisioni approvate
@@ -64,6 +66,8 @@ Una riga per step o evento rilevante, dal piu recente.
 
 | Data | Step | PR / commit | Esito |
 |---|---|---|---|
+| 2026-10-27 | P1.5 Indirizzi per pagina | #44 | Frontend 234/234 (+18: indirizzi, cronologia, controllo bozze sul tasto indietro, sincronizzazione dei dettagli), verifica per mutazione sul controllo bozze; E2E locale 21/21 sullo stack isolato con il nuovo `navigation.spec.ts` |
+| 2026-10-27 | Patch Maven (Dependabot #37, #38, #39) | #43 | Spring Boot 4.1.2, surefire 3.6.1, Modulith 2.1.2; backend 347/347 |
 | 2026-10-26 | Checkout fuori da iCloud Drive | #42 | Copia integrale con `.git` in `/Users/aim_defix/Developer/Gestisco.IO` (64 ref identiche, fsck pulito); build locale dalla nuova cartella: frontend 213/213, backend 341/341; copia sulla Scrivania conservata come riserva |
 | 2026-10-26 | P1.4 IVA per prodotto e per riga | #41 | Backend 347/347 (+6: calcolo per aliquota con prova su 500 casi casuali, fattura mista 22/10/esente, snapshot IVA, API aliquote, migrazione V38 sulle fixture storiche); verifica per mutazione sull'aliquota della riga; frontend 216/216 (+3) |
 | 2026-10-26 | P1.3 Codici a barre e unita di misura | #40 | Backend +14 test (validatore EAN, API, migrazione V37), verifica per mutazione sulla cifra di controllo; frontend 213/213 |

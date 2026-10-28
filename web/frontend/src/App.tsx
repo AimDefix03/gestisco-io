@@ -36,8 +36,10 @@ import useSessionFlow from './features/session/useSessionFlow';
 import { ProductCategoriesProvider } from './features/catalog/ProductCategoriesContext';
 import { VatRatesProvider } from './features/catalog/VatRatesContext';
 import useCommandExecution, { type UiNotice } from './hooks/useCommandExecution';
+import useDetailRouteSync from './hooks/useDetailRouteSync';
 import useDraftState from './hooks/useDraftState';
 import useWorkspaceNavigation from './hooks/useWorkspaceNavigation';
+import { canOpenView } from './navigation/access';
 import CustomerDashboardPage from './pages/CustomerDashboardPage';
 import DashboardPage from './pages/DashboardPage';
 import InventoryPage from './pages/InventoryPage';
@@ -47,6 +49,7 @@ import { titleForView } from './utils/formatters';
 import { upsertPageItem } from './utils/pageState';
 
 const DEFAULT_PAGE_SIZE = 8;
+const BASE_TITLE = document.title;
 const INITIAL_MOVEMENT_FORM: MovementFormState = { productCode: '', operation: 'INITIAL_BALANCE', quantity: '0', reason: '' };
 
 type PendingNavigation = {
@@ -63,12 +66,21 @@ function emptyPage<T>(size = DEFAULT_PAGE_SIZE): PageResponse<T> {
 }
 
 export default function App() {
-  const { activeView, openTabs, openMenu, setActiveView, setOpenMenu, openTab, closeTab, resetNavigation } = useWorkspaceNavigation();
   const drafts = useDraftStore();
+  const { route, activeView, openTabs, openMenu, navigate, setActiveView, setOpenMenu, openTab, closeTab, resetNavigation, restoreFromLocation } = useWorkspaceNavigation({
+    shouldConfirmLeave: (from) => drafts.hasDirtyDrafts(from),
+    onLeaveBlocked: (target, proceed) => queueDraftGuard(
+      activeView,
+      `Passare a ${target.notFound ? 'un altro indirizzo' : titleForView(target.view)}?`,
+      'La bozza della scheda corrente resta salvata per questa sessione.',
+      'Cambia scheda',
+      proceed
+    )
+  });
   const [pendingNavigation, setPendingNavigation] = useState<PendingNavigation | null>(null);
   const [notice, setNotice] = useState<UiNotice | null>(null);
   const sessionFlow = useSessionFlow({
-    onAuthenticated: resetNavigation,
+    onAuthenticated: restoreFromLocation,
     onSignedOut: resetWorkspaceState,
     onNotice: (message, title) => setWorkspaceNotice(message, 'success', title)
   });
@@ -156,6 +168,33 @@ export default function App() {
     onRefreshCustomerAccounts: partnerFlow.refreshCustomerAccounts,
     onNotice: setWorkspaceNotice
   });
+  useDetailRouteSync({
+    active: activeView === 'orders',
+    routeDetail: route.detail,
+    selected: orderFlow.selectedOrderCode || undefined,
+    onRouteDetail: (code) => orderFlow.selectOrder(code ?? ''),
+    onSelectionChange: (code) => navigate({ view: 'orders', detail: code })
+  });
+  useDetailRouteSync({
+    active: activeView === 'purchases',
+    routeDetail: route.detail,
+    selected: purchaseFlow.selectedCode ?? undefined,
+    onRouteDetail: (code) => purchaseFlow.setSelectedCode(code ?? null),
+    onSelectionChange: (code) => navigate({ view: 'purchases', detail: code })
+  });
+  useDetailRouteSync({
+    active: activeView === 'inventory',
+    routeDetail: route.detail,
+    selected: physicalInventoryFlow.selectedId === null ? undefined : String(physicalInventoryFlow.selectedId),
+    onRouteDetail: (id) => physicalInventoryFlow.setSelectedId(id ? Number(id) : null),
+    onSelectionChange: (id) => navigate({ view: 'inventory', detail: id })
+  });
+
+  useEffect(() => {
+    const viewTitle = route.notFound ? 'Pagina non trovata' : titleForView(activeView);
+    document.title = currentUser ? `${viewTitle} - ${BASE_TITLE}` : BASE_TITLE;
+  }, [activeView, currentUser, route.notFound]);
+
   useEffect(() => {
     if (currentUser) {
       void loadWorkspace();
@@ -460,6 +499,8 @@ export default function App() {
   }
 
   function renderActiveView() {
+    if (route.notFound) return renderUnavailable('Pagina non trovata', `L'indirizzo ${route.path} non corrisponde a nessuna sezione del gestionale.`);
+    if (!canOpenView(activeView, currentUser!.permissions)) return renderUnavailable('Sezione non disponibile', 'Il profilo corrente non ha i permessi per aprire questa sezione.');
     if (activeView === 'dashboard') return renderDashboard();
     if (activeView === 'catalog') return renderCatalog();
     if (activeView === 'sales') return renderSales();
@@ -471,6 +512,15 @@ export default function App() {
     if (activeView === 'reports') return renderReports();
     if (activeView === 'accounts' || activeView === 'company' || activeView === 'monitoring' || activeView === 'audit') return renderAdministration(activeView);
     return renderDashboard();
+  }
+
+  function renderUnavailable(title: string, message: string) {
+    return (
+      <section className="panel" role="alert">
+        <div className="section-heading compact"><span>Indirizzo</span><h2>{title}</h2><p>{message}</p></div>
+        <div className="form-actions"><button className="button primary" type="button" onClick={() => navigate({ view: 'dashboard' })}>Vai alla dashboard</button></div>
+      </section>
+    );
   }
 
   function renderDashboard() {
