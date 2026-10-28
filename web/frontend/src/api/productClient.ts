@@ -1,5 +1,5 @@
 import { fetchAllPages, request, toQueryString } from './httpClient';
-import type { CustomerProduct, PageResponse, Product, ProductAttributeOption, ProductAttributePayload, ProductCategoryOption, ProductCategoryPayload, ProductLookup, VatRateOption, ProductOperationalDetail, ProductPayload, ProductQuery } from './types';
+import type { CustomerProduct, PageResponse, Product, ProductAttributeOption, ProductAttributePayload, ProductCategoryOption, ProductCategoryPayload, ProductLookup, VatRateOption, ProductOperationalDetail, ProductPayload, ProductQuery, UnitOfMeasureOption, UnitOfMeasurePayload } from './types';
 
 const baseUrl = '/api/products';
 
@@ -88,6 +88,24 @@ export function createProductAttribute(payload: ProductAttributePayload): Promis
 
 export function updateProductAttribute(code: string, payload: ProductAttributePayload): Promise<ProductAttributeOption> {
   return request<ProductAttributeOption>(`/api/product-attributes/${encodeURIComponent(code)}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload)
+  });
+}
+
+export function fetchUnitsOfMeasure(includeInactive = false, signal?: AbortSignal): Promise<UnitOfMeasureOption[]> {
+  return request<UnitOfMeasureOption[]>(`/api/units-of-measure${includeInactive ? '?includeInactive=true' : ''}`, { signal });
+}
+
+export function createUnitOfMeasure(payload: UnitOfMeasurePayload): Promise<UnitOfMeasureOption> {
+  return request<UnitOfMeasureOption>('/api/units-of-measure', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
+}
+
+export function updateUnitOfMeasure(code: string, payload: UnitOfMeasurePayload): Promise<UnitOfMeasureOption> {
+  return request<UnitOfMeasureOption>(`/api/units-of-measure/${encodeURIComponent(code)}`, {
     method: 'PUT',
     body: JSON.stringify(payload)
   });

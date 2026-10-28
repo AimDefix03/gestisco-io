@@ -182,6 +182,14 @@
         "populated-upgrade-v39",
         "no-invented-product-attributes"
       ]
+    },
+    {
+      "version": 40,
+      "baseVersion": 39,
+      "scenarios": [
+        "populated-upgrade-v40",
+        "historical-units-seeded-and-kept"
+      ]
     }
   ],
   "findingCoverage": {

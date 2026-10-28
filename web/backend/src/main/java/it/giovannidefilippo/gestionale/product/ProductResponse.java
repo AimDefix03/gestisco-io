@@ -14,7 +14,7 @@ public record ProductResponse(
         String productType,
         String usageContext,
         String barcode,
-        UnitOfMeasure unitOfMeasure,
+        String unitOfMeasure,
         String unitLabel,
         String vatRateCode,
         BigDecimal vatRate,

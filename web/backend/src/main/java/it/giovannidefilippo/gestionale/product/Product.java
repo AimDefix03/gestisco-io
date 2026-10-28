@@ -5,8 +5,6 @@ import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -65,9 +63,9 @@ public class Product {
     @Column(length = 32, unique = true)
     private String barcodeCanonical;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 16)
-    private UnitOfMeasure unitOfMeasure = UnitOfMeasure.PIECE;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "unit_of_measure", referencedColumnName = "code", nullable = false)
+    private UnitOfMeasure unitOfMeasure;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "vat_rate_id", nullable = false)
@@ -107,14 +105,15 @@ public class Product {
     protected Product() {
     }
 
-    Product(ProductRequest request, ProductCategory category, VatRate vatRate) {
+    Product(ProductRequest request, ProductCategory category, VatRate vatRate, UnitOfMeasure unitOfMeasure) {
         this.quantity = 0;
         this.reservedQuantity = 0;
-        update(request, category, vatRate);
+        update(request, category, vatRate, unitOfMeasure);
     }
 
-    void update(ProductRequest request, ProductCategory category, VatRate vatRate) {
+    void update(ProductRequest request, ProductCategory category, VatRate vatRate, UnitOfMeasure unitOfMeasure) {
         this.vatRate = vatRate;
+        this.unitOfMeasure = unitOfMeasure;
         this.code = BusinessIdentifierCanonicalizer.display(request.code());
         this.codeCanonical = BusinessIdentifierCanonicalizer.canonical(request.code());
         this.name = clean(request.name());
@@ -125,7 +124,6 @@ public class Product {
         this.usageContext = optional(request.usageContext());
         this.barcode = Barcode.normalize(request.barcode());
         this.barcodeCanonical = barcode == null ? null : BusinessIdentifierCanonicalizer.canonical(barcode);
-        this.unitOfMeasure = request.unitOfMeasure() == null ? UnitOfMeasure.PIECE : request.unitOfMeasure();
         this.price = request.price().setScale(2, RoundingMode.HALF_UP);
         this.discount = request.discount().setScale(2, RoundingMode.HALF_UP);
     }

@@ -1,10 +1,10 @@
 import { FormEvent, useMemo } from 'react';
 import { Product, ProductCategory, ProductPayload, UnitOfMeasure } from '../api';
-import { UNIT_OF_MEASURE_LABELS } from '../utils/units';
 import { vatRateLabel } from '../utils/vat';
 import { useVatRates } from '../features/catalog/VatRatesContext';
 import { categoryOptionLabel, useProductCategories } from '../features/catalog/ProductCategoriesContext';
 import { attributeAppliesTo, useProductAttributes } from '../features/catalog/ProductAttributesContext';
+import { useUnitsOfMeasure } from '../features/catalog/UnitsOfMeasureContext';
 import useDraftState from '../hooks/useDraftState';
 
 type Props = {
@@ -33,6 +33,7 @@ const initialForm = {
 export default function ProductForm({ editingProduct, busy, onSubmit, onCancel }: Props) {
   const { categories } = useProductCategories();
   const { attributes } = useProductAttributes();
+  const { units } = useUnitsOfMeasure();
   const vatRates = useVatRates();
   const defaultVatRate = vatRates.find((rate) => rate.defaultRate);
   const initialValue = useMemo(() => editingProduct ? ({
@@ -131,7 +132,12 @@ export default function ProductForm({ editingProduct, busy, onSubmit, onCancel }
         <label>
           Unita di misura
           <select value={form.unitOfMeasure} onChange={(event) => updateField('unitOfMeasure', event.target.value as UnitOfMeasure)}>
-            {(Object.keys(UNIT_OF_MEASURE_LABELS) as UnitOfMeasure[]).map((unit) => <option key={unit} value={unit}>{UNIT_OF_MEASURE_LABELS[unit]}</option>)}
+            {units
+              .filter((unit) => unit.active || unit.code === form.unitOfMeasure)
+              .map((unit) => <option key={unit.code} value={unit.code}>{unit.label} ({unit.symbol})</option>)}
+            {!units.some((unit) => unit.code === form.unitOfMeasure) && (
+              <option value={form.unitOfMeasure}>{editingProduct?.unitOfMeasure === form.unitOfMeasure ? editingProduct.unitLabel : form.unitOfMeasure}</option>
+            )}
           </select>
         </label>
         <label>
